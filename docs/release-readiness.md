@@ -1,6 +1,6 @@
 # Release readiness
 
-WORK-009 extends the non-publishing release gate to one public name and two install
+WORK-011 extends the guarded release and publication gate to one public name and two install
 ecosystems. Ordinary CI builds Python distributions, six platform executables, and an
 npm tarball for verification; it does not publish, tag, create a GitHub Release, or
 configure a registry.
@@ -50,16 +50,21 @@ on Codex, Claude Code, and Cursor.
 
 ## Remaining gates
 
-- Push WORK-009 and require the new six-target native and npm-package CI jobs to pass.
-- Review CI cost, public-preview runner stability, artifact inventories, and every
-  current dependency vulnerability result.
-- Merge through an authorized review path, then rebuild the release candidate from
-  the resulting exact main commit.
-- Recheck both registry names and configure protected OIDC trusted publishers only
-  after explicit owner authority.
-- Treat tag creation, GitHub Release, attestation, PyPI publication, and npm staged
-  publication as each a separate external action.
-
+- Merge WORK-011 after its full local and GitHub CI verification.
+- Enable GitHub release immutability and create protected `pypi` and `npm`
+  environments with required approval and `main`-only deployment policy.
+- Recheck both registry names immediately before first publication.
+- With separate explicit authority, invoke the candidate workflow from an exact
+  reviewed `main` commit, inspect the complete attested set, then create its tag and
+  immutable GitHub Release.
+- Configure the PyPI pending publisher. Bootstrap npm 0.1.0 separately with
+  interactive two-factor authentication, then configure npm Trusted Publishing with
+  stage-only permission where practical.
+- Treat each candidate invocation, tag, GitHub Release, environment or registry
+  setup, PyPI publication, npm staging, npm approval, and direct npm publication as a
+  separate external action and authorization checkpoint.
+- Complete Tier 1 agent-runtime evaluation and decide whether native platform signing
+  is required before a stable release.
 ## Complete release-set gate
 
 After all upstream checks pass, assemble the coordinated non-publishing input from one

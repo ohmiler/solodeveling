@@ -1,0 +1,187 @@
+name: Publish verified release set
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact SemVer release version (without v)
+        required: true
+        type: string
+      source_revision:
+        description: Exact lowercase 40-character main commit SHA
+        required: true
+        type: string
+      confirmation:
+        description: Type CONFIRM publish solodeveling <version> from <source_revision>
+        required: true
+        type: string
+      publish_pypi:
+        description: Publish the verified Python distributions to PyPI
+        required: true
+        default: false
+        type: boolean
+      npm_action:
+        description: npm action (skip; stage for review; or direct publish)
+        required: true
+        default: skip
+        type: choice
+        options:
+          - skip
+          - stage
+          - publish
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      attestations: read
+    steps:
+      - name: Validate immutable publication authority
+        env:
+          VERSION: ${{ inputs.version }}
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          PUBLISH_PYPI: ${{ inputs.publish_pypi }}
+          NPM_ACTION: ${{ inputs.npm_action }}
+          WORKFLOW_REF: ${{ github.ref }}
+          WORKFLOW_REVISION: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+
+          version = os.environ["VERSION"]
+          revision = os.environ["SOURCE_REVISION"]
+          expected = f"CONFIRM publish solodeveling {version} from {revision}"
+          if re.fullmatch(r"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?", version) is None:
+              raise SystemExit("version must be an exact supported SemVer")
+          if re.fullmatch(r"[0-9a-f]{40}", revision) is None:
+              raise SystemExit("source_revision must be a lowercase 40-character Git SHA")
+          if os.environ["WORKFLOW_REF"] != "refs/heads/main":
+              raise SystemExit("publish workflow must run from refs/heads/main")
+          if revision != os.environ["WORKFLOW_REVISION"]:
+              raise SystemExit("source_revision must equal the publish workflow commit")
+          if os.environ["CONFIRMATION"] != expected:
+              raise SystemExit(f"confirmation must equal: {expected}")
+          if os.environ["PUBLISH_PYPI"] != "true" and os.environ["NPM_ACTION"] == "skip":
+              raise SystemExit("publication request is a no-op")
+          PY
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+          fetch-depth: 0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Verify package, tag, and published GitHub Release identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        run: |
+          package_version="$(python -c 'from pathlib import Path; import re; print(re.search(r"""^version = "([^"]+)"$""", Path("pyproject.toml").read_text(), re.MULTILINE).group(1))')"
+          test "$package_version" = "$VERSION"
+          git fetch --force origin "refs/tags/v$VERSION:refs/tags/v$VERSION"
+          test "$(git rev-list -n 1 "v$VERSION")" = "$SOURCE_REVISION"
+          release_json="$(gh release view "v$VERSION" --repo ohmiler/solodeveling --json isDraft,isImmutable)"
+          test "$(jq -r .isDraft <<<"$release_json")" = "false" || { echo "release is draft"; exit 1; }
+          test "$(jq -r .isImmutable <<<"$release_json")" = "true" || { echo "release is not immutable"; exit 1; }
+          gh release verify "v$VERSION" --repo ohmiler/solodeveling
+      - name: Download and verify the exact release set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        run: |
+          mkdir release-set
+          gh release download "v$VERSION" --repo ohmiler/solodeveling --dir release-set
+          python -m pip install .
+          python scripts/verify_release_set.py release-set --source-revision "$SOURCE_REVISION"
+          for subject in release-set/*; do
+            gh release verify-asset "v$VERSION" "$subject" --repo ohmiler/solodeveling
+            gh attestation verify "$subject" \
+              --repo ohmiler/solodeveling \
+              --signer-workflow ohmiler/solodeveling/.github/workflows/release-candidate.yml \
+              --source-digest "$SOURCE_REVISION" \
+              --source-ref refs/heads/main \
+              --deny-self-hosted-runners
+          done
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: verified-release-set
+          path: release-set/
+          if-no-files-found: error
+          retention-days: 1
+
+  publish-pypi:
+    if: inputs.publish_pypi
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: verified-release-set
+          path: release-set
+      - name: Prepare exact PyPI upload inputs
+        run: |
+          python -m pip install .
+          python scripts/verify_release_set.py release-set --source-revision "${{ inputs.source_revision }}"
+          python scripts/prepare_publication.py release-set publication --source-revision "${{ inputs.source_revision }}"
+      - name: Publish verified Python distributions through OIDC
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # release/v1
+        with:
+          packages-dir: publication/pypi
+
+  publish-npm:
+    if: inputs.npm_action != 'skip'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: verified-release-set
+          path: release-set
+      - name: Prepare exact npm upload input
+        run: |
+          python -m pip install .
+          npm install --global npm@11.15.0
+          python scripts/verify_release_set.py release-set --source-revision "${{ inputs.source_revision }}"
+          python scripts/prepare_publication.py release-set publication --source-revision "${{ inputs.source_revision }}"
+      - name: Stage npm publication for owner review
+        if: inputs.npm_action == 'stage'
+        run: npm stage publish "publication/npm/solodeveling-${{ inputs.version }}.tgz" --access public
+      - name: Publish npm package directly
+        if: inputs.npm_action == 'publish'
+        run: npm publish "publication/npm/solodeveling-${{ inputs.version }}.tgz" --access public

@@ -25,6 +25,10 @@ jobs:
           value = os.environ["SOURCE_REVISION"]
           if re.fullmatch(r"[0-9a-f]{40}", value) is None:
               raise SystemExit("source_revision must be a lowercase 40-character Git SHA")
+          if os.environ["GITHUB_REF"] != "refs/heads/main":
+              raise SystemExit("release candidate workflow must run from refs/heads/main")
+          if value != os.environ["GITHUB_SHA"]:
+              raise SystemExit("source_revision must equal the workflow commit (GITHUB_SHA)")
           PY
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
