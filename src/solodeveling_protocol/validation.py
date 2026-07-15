@@ -51,6 +51,8 @@ def validate_document(
 
 def _artifact_kind(path: Path) -> str | None:
     normalized = path.as_posix()
+    if not normalized.startswith("/"):
+        normalized = "/" + normalized
     if normalized.endswith("/.solodeveling/project.md"):
         return "project"
     if normalized.endswith("/.solodeveling/state.md"):
