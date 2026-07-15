@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-014
 title: Configure owner-controlled release prerequisites
-status: verifying
+status: done
 level: critical
 type: change
 goal: Enable immutable GitHub Releases and create approval-gated pypi/npm deployment environments restricted to main without invoking any release or publication workflow.
@@ -28,7 +28,7 @@ verification:
 - Re-read immutable-release status and full environment protection rules through the GitHub REST API.
 - List deployment branch policies, environment secret names, variable names, tags, releases, and relevant workflow runs.
 - Validate project memory, run documentation/release policy tests, and inspect the diff.
-next_action: Submit the verified configuration record for pull-request CI; remain in verifying until that CI passes.
+next_action: Decide whether to disable administrator bypass in the GitHub UI and obtain separate authority before configuring the PyPI pending publisher or invoking any release action.
 security_considerations:
 - Configuration uses the authenticated repository administrator and least-privilege environment gates; no token, credential, secret, or variable was added or recorded.
 - Exact main-only policy and manual review reduce unauthorized publication paths but do not prove registry or artifact security; admin bypass remains an explicit residual control.

@@ -17,7 +17,7 @@ solodeveling_schema: 1
 12. Guarded PyPI and npm publication workflow - implemented as WORK-011 and merged through pull request 11; Trusted Publishers and registries remain unconfigured.
 13. Zero-config project installation, check, and uninstall - implemented as WORK-012 and merged through pull request 12.
 14. Pre-release documentation reconciliation - implemented as WORK-013 and verified through pull request 13; no candidate, tag, GitHub Release, registry setup, or publication was authorized by this work.
-15. Owner-controlled GitHub release prerequisites - active as WORK-014; immutable releases and protected pypi/npm environments are configured without invoking release workflows.
+15. Owner-controlled GitHub release prerequisites - implemented as WORK-014 and verified through pull request 14; immutable releases and protected pypi/npm environments are configured without invoking release workflows.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
