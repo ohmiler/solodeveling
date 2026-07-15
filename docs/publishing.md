@@ -57,8 +57,24 @@ after hashing.
 7. Observe clean-machine `uvx`, `pipx`, `npx`, and
    global npm installation after publication.
 
-The current workflows build and upload only temporary CI artifacts. They contain no
-registry publish command and no registry identity-token permission.
+Ordinary CI builds and uploads only temporary artifacts with `contents: read`. The
+manual release-set workflow grants `id-token: write` and `attestations: write` only
+to its final assembly job so it can attest exact subjects. It has no contents-write,
+packages-write, registry environment, tag, release, or publish capability.
+
+## Complete release set gate
+
+The manual workflow builds one complete release set from an exact commit. It verifies
+the Python candidate, six native executables, and npm tarball, then writes
+`release-set-manifest.json` and `SHA256SUMS`. This preparation does not publish,
+create a tag, create a GitHub Release, reserve a registry name, or prove behavior on
+all agent runtimes.
+
+Treat the set as indivisible. If source, version, inventory, size, digest, SBOM, npm
+manifest, or build input changes, discard disposable outputs and rebuild the entire
+set. Never repair a candidate by editing a generated manifest or replacing one file.
+Tag creation, GitHub Release creation, platform signing, PyPI publication, and npm
+publication each require separate explicit authorization.
 
 ## Recovery
 

@@ -3,8 +3,9 @@ solodeveling_schema: 1
 ---
 # Risks
 
-- WORK-008 remains unmerged and any public candidate must be rebuilt from the eventual `main` release commit.
-- Candidate checksums and SBOM prove bounded integrity and inventory only; no final `main` candidate is signed or attested.
+- WORK-010 changes the release-set pipeline on a feature branch; any authorized public release must rebuild the entire set from the eventual reviewed `main` commit.
+- Checksums, manifests, SBOM, and GitHub artifact attestation provide bounded integrity and provenance evidence only; they do not sign platform executables, prove safety, or establish a SLSA level by themselves.
+- npm and PyPI names are not reserved, protected registry environments and Trusted Publishers are not configured, and availability can change before publication.
 - One representative live scenario does not prove stable behavior across the full core matrix, model versions, repetitions, or sessions.
 - cursor-agent is unavailable locally, so Cursor behavior and complete Tier 1 support remain unverified.
 - Co-installing native runtime adapters may surface duplicate skills in clients that scan compatibility paths.

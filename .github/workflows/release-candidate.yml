@@ -1,4 +1,4 @@
-name: Release candidate provenance
+name: Verified release set provenance
 
 on:
   workflow_dispatch:
@@ -12,7 +12,142 @@ permissions:
   contents: read
 
 jobs:
-  candidate:
+  validate-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require an immutable source revision
+        env:
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          value = os.environ["SOURCE_REVISION"]
+          if re.fullmatch(r"[0-9a-f]{40}", value) is None:
+              raise SystemExit("source_revision must be a lowercase 40-character Git SHA")
+          PY
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+      - name: Confirm the checked-out commit
+        env:
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        run: test "$(git rev-parse HEAD)" = "$SOURCE_REVISION"
+
+  python-candidate:
+    needs: validate-source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install candidate tools
+        run: python -m pip install ".[dev]"
+      - name: Run source and protocol gates
+        run: |
+          python -m pytest -q
+          python scripts/validate_skill_suite.py
+          python -m solodeveling_protocol.cli .
+          python -m compileall -q src tests scripts
+          python -m pip check
+      - name: Build and verify source-bound Python candidate
+        run: |
+          python scripts/build_candidate.py candidate --source-revision "${{ inputs.source_revision }}"
+          python scripts/verify_candidate.py candidate --source-revision "${{ inputs.source_revision }}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: python-candidate
+          path: candidate/
+          if-no-files-found: error
+
+  native:
+    needs: validate-source
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            key: linux-x64
+          - os: ubuntu-24.04-arm
+            key: linux-arm64
+          - os: macos-15-intel
+            key: darwin-x64
+          - os: macos-15
+            key: darwin-arm64
+          - os: windows-latest
+            key: win32-x64
+          - os: windows-11-arm
+            key: win32-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install native build dependencies
+        run: python -m pip install ".[native]"
+      - name: Build and smoke-test current-platform executable
+        run: |
+          python scripts/build_native.py native
+          python scripts/smoke_native.py native "${{ runner.temp }}/solodeveling-native-smoke"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: native-${{ matrix.key }}
+          path: native/
+          if-no-files-found: error
+
+  npm-package:
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: native-*
+          path: native
+          merge-multiple: true
+      - name: Install package tooling and test launcher
+        run: |
+          python -m pip install .
+          npm test --prefix packages/npm
+      - name: Bind native inventory and pack npm tarball
+        run: |
+          python scripts/prepare_npm_package.py native npm-stage
+          mkdir npm-dist
+          npm pack ./npm-stage --pack-destination npm-dist
+      - name: Smoke-test local npx tarball without downloading executable code
+        run: |
+          version="$(python -c 'from solodeveling_protocol import __version__; print(__version__)')"
+          mkdir -p "npm-cache/$version/linux-x64"
+          cp "native/solodeveling-$version-linux-x64" "npm-cache/$version/linux-x64/"
+          chmod +x "npm-cache/$version/linux-x64/solodeveling-$version-linux-x64"
+          mapfile -t npm_files < <(find npm-dist -maxdepth 1 -type f -name '*.tgz')
+          test "${#npm_files[@]}" -eq 1
+          SOLODEVELING_CACHE_DIR="$PWD/npm-cache" npx --yes --package "$PWD/${npm_files[0]}" solodeveling version
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: npm-package
+          path: npm-dist/
+          if-no-files-found: error
+
+  assemble:
+    needs: [python-candidate, native, npm-package]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,21 +161,33 @@ jobs:
         with:
           python-version: "3.14"
           cache: pip
-      - name: Install candidate tools
-        run: python -m pip install ".[dev]"
-      - name: Build and verify non-publishing candidate
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: python-candidate
+          path: inputs/candidate
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: native-*
+          path: inputs/native
+          merge-multiple: true
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: npm-package
+          path: inputs/npm
+      - name: Install verification tooling
+        run: python -m pip install .
+      - name: Assemble and verify the complete non-publishing release set
         run: |
-          python scripts/build_candidate.py candidate --source-revision "${{ inputs.source_revision }}"
-          python scripts/verify_candidate.py candidate --source-revision "${{ inputs.source_revision }}"
-      - name: Attest exact candidate subjects
+          mapfile -t npm_files < <(find inputs/npm -maxdepth 1 -type f -name '*.tgz')
+          test "${#npm_files[@]}" -eq 1
+          python scripts/assemble_release_set.py inputs/candidate inputs/native "${npm_files[0]}" release-set --source-revision "${{ inputs.source_revision }}"
+          python scripts/verify_release_set.py release-set --source-revision "${{ inputs.source_revision }}"
+      - name: Attest exact complete release-set subjects
         uses: actions/attest@f6bf1532d7d6793fce74eac584813a8eee607999 # v4
         with:
-          subject-path: |
-            candidate/*.whl
-            candidate/*.tar.gz
-            candidate/*.cdx.json
+          subject-path: release-set/*
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: solodeveling-0.1.0-candidate
-          path: candidate/
+          name: solodeveling-release-set-${{ inputs.source_revision }}
+          path: release-set/
           if-no-files-found: error

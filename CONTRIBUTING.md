@@ -41,6 +41,10 @@ Build into a new output directory and verify it without publishing:
 ```console
 python scripts/build_release.py ./local-release
 python scripts/verify_release.py ./local-release
+
+# After collecting a source-bound candidate, all six native files, and npm tarball:
+python scripts/assemble_release_set.py ./candidate ./native ./solodeveling-0.1.0.tgz ./release-set --source-revision <sha>
+python scripts/verify_release_set.py ./release-set --source-revision <sha>
 ```
 
 Install the wheel in a fresh virtual environment and run
