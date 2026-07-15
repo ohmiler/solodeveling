@@ -11,6 +11,7 @@ from pathlib import Path
 from solodeveling_protocol import __version__
 from solodeveling_protocol.release import (
     ReleaseError,
+    bind_candidate_sbom_identity,
     build_release_bundle,
     finalize_candidate_bundle,
 )

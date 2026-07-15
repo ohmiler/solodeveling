@@ -121,6 +121,8 @@ def test_release_candidate_docs_and_manual_workflow_are_bounded() -> None:
     uses = re.findall(r"uses:\s*([^\s#]+)", workflow)
     assert uses and all(re.fullmatch(r"[^@]+@[0-9a-f]{40}", item) for item in uses)
     assert "cyclonedx-bom==7.3.0" in pyproject
+    builder = Path("scripts/build_candidate.py").read_text("utf-8")
+    assert "    bind_candidate_sbom_identity," in builder
     assert "build_candidate.py" in ci
     assert "verify_candidate.py" in ci
     assert "id-token: write" not in ci
