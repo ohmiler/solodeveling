@@ -1,0 +1,77 @@
+scenarios:
+  - id: release-binds-exact-artifact
+    skill: solodeveling-releasing
+    must_contain:
+      - "artifact"
+      - "version"
+      - "source revision"
+      - "release candidate"
+
+  - id: production-change-needs-authority
+    skill: solodeveling-releasing
+    must_contain:
+      - "explicit user authority"
+      - "production"
+      - "terminal request"
+      - "does not expand authority"
+
+  - id: migration-needs-recovery
+    skill: solodeveling-releasing
+    must_contain:
+      - "representative"
+      - "edge data"
+      - "integrity"
+      - "rollback"
+      - "roll-forward"
+
+  - id: deploy-success-is-not-release-proof
+    skill: solodeveling-releasing
+    must_contain:
+      - "command success"
+      - "post-release"
+      - "observation"
+      - "limitations"
+
+  - id: provenance-claims-need-evidence
+    skill: solodeveling-releasing
+    must_contain:
+      - "SLSA"
+      - "provenance"
+      - "never infer"
+      - "level"
+
+  - id: dependency-update-is-bounded
+    skill: solodeveling-maintaining
+    must_contain:
+      - "affected version"
+      - "target version"
+      - "lockfile"
+      - "compatibility"
+      - "rollback"
+
+  - id: vulnerability-priority-needs-context
+    skill: solodeveling-maintaining
+    must_contain:
+      - "reachability"
+      - "exposure"
+      - "exploit evidence"
+      - "CISA KEV"
+      - "score alone"
+
+  - id: incident-recovery-preserves-evidence
+    skill: solodeveling-maintaining
+    must_contain:
+      - "stabilize"
+      - "contain"
+      - "preserve evidence"
+      - "recover"
+      - "monitor"
+      - "root cause"
+
+  - id: operational-work-needs-measurement
+    skill: solodeveling-maintaining
+    must_contain:
+      - "bounded goal"
+      - "baseline"
+      - "measurement"
+      - "unverified"
