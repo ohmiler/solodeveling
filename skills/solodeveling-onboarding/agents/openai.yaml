@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Onboarding"
+  short_description: "Initialize or discover project memory safely"
+  default_prompt: "Use $solodeveling-onboarding to understand this project and create minimal non-destructive project memory."

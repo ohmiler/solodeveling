@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solodeveling.dev/schemas/v1/evidence.schema.json",
+  "type": "object",
+  "required": ["solodeveling_schema", "id", "work_item", "claim", "method", "result", "scope", "limitations"],
+  "properties": {
+    "solodeveling_schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^EVIDENCE-[0-9]{3,}$"},
+    "work_item": {"type": "string", "pattern": "^WORK-[0-9]{3,}$"},
+    "claim": {"type": "string", "minLength": 1},
+    "method": {"type": "string", "minLength": 1},
+    "command": {"type": ["string", "null"]},
+    "result": {"enum": ["passed", "failed", "unverified", "accepted-gap"]},
+    "scope": {"type": "string", "minLength": 1},
+    "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "additionalProperties": false
+}

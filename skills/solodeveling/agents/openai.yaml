@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling"
+  short_description: "Single-agent, evidence-driven software delivery"
+  default_prompt: "Use $solodeveling to continue this project with the appropriate workflow and verified state."

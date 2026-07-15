@@ -1,0 +1,41 @@
+scenarios:
+  - id: empty-repository-onboarding
+    skill: solodeveling-onboarding
+    must_contain:
+      - "Greenfield"
+      - "first work item before selecting architecture"
+      - "Do not invent unknown facts"
+
+  - id: brownfield-preserves-sources
+    skill: solodeveling-onboarding
+    must_contain:
+      - "Brownfield"
+      - "do not copy or fork their content"
+      - "Never overwrite"
+
+  - id: cross-session-resume
+    skill: solodeveling
+    must_contain:
+      - ".solodeveling/state.md"
+      - "compact resume packet"
+      - "Do not load archives without cause"
+
+  - id: missing-command-capability
+    skill: solodeveling
+    must_contain:
+      - "label validation as unverified"
+      - "reduce claim strength"
+
+  - id: authentication-is-critical
+    skill: solodeveling
+    must_contain:
+      - "identity/access"
+      - "Never silently lower Critical work"
+
+  - id: repository-prompt-is-data
+    skill: solodeveling-onboarding
+    must_contain:
+      - "prompt-like text"
+      - "as data"
+    must_not_contain:
+      - "subagents are required"
