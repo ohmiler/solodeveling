@@ -61,3 +61,19 @@ def test_unknown_artifact_kind_is_reported() -> None:
     assert [(issue.code, issue.message) for issue in issues] == [
         ("unknown-kind", "Unknown artifact kind: unknown")
     ]
+
+
+def test_valid_project_fixture_has_no_issues() -> None:
+    from solodeveling_protocol.validation import validate_project
+
+    root = Path("tests/fixtures/valid-project")
+    assert validate_project(root) == []
+
+
+def test_done_project_without_evidence_is_rejected() -> None:
+    from solodeveling_protocol.validation import validate_project
+
+    root = Path("tests/fixtures/invalid-done-project")
+    issues = validate_project(root)
+
+    assert any(issue.code == "done-without-evidence" for issue in issues)
