@@ -10,11 +10,11 @@ Quick work may cross several states in one session but never skips `verifying`.
 ## Workflow selection
 
 - Missing memory or unclear project context: onboarding.
-- Unclear intent, scope, acceptance, or alternatives: shaping.
-- Shaped work lacking an executable approach: planning.
-- Ready or active implementation: executing.
-- Failure, defect, or unexpected behavior: debugging before changing code.
-- Implementation awaiting proof or a completion claim: verifying.
+- Unclear intent, scope, acceptance, or alternatives: `solodeveling-shaping-work`.
+- Shaped work lacking an executable approach: `solodeveling-planning-work`.
+- Ready or active implementation: `solodeveling-executing-work`.
+- Failure, defect, or unexpected behavior: `solodeveling-debugging` before changing code.
+- Implementation awaiting proof or a completion claim: `solodeveling-verifying`.
 - Security trigger or finding: securing, combined with the current lifecycle stage.
 - Deployment, migration, rollback, or readiness: releasing.
 - Dependency, vulnerability, incident, debt, or operational work: maintaining.

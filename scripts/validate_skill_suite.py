@@ -81,46 +81,49 @@ def _validate_skill(skill: Path) -> tuple[list[str], str]:
             if f"${name}" not in default_prompt:
                 issues.append(f"{metadata_file}: default_prompt must mention ${name}")
 
-    if skill.name == "solodeveling" and estimate_tokens(text) > 1200:
+    budget = 1200 if skill.name == "solodeveling" else 2500
+    if estimate_tokens(text) > budget:
         issues.append(
-            f"{skill_file}: router exceeds 1200-token budget "
+            f"{skill_file}: exceeds {budget}-token budget "
             f"({estimate_tokens(text)} estimated)"
         )
     return issues, body
 
 
-def _scenario_issues(root: Path, skills: dict[str, str]) -> list[str]:
-    scenario_path = root / "tests" / "scenarios" / "router-onboarding.yaml"
-    if not scenario_path.is_file():
-        return []
-    document = yaml.safe_load(scenario_path.read_text("utf-8"))
-    scenarios = document.get("scenarios", []) if isinstance(document, dict) else []
-    issues: list[str] = []
-    if not isinstance(scenarios, list):
-        return [f"{scenario_path}: scenarios must be a list"]
-    identifiers: set[str] = set()
-    for scenario in scenarios:
-        if not isinstance(scenario, dict):
-            issues.append(f"{scenario_path}: scenario must be a mapping")
-            continue
-        identifier = scenario.get("id")
-        skill_name = scenario.get("skill")
-        if not isinstance(identifier, str) or identifier in identifiers:
-            issues.append(f"{scenario_path}: scenario IDs must be unique strings")
-            continue
-        identifiers.add(identifier)
-        if skill_name not in skills:
-            issues.append(f"{identifier}: unknown skill {skill_name}")
-            continue
-        haystack = skills[skill_name].lower()
-        for phrase in scenario.get("must_contain", []):
-            if str(phrase).lower() not in haystack:
-                issues.append(f"{identifier}: missing protocol phrase: {phrase}")
-        for phrase in scenario.get("must_not_contain", []):
-            if str(phrase).lower() in haystack:
-                issues.append(f"{identifier}: forbidden protocol phrase: {phrase}")
-    return issues
+def scenario_files(root: Path) -> list[Path]:
+    return sorted((root / "tests" / "scenarios").glob("*.yaml"))
 
+
+def _scenario_issues(root: Path, skills: dict[str, str]) -> list[str]:
+    issues: list[str] = []
+    identifiers: set[str] = set()
+    for scenario_path in scenario_files(root):
+        document = yaml.safe_load(scenario_path.read_text("utf-8"))
+        scenarios = document.get("scenarios", []) if isinstance(document, dict) else []
+        if not isinstance(scenarios, list):
+            issues.append(f"{scenario_path}: scenarios must be a list")
+            continue
+        for scenario in scenarios:
+            if not isinstance(scenario, dict):
+                issues.append(f"{scenario_path}: scenario must be a mapping")
+                continue
+            identifier = scenario.get("id")
+            skill_name = scenario.get("skill")
+            if not isinstance(identifier, str) or identifier in identifiers:
+                issues.append(f"{scenario_path}: scenario IDs must be unique strings")
+                continue
+            identifiers.add(identifier)
+            if skill_name not in skills:
+                issues.append(f"{identifier}: unknown skill {skill_name}")
+                continue
+            haystack = skills[skill_name].lower()
+            for phrase in scenario.get("must_contain", []):
+                if str(phrase).lower() not in haystack:
+                    issues.append(f"{identifier}: missing protocol phrase: {phrase}")
+            for phrase in scenario.get("must_not_contain", []):
+                if str(phrase).lower() in haystack:
+                    issues.append(f"{identifier}: forbidden protocol phrase: {phrase}")
+    return issues
 
 def _duplicate_paragraph_issues(bodies: dict[str, str]) -> list[str]:
     owners: dict[str, list[str]] = defaultdict(list)

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Shaping Work"
+  short_description: "Shape intent, scope, and acceptance clearly"
+  default_prompt: "Use $solodeveling-shaping-work to shape this request into ready, bounded work."

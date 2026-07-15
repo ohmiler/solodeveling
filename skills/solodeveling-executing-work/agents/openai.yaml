@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Executing Work"
+  short_description: "Execute software work with one primary agent"
+  default_prompt: "Use $solodeveling-executing-work to implement the ready work item and maintain durable state."

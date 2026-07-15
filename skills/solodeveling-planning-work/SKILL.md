@@ -1,0 +1,39 @@
+---
+name: solodeveling-planning-work
+description: Convert a shaped Solodeveling work item into a proportional, executable implementation and verification plan. Use when scope and acceptance are clear but the sequence, affected boundaries, tests, security work, migration, or recovery approach is not yet ready for implementation. Supports Quick, Standard, and Critical work without team ceremony.
+---
+
+# Planning Work
+
+Plan for one primary agent. Base the plan on inspected code, project conventions,
+current dependency versions, and available capabilities; do not plan from filenames
+or framework memory alone.
+
+## Choose proportional depth
+
+- Quick: write the smallest useful plan: intended edit, one verification method, and
+  rollback only if it is not obvious. Do not create ceremony for a reversible change.
+- Standard: identify affected components and interfaces, ordered implementation
+  slices, tests for each behavior, final verification, documentation or migration
+  effects, and meaningful rollback.
+- Critical: include threat or abuse cases, security controls, sensitive-data impact,
+  migration safety, staged verification, recovery and rollback, and authorization
+  checkpoints before irreversible or production effects.
+
+## Build the plan
+
+1. Confirm the shaped goal, scope, out of scope, acceptance criteria, level, risks,
+   and decisions. Return to shaping if any material boundary is unresolved.
+2. Inspect relevant implementation and tests. Name paths or components only after
+   discovery; preserve user changes and established sources of truth.
+3. Split work into independently verifiable slices. For behavior changes, begin with
+   a failing regression where practical. Include exact commands only when confirmed.
+4. Map every acceptance criterion to planned verification. Label checks that cannot
+   run in the current environment rather than assuming they will pass.
+5. Include security and recovery whenever triggers or irreversible effects apply.
+   Do not hide them in a generic final checklist.
+6. Record dependencies, decision points, risks, and the next executable action.
+
+Mark the work item `ready` only when another session can execute the plan without
+recovering missing intent or making an unapproved material decision. Store concise
+steps in the work item or a linked project plan; do not copy source code into it.

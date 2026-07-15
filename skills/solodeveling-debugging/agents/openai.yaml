@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Debugging"
+  short_description: "Diagnose root causes before implementing fixes"
+  default_prompt: "Use $solodeveling-debugging to reproduce this failure, identify its root cause, and verify the repair."
