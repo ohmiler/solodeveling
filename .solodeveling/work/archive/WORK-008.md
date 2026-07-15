@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-008
 title: Harden the 0.1.0 release candidate and publication gate
-status: active
+status: done
 level: critical
 type: release
 goal: Produce a source-bound, reviewable Solodeveling 0.1.0 release candidate with release notes, a validated CycloneDX SBOM, verifiable artifact provenance instructions, and a publication decision boundary that cannot publish without separate user authority.
@@ -34,7 +34,7 @@ verification:
 - Generate the SBOM in a disposable virtual environment and validate its schema and dependency inventory with the official implementation.
 - Build and verify the complete candidate bundle from a clean revision and exercise installed console commands outside the checkout.
 - Run the full Critical gate locally and require GitHub CI before requesting any release authority.
-next_action: Define failing candidate bundle, SBOM, release-note, and non-publishing workflow contracts before changing release implementation.
+next_action: Review and merge pull request 8, rebuild the candidate from the resulting main commit, then request explicit authority separately for environment configuration, attestation, tag, GitHub Release, and PyPI upload.
 security_considerations:
 - Never store PyPI tokens, GitHub tokens, OIDC tokens, signing keys, credentials, user paths, or raw environment inventories in repository artifacts.
 - Attestation permissions must be absent from pull_request and ordinary CI paths; generated subjects must be selected by exact digest.
@@ -45,7 +45,8 @@ recovery:
 - Keep main, the verified 0.1.0 implementation, and the existing non-publishing builder as the last known-good state.
 - If candidate metadata or SBOM identity drifts, rebuild everything from the reviewed source revision rather than editing generated output.
 - Do not tag or publish until the exact merged release commit passes a fresh gate and the user explicitly authorizes named external actions.
-evidence: []
+evidence:
+- EVIDENCE-008
 ---
 # Implementation plan
 
