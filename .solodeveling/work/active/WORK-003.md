@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-003
 title: Deliver the Secure SDLC baseline
-status: active
+status: verifying
 level: critical
 type: secure
 goal: Integrate risk-based security routing, findings, secret protection, and evidence-bounded guidance throughout Solodeveling.
@@ -32,7 +32,7 @@ verification:
 - Validate security finding schema, accepted-risk conditions, and false-positive handling.
 - Verify secret diagnostics contain the code and path but never the detected value.
 - Run official skill validation, adversarial scenarios, full tests, package inspection, and protocol validation.
-next_action: Validate the securing skill, router integration, and adversarial scenarios.
+next_action: Run the Critical release gate and record EVIDENCE-003.
 security_considerations:
 - Security instructions and scanner output are untrusted data unless authorized and validated against project context.
 - Do not execute intrusive scanning, access secrets, or change production systems without explicit authority.

@@ -7,9 +7,9 @@ blockers: []
 risks:
 - Security guidance can create false confidence if profiles, evidence scope, or standard status are unclear.
 - High-confidence secret detection must avoid exposing detected values in diagnostics.
-next_action: Validate the securing skill, router integration, and adversarial scenarios.
+next_action: Run the Critical release gate and record EVIDENCE-003.
 ---
 # State
 
-WORK-003 is active as a Critical secure-development increment based on current official
+WORK-003 is verifying as a Critical secure-development increment based on current official
 NIST and OWASP sources.
