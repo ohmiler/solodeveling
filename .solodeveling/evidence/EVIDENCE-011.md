@@ -4,7 +4,7 @@ id: EVIDENCE-011
 work_item: WORK-011
 claim: Solodeveling prepares exact registry upload inputs from one verified release set and defines a manual, environment-gated OIDC publication path that fails closed on source, tag, immutable-release, asset, digest, attestation, permission, or confirmation drift.
 method: Adversarial publication-input fixtures, static workflow policy regression, full Python and Node regression, official and project skill validation, protocol validation, compilation, dependency health, workflow YAML parsing, diff review, and successful push and pull-request GitHub Actions matrices.
-command: python -m pytest -q; npm test --prefix packages/npm; python scripts/validate_skill_suite.py; official quick_validate.py for ten skills; python -m solodeveling_protocol.cli .; python -m compileall -q src tests scripts; python -m pip check; workflow YAML parse; git diff --check; GitHub Actions runs 29439522150 and 29439541715.
+command: python -m pytest -q; npm test --prefix packages/npm; python scripts/validate_skill_suite.py; official quick_validate.py for ten skills; python -m solodeveling_protocol.cli .; python -m compileall -q src tests scripts; python -m pip check; workflow YAML parse; git diff --check; GitHub Actions runs 29439522150, 29439541715, and post-merge main run 29440063302.
 result: passed
 scope: Deterministic publication input selection, plan verification, tamper rejection, exact source/version binding, release-candidate provenance guard, manual publication workflow policy, immutable GitHub Release and asset verification, build attestation identity, protected environments, OIDC-only registry permissions, owner setup documentation, post-publication smoke, and recovery.
 limitations:
@@ -36,6 +36,7 @@ limitations:
 - `python -m pip check`: no broken requirements.
 - Both workflow YAML files parsed; `git diff --check` passed.
 - GitHub Actions push run 29439522150 and pull-request run 29439541715 passed the Python 3.10/3.14 matrix on Ubuntu, Windows, and macOS; package build/install smoke; all six native targets; and npm pack/npx smoke at commit ad0cf696e81c00edd0a10a889ed53b07a036ad82.
+- Post-merge main run 29440063302 passed the same complete matrix at merge commit 7d1d544d1447e55270bea7b9ead5caf453e79ea3.
 
 ## Security and recovery
 
