@@ -18,6 +18,7 @@ solodeveling_schema: 1
 13. Zero-config project installation, check, and uninstall - implemented as WORK-012 and merged through pull request 12.
 14. Pre-release documentation reconciliation - implemented as WORK-013 and verified through pull request 13; no candidate, tag, GitHub Release, registry setup, or publication was authorized by this work.
 15. Owner-controlled GitHub release prerequisites - implemented as WORK-014 and verified through pull request 14; immutable releases and protected pypi/npm environments are configured without invoking release workflows.
+16. Owner release-setup verification - implemented as WORK-015; admin bypass is API-verified disabled and the PyPI pending publisher is owner-confirmed without invoking release workflows.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.

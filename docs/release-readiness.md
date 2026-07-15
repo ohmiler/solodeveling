@@ -59,23 +59,24 @@ on Codex, Claude Code, and Cursor.
   and registry installation remain unavailable.
 - GitHub Release immutability is enabled. The `pypi` and `npm` environments require
   reviewer `ohmiler`, permit solo-owner self-review, contain exact `main`-only branch
-  policy, and contain no secrets or variables. Administrator bypass remains enabled
-  as an explicit residual recovery path.
+  policy, contain no secrets or variables, and have administrator bypass disabled.
+- The PyPI pending publisher is owner-confirmed for project `solodeveling`, owner
+  `ohmiler`, repository `solodeveling`, workflow `publish.yml`, and environment
+  `pypi`. Public independent verification is unavailable until first OIDC use.
 - Source and guarded workflows are ready for owner-controlled release preparation.
   No candidate workflow, registry, tag, release, attestation, staging action,
   approval, or publication has been invoked.
 
 ## Remaining gates
 
-- Decide whether to disable administrator bypass for `pypi` and `npm` through the
-  GitHub environment UI before first publication.
 - Recheck both registry names immediately before first publication.
 - With separate explicit authority, invoke the candidate workflow from an exact
   reviewed `main` commit, inspect the complete attested set, then create its tag and
   immutable GitHub Release.
-- Configure the PyPI pending publisher. Bootstrap npm 0.1.0 separately with
-  interactive two-factor authentication, then configure npm Trusted Publishing with
-  stage-only permission where practical.
+- Verify the owner-confirmed PyPI pending publisher during the first separately
+  authorized OIDC publication. Bootstrap npm 0.1.0 separately with interactive
+  two-factor authentication, then configure npm Trusted Publishing with stage-only
+  permission where practical.
 - Treat each candidate invocation, tag, GitHub Release, environment or registry
   setup, PyPI publication, npm staging, npm approval, and direct npm publication as a
   separate external action and authorization checkpoint.
