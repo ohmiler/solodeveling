@@ -1,17 +1,17 @@
 ---
 solodeveling_schema: 1
-current_goal: Evaluate Solodeveling behavior across Tier 1 coding agents.
+current_goal: Prepare public packaging, installation UX, and release readiness.
 active_work: []
 blockers: []
 risks:
-- cursor-agent is unavailable in the current environment, so a complete Tier 1 live matrix cannot yet run locally.
-- Live agent evaluation uses external services, may incur usage, and produces nondeterministic outputs requiring bounded scoring.
-- Multi-runtime co-installation may surface duplicate skills when a runtime scans compatibility paths.
-next_action: Shape WORK-006 for shared behavioral scenarios, bounded scoring, live Codex and Claude runs, and an explicit Cursor execution path.
+- Only one representative scenario has live Codex and Claude evidence; full Tier 1 remains unverified.
+- cursor-agent is unavailable locally, so Cursor behavioral claims remain unavailable.
+- Public installation and release surfaces require a bounded security and recovery review.
+next_action: Shape WORK-007 for public packaging, installation UX, and release readiness without claiming unverified Tier 1 support.
 ---
 # State
 
-Safe runtime adapters are implemented as WORK-005. They materialize one canonical
-skill suite without changing protocol semantics and refuse unsafe overwrite or
-removal. Live Tier 1 behavioral support remains unverified and is the next increment.
-Solodeveling remains the active workflow; Superpowers is not used.
+WORK-006 delivered a deterministic cross-agent evaluation harness and bounded live
+representative evidence for Codex and Claude Code. Cursor was unavailable and Tier 1
+remains explicitly unverified. Solodeveling remains the active single-agent workflow;
+Superpowers is not used.

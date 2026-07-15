@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solodeveling.dev/schemas/evaluation-result.schema.json",
+  "title": "Solodeveling evaluation result summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "solodeveling_eval_result_schema",
+    "generated_at",
+    "live",
+    "results"
+  ],
+  "properties": {
+    "solodeveling_eval_result_schema": {
+      "const": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "live": {
+      "type": "boolean"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "runtime",
+          "runtime_version",
+          "scenario_id",
+          "state",
+          "live",
+          "score",
+          "critical_gates_passed",
+          "failures",
+          "integrity_unchanged",
+          "cost_usd",
+          "diagnostic",
+          "response"
+        ],
+        "properties": {
+          "runtime": {
+            "enum": ["codex", "claude-code", "cursor"]
+          },
+          "runtime_version": {
+            "type": ["string", "null"]
+          },
+          "scenario_id": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "live-pass",
+              "live-failure",
+              "unavailable",
+              "auth-failure",
+              "network-failure",
+              "timeout",
+              "runtime-failure",
+              "invalid-output",
+              "semantic-failure",
+              "safety-failure",
+              "replay-pass",
+              "replay-failure"
+            ]
+          },
+          "live": {
+            "type": "boolean"
+          },
+          "score": {
+            "type": ["number", "null"],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "critical_gates_passed": {
+            "type": ["boolean", "null"]
+          },
+          "failures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "integrity_unchanged": {
+            "type": ["boolean", "null"]
+          },
+          "cost_usd": {
+            "type": ["number", "null"],
+            "minimum": 0
+          },
+          "diagnostic": {
+            "type": "string"
+          },
+          "response": {
+            "type": ["object", "null"]
+          }
+        }
+      }
+    }
+  }
+}
