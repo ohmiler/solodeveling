@@ -119,7 +119,7 @@ jobs:
         run: |
           python scripts/prepare_npm_package.py native npm-stage
           mkdir npm-dist
-          npm pack npm-stage --pack-destination npm-dist
+          npm pack ./npm-stage --pack-destination npm-dist
       - name: Smoke-test local npx tarball without network download
         run: |
           mkdir -p npm-cache/0.1.0/linux-x64
