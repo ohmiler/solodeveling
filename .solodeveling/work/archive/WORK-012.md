@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-012
 title: Make runtime installation zero-config
-status: verifying
+status: done
 level: standard
 type: change
 goal: Let ordinary users install, check, and uninstall Solodeveling with short commands that do not require runtime or dry-run flags.
@@ -30,7 +30,7 @@ verification:
 - Begin with failing CLI regressions for marker-free default, Claude/Cursor detection, multiple markers, existing-manifest discovery, no-install check/uninstall failure, and explicit override compatibility.
 - Run focused adapter and documentation tests after each slice.
 - Run full Python and Node suites, canonical and official skill validators, protocol validation, compileall, dependency health, package build checks, and diff review.
-next_action: Review, commit, and push WORK-012 for cross-platform GitHub CI without publishing.
+next_action: Use the short installation commands in the next release; owner-controlled release prerequisites and publication remain separately authorized.
 security_considerations:
 - Detection reads only fixed project-relative marker and manifest paths and must not execute agent binaries or trust environment-provided paths.
 - Check and uninstall may act only on validated manifests; unchanged-hash and containment protections remain mandatory.

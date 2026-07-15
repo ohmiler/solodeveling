@@ -4,7 +4,7 @@ id: EVIDENCE-012
 work_item: WORK-012
 claim: Ordinary project installation, verification, and removal use short flag-free commands while deterministic project-local runtime discovery preserves managed-file, containment, collision, symlink, and explicit-override protections.
 method: Failing-first zero-config CLI regressions, runtime discovery and adversarial marker tests, packaged-resource integration, documentation contracts, full Python and Node regression, canonical and official skill validation, protocol validation, compilation, dependency health, and diff review.
-command: python -m pytest -q; npm test --prefix packages/npm; python scripts/validate_skill_suite.py; official quick_validate.py for ten skills; python -m solodeveling_protocol.cli .; python -m compileall -q src tests scripts; python -m pip check; git diff --check.
+command: python -m pytest -q; npm test --prefix packages/npm; python scripts/validate_skill_suite.py; official quick_validate.py for ten skills; python -m solodeveling_protocol.cli .; python -m compileall -q src tests scripts; python -m pip check; git diff --check; GitHub Actions runs 29441919964, 29441947219, and 29442167720.
 result: passed
 scope: Flag-free install/check/uninstall, marker-free default, project-local Codex/Agent Skills/Claude Code/Cursor detection, distinct-target deduplication, existing-manifest identity, multi-target preflight, no-managed failure, explicit flag compatibility, packaged skill resources, Quick Start, installation documentation, and safety boundaries.
 limitations:
@@ -36,6 +36,8 @@ limitations:
 - `python -m compileall -q src tests scripts`: passed.
 - `python -m pip check`: no broken requirements.
 - `git diff --check`: passed.
+- GitHub Actions push run 29441919964 and pull-request run 29441947219 passed the Python 3.10/3.14 matrix on Ubuntu, Windows, and macOS; package build/install smoke; all six native targets; and npm pack/npx smoke at commit b629d644f3a62757cf5a1ee8373f8fab76a03b25.
+- Post-merge main run 29442167720 passed the same complete matrix at merge commit 4b0812f00c41260c4c66ec04e42d168a59323ac4.
 
 ## Security and recovery
 
