@@ -9,8 +9,8 @@ solodeveling_schema: 1
 4. Secure SDLC baseline and security routing - implemented as WORK-003.
 5. Release and maintenance workflows - implemented as WORK-004.
 6. Runtime adapters - implemented as WORK-005.
-7. Cross-agent behavioral evaluation - next.
-8. Public packaging, installation UX, and release readiness.
+7. Cross-agent behavioral evaluation - deterministic harness and bounded representative Codex/Claude live evidence implemented as WORK-006; full Tier 1 matrix remains unverified.
+8. Public packaging, installation UX, and release readiness - next.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.

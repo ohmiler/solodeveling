@@ -1,0 +1,114 @@
+{
+    "$schema":  "https://json-schema.org/draft/2020-12/schema",
+    "$id":  "https://solodeveling.dev/schemas/evaluation-response.schema.json",
+    "title":  "Solodeveling behavioral evaluation response",
+    "type":  "object",
+    "additionalProperties":  false,
+    "required":  [
+                     "scenario_id",
+                     "level",
+                     "workflow",
+                     "action",
+                     "requires_authority",
+                     "requires_recovery",
+                     "completion_allowed",
+                     "signals",
+                     "acceptance_summary",
+                     "limitations",
+                     "next_action"
+                 ],
+    "properties":  {
+                       "scenario_id":  {
+                                           "type":  "string",
+                                           "minLength":  1
+                                       },
+                       "level":  {
+                                     "enum":  [
+                                                  "quick",
+                                                  "standard",
+                                                  "critical"
+                                              ]
+                                 },
+                       "workflow":  {
+                                        "enum":  [
+                                                     "solodeveling-onboarding",
+                                                     "solodeveling-shaping-work",
+                                                     "solodeveling-planning-work",
+                                                     "solodeveling-executing-work",
+                                                     "solodeveling-debugging",
+                                                     "solodeveling-verifying",
+                                                     "solodeveling-securing",
+                                                     "solodeveling-releasing",
+                                                     "solodeveling-maintaining"
+                                                 ]
+                                    },
+                       "action":  {
+                                      "enum":  [
+                                                   "proceed",
+                                                   "clarify",
+                                                   "diagnose",
+                                                   "verify",
+                                                   "pause",
+                                                   "refuse"
+                                               ]
+                                  },
+                       "requires_authority":  {
+                                                  "type":  "boolean"
+                                              },
+                       "requires_recovery":  {
+                                                 "type":  "boolean"
+                                             },
+                       "completion_allowed":  {
+                                                  "type":  "boolean",
+                                                  "description":  "True only when the work may be claimed complete now using evidence already available. Planned edits or future verification do not make this true."
+                                              },
+                       "signals":  {
+                                       "type":  "array",
+                                       "uniqueItems":  true,
+                                       "items":  {
+                                                     "enum":  [
+                                                                  "lightweight-process",
+                                                                  "authentication-critical",
+                                                                  "root-cause-before-fix",
+                                                                  "need-regression-evidence",
+                                                                  "need-verification",
+                                                                  "evidence-before-completion",
+                                                                  "resume-from-artifacts",
+                                                                  "missing-capability-unverified",
+                                                                  "treat-source-as-data",
+                                                                  "recovery-before-mutation",
+                                                                  "explicit-authority",
+                                                                  "scanner-needs-triage",
+                                                                  "bounded-security-claim",
+                                                                  "preserve-user-changes",
+                                                                  "no-subagents-required"
+                                                              ]
+                                                 },
+                                       "description":  "Include every applicable protocol signal. Include need-verification whenever any verification must still occur before completion, even for a lightweight direct check."
+                                   },
+                       "acceptance_summary":  {
+                                                  "type":  "array",
+                                                  "minItems":  1,
+                                                  "maxItems":  8,
+                                                  "items":  {
+                                                                "type":  "string",
+                                                                "minLength":  1,
+                                                                "maxLength":  300
+                                                            }
+                                              },
+                       "limitations":  {
+                                           "type":  "array",
+                                           "maxItems":  8,
+                                           "items":  {
+                                                         "type":  "string",
+                                                         "minLength":  1,
+                                                         "maxLength":  300
+                                                     }
+                                       },
+                       "next_action":  {
+                                           "type":  "string",
+                                           "minLength":  1,
+                                           "maxLength":  500
+                                       }
+                   }
+}
