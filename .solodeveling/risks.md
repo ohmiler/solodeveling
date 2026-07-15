@@ -3,8 +3,8 @@ solodeveling_schema: 1
 ---
 # Risks
 
-- The stacked feature history is not merged into `main`; release publication remains premature.
-- Release bundle checksums prove byte integrity only; artifacts are not signed, attested, or accompanied by an SBOM.
+- WORK-008 remains unmerged and any public candidate must be rebuilt from the eventual `main` release commit.
+- Candidate checksums and SBOM prove bounded integrity and inventory only; no final `main` candidate is signed or attested.
 - One representative live scenario does not prove stable behavior across the full core matrix, model versions, repetitions, or sessions.
 - cursor-agent is unavailable locally, so Cursor behavior and complete Tier 1 support remain unverified.
 - Co-installing native runtime adapters may surface duplicate skills in clients that scan compatibility paths.

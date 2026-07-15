@@ -44,10 +44,10 @@ jobs:
           cache: pip
       - name: Install build dependencies
         run: python -m pip install ".[dev]"
-      - name: Build non-publishing release bundle
-        run: python scripts/build_release.py ci-release
-      - name: Inspect release contents and checksums
-        run: python scripts/verify_release.py ci-release
+      - name: Build source-bound non-publishing candidate
+        run: python scripts/build_candidate.py ci-release --source-revision "$GITHUB_SHA"
+      - name: Inspect candidate, SBOM, contents, and checksums
+        run: python scripts/verify_candidate.py ci-release --source-revision "$GITHUB_SHA"
       - name: Verify installed commands outside checkout
         run: |
           python -m pip install --force-reinstall --no-deps ci-release/*.whl
