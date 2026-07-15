@@ -19,10 +19,11 @@ limitations:
 
 On 2026-07-15, 141 tests passed locally. The suite validator, all ten official
 skill validations, protocol validation, compilation, dependency health, and diff
-checks passed. GitHub Actions push run 29425874350 and pull-request run 29425877305
+checks passed. GitHub Actions push run 29426760418 and pull-request run 29426763270
 both passed all seven jobs: six test combinations across Windows, Ubuntu, and macOS
 with Python 3.10 and 3.14, plus the Ubuntu package build, verification, installed
-smoke, and artifact upload job. Third-party actions use reviewed full commit SHAs and
+smoke, and artifact upload job. Third-party actions use reviewed full commit
+SHAs, including Node.js 24-native upload-artifact@v7, and
 the workflow grants only `contents: read`.
 
 The final local bundle was built from commit 1d6a22d and passed

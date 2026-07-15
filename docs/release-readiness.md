@@ -42,9 +42,9 @@ and never uploads, tags, signs, merges, or creates a release.
 - GitHub repository: public, Apache-2.0, default branch `main`, no releases, no existing
   workflows before WORK-007, blank description, and no topics at the time checked.
 - GitHub Actions: push run
-  [29425874350](https://github.com/ohmiler/solodeveling/actions/runs/29425874350)
+  [29426760418](https://github.com/ohmiler/solodeveling/actions/runs/29426760418)
   and pull-request run
-  [29425877305](https://github.com/ohmiler/solodeveling/actions/runs/29425877305)
+  [29426763270](https://github.com/ohmiler/solodeveling/actions/runs/29426763270)
   passed all six Windows, Ubuntu, and macOS test combinations for Python 3.10 and 3.14 plus the Ubuntu package job.
 - Final local artifact hashes from commit `1d6a22d`: wheel
   `6055590863c021ac28839ea996703081e22fbaa445f6753519bb47a988c30a93`; source
