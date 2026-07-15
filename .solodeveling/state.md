@@ -1,15 +1,14 @@
 ---
 solodeveling_schema: 1
-current_goal: Implement the Secure SDLC baseline and security-routing workflows.
-active_work:
-- WORK-003
+current_goal: Implement release and maintenance workflows.
+active_work: []
 blockers: []
 risks:
-- Security guidance can create false confidence if profiles, evidence scope, or standard status are unclear.
-- High-confidence secret detection must avoid exposing detected values in diagnostics.
-next_action: Run the Critical release gate and record EVIDENCE-003.
+- Release and maintenance workflows are not implemented, so public Version 1 readiness has not been reached.
+- Live cross-agent behavior is not yet verified on Codex, Claude Code, and Cursor.
+next_action: Shape WORK-004 for release readiness, rollback, maintenance, vulnerabilities, and incidents.
 ---
 # State
 
-WORK-003 is verifying as a Critical secure-development increment based on current official
-NIST and OWASP sources.
+The ordinary development loop and Secure SDLC baseline now use Solodeveling without
+Superpowers. Security claims remain bounded by performed checks and limitations.

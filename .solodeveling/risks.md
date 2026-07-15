@@ -3,8 +3,10 @@ solodeveling_schema: 1
 ---
 # Risks
 
-- Prematurely replacing the current workflow before execution and verification skills
-  exist could remove required safeguards.
-- Static scenario assertions establish protocol coverage but do not yet prove
-  equivalent behavior across Codex, Claude Code, and Cursor.
-- Optional Python tooling must never become a hidden runtime dependency.
+- Release and maintenance workflows remain incomplete.
+- Static and executable scenarios do not yet prove equivalent live behavior across
+  Codex, Claude Code, and Cursor.
+- High-confidence secret detection protects project memory only and is not a complete
+  repository scanner.
+- Security standards and attack guidance evolve; exact control references require a
+  current official-source check when applied.

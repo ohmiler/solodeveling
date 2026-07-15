@@ -19,3 +19,9 @@ solodeveling_schema: 1
 - Keep the core router within its token budget and runtime adapters semantic-free.
 
 Detailed product requirements remain in the approved design under `docs/superpowers/`.
+## Security references
+
+Use `skills/solodeveling-securing/references/standards.md` for status-aware NIST SSDF,
+OWASP SAMM, ASVS, MASVS, SCVS, and Agentic Security sources. Refresh official sources
+when an exact control or current version affects a decision. Never interpret baseline
+checks or absence of findings as categorical security assurance.
