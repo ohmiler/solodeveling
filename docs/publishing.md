@@ -22,14 +22,15 @@ Use these exact identities:
 
 Both GitHub environments exist, require reviewer `ohmiler`, permit the solo owner to
 review a workflow they initiated, and allow deployment only from exact branch
-`main`. They contain no secrets or variables. GitHub reports that administrators can
-explicitly bypass the ordinary reviewer gate; reconsider disabling this recovery
-path in the repository UI before first publication.
+`main`. They contain no secrets or variables, and GitHub reports administrator bypass
+is disabled for both environments.
 
-Before the first PyPI release, an owner must create a PyPI pending publisher for
-project `solodeveling`, owner `ohmiler`, repository `solodeveling`, workflow
-`publish.yml`, and environment `pypi`. The existing GitHub `pypi` environment
-provides the required owner review and exact `main` branch restriction.
+The owner confirmed a PyPI pending publisher for project `solodeveling`, GitHub owner
+`ohmiler`, repository `solodeveling`, workflow `publish.yml`, and environment `pypi`.
+PyPI does not expose this authenticated account setting through a public read API;
+the first separately authorized OIDC publication must verify exact matching. The
+existing GitHub `pypi` environment provides required owner review and exact `main`
+branch restriction.
 
 The npm package does not exist yet. Trusted Publishing cannot bootstrap a package
 that has never been published. The first npm publication must therefore be an
