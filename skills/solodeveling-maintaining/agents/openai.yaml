@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Maintaining"
+  short_description: "Guide risk-based software maintenance"
+  default_prompt: "Use $solodeveling-maintaining to triage and execute this maintenance work with bounded evidence."

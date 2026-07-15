@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Releasing"
+  short_description: "Verify and guide safe software releases"
+  default_prompt: "Use $solodeveling-releasing to assess this release and produce an evidence-bounded readiness decision."

@@ -42,6 +42,7 @@ def test_router_stays_within_token_budget() -> None:
 
     assert validator.estimate_tokens(text) <= 1200  # type: ignore[attr-defined]
 
+
 def test_all_core_lifecycle_skills_exist() -> None:
     required = {
         "solodeveling-shaping-work",
@@ -64,7 +65,14 @@ def test_validator_discovers_every_scenario_file() -> None:
         "router-onboarding.yaml",
         "lifecycle-workflows.yaml",
         "security.yaml",
+        "release-maintenance.yaml",
     }
+
 
 def test_securing_skill_exists() -> None:
     assert Path("skills/solodeveling-securing/SKILL.md").is_file()
+
+
+def test_release_and_maintenance_skills_exist() -> None:
+    assert Path("skills/solodeveling-releasing/SKILL.md").is_file()
+    assert Path("skills/solodeveling-maintaining/SKILL.md").is_file()
