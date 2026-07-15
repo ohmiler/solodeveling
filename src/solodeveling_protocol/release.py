@@ -111,6 +111,32 @@ def _normalized_component_name(value: object) -> str:
     return re.sub(r"[-_.]+", "-", str(value).strip().lower())
 
 
+
+def bind_candidate_sbom_identity(path: Path, *, version: str) -> dict[str, object]:
+    """Bind Hatch's dynamic version after CycloneDX reads PEP 621 metadata."""
+    path = Path(path)
+    if not path.is_file() or path.is_symlink():
+        raise ReleaseError("candidate SBOM is missing or unsafe")
+    try:
+        document = json.loads(path.read_text("utf-8"))
+        component = document["metadata"]["component"]
+    except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError) as error:
+        raise ReleaseError("candidate SBOM is malformed") from error
+    if (
+        component.get("type") != "library"
+        or _normalized_component_name(component.get("name"))
+        != "solodeveling-protocol"
+    ):
+        raise ReleaseError("candidate SBOM root identity is invalid")
+    existing = component.get("version")
+    if existing is not None and existing != version:
+        raise ReleaseError("candidate SBOM version conflicts with the package")
+    component["version"] = version
+    path.write_text(
+        json.dumps(document, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return document
 def validate_candidate_sbom(path: Path, *, version: str) -> dict[str, object]:
     """Apply project identity gates after official CycloneDX schema validation."""
     path = Path(path)
@@ -143,6 +169,12 @@ def validate_candidate_sbom(path: Path, *, version: str) -> dict[str, object]:
         raise ReleaseError(
             "candidate SBOM is missing runtime dependencies: "
             + ", ".join(sorted(missing))
+        )
+    forbidden = {"pip", "setuptools", "wheel", "build", "cyclonedx-bom"} & names
+    if forbidden:
+        raise ReleaseError(
+            "candidate SBOM contains build tools: "
+            + ", ".join(sorted(forbidden))
         )
     return document
 

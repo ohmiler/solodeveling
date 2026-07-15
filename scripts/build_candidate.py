@@ -85,13 +85,15 @@ def build_candidate(
         build_release_bundle(project_root, bundle)
         wheel = next(bundle.glob("*.whl"))
         runtime = root / "runtime"
-        _run((sys.executable, "-m", "venv", str(runtime)), project_root, "venv creation")
+        _run((sys.executable, "-m", "venv", "--without-pip", str(runtime)), project_root, "venv creation")
         runtime_python = _runtime_python(runtime)
         _run(
             (
-                str(runtime_python),
+                sys.executable,
                 "-m",
                 "pip",
+                "--python",
+                str(runtime_python),
                 "install",
                 "--disable-pip-version-check",
                 str(wheel),
@@ -123,6 +125,7 @@ def build_candidate(
             project_root,
             "CycloneDX SBOM generation",
         )
+        bind_candidate_sbom_identity(sbom, version=__version__)
         manifest = finalize_candidate_bundle(
             bundle,
             source_revision=source_revision,

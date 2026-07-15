@@ -182,3 +182,34 @@ def test_candidate_verifier_rejects_wrong_revision_and_tampering(
     (bundle / "RELEASE-NOTES.md").write_bytes(b"tampered")
     with pytest.raises(release.ReleaseError, match="hash mismatch"):
         release.verify_candidate_bundle(bundle, source_revision=REVISION)
+
+def test_dynamic_project_version_is_bound_before_sbom_validation(
+    tmp_path: Path,
+) -> None:
+    sbom = _sbom(tmp_path / "dynamic.cdx.json")
+    document = json.loads(sbom.read_text("utf-8"))
+    document["metadata"]["component"].pop("version")
+    sbom.write_text(json.dumps(document), encoding="utf-8")
+
+    release.bind_candidate_sbom_identity(sbom, version="0.1.0")
+
+    rebound = json.loads(sbom.read_text("utf-8"))
+    assert rebound["metadata"]["component"]["version"] == "0.1.0"
+    release.validate_candidate_sbom(sbom, version="0.1.0")
+
+
+def test_sbom_rejects_build_tools_and_conflicting_bound_version(
+    tmp_path: Path,
+) -> None:
+    sbom = _sbom(tmp_path / "unsafe.cdx.json")
+    document = json.loads(sbom.read_text("utf-8"))
+    document["metadata"]["component"]["version"] = "9.9.9"
+    document["components"].append(
+        {"type": "library", "name": "pip", "version": "26.1.2"}
+    )
+    sbom.write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(release.ReleaseError, match="conflicts"):
+        release.bind_candidate_sbom_identity(sbom, version="0.1.0")
+    with pytest.raises(release.ReleaseError, match="build tools"):
+        release.validate_candidate_sbom(sbom, version="9.9.9")
