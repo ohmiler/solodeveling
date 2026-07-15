@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-002
 title: Deliver the core development workflow suite
-status: ready
+status: verifying
 level: standard
 type: build
 goal: Let one primary agent shape, plan, execute, debug, and verify ordinary software work using Solodeveling alone.
@@ -19,6 +19,7 @@ acceptance:
 risks:
 - Copying Superpowers wording could preserve unwanted team-oriented ceremony or licensing ambiguity.
 - Structural assertions alone may not prove agent behavior under pressure.
+- The dogfood run missed the active-state checkpoint before implementation; it was surfaced and reconciled before verification.
 decisions:
 - Reimplement protocol behavior from the approved Solodeveling design rather than copying Superpowers skill text.
 - Keep each workflow runtime-neutral and fully correct with one primary agent.
@@ -28,7 +29,7 @@ verification:
 - Run suite checks for references, metadata, token budgets, and prohibited subagent requirements.
 - Run scenarios for Quick work, ordinary planning, root-cause repair, verification failure, missing capabilities, and lifecycle resumption.
 - Dogfood WORK-002 using only Solodeveling artifacts and workflows.
-next_action: Add failing scenario and suite checks before scaffolding the workflow skills.
+next_action: Run the clean release gate and record EVIDENCE-002.
 ---
 # Implementation plan
 
@@ -37,3 +38,9 @@ next_action: Add failing scenario and suite checks before scaffolding the workfl
 3. Implement shaping and planning, then execution and debugging, then verification.
 4. Integrate router workflow names and progressive-disclosure budgets.
 5. Exercise the lifecycle on WORK-002, record evidence, reconcile memory, and push.
+## Dogfood observation
+
+The first execution pass left the durable status at `ready` while implementation was
+in progress. The discrepancy was detected during reconciliation, recorded rather
+than hidden, and corrected to `verifying`. Automated lifecycle coverage now exercises
+captured through verifying; future live runs must checkpoint `active` at execution entry.

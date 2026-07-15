@@ -6,8 +6,8 @@ active_work:
 blockers: []
 risks:
 - The replacement boundary requires end-to-end evidence, not only structurally valid skill files.
-next_action: Add failing scenarios for the five core lifecycle workflows.
+next_action: Run the clean release gate and record EVIDENCE-002.
 ---
 # State
 
-WORK-002 is ready with scope and acceptance derived from the approved design.
+WORK-002 implementation is complete and reconciled at the verifying boundary.
