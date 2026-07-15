@@ -63,16 +63,19 @@ on Codex, Claude Code, and Cursor.
 - The PyPI pending publisher is owner-confirmed for project `solodeveling`, owner
   `ohmiler`, repository `solodeveling`, workflow `publish.yml`, and environment
   `pypi`. Public independent verification is unavailable until first OIDC use.
-- Source and guarded workflows are ready for owner-controlled release preparation.
-  No candidate workflow, registry, tag, release, attestation, staging action,
-  approval, or publication has been invoked.
+- Owner-authorized candidate run 29452526223 succeeded for version `0.1.0` from
+  exact `main` commit `700a9b9dafc877507232b84a94ff3d6eaf7afda4`.
+  All build, smoke, assembly, integrity, and attestation jobs passed. Independent
+  verification of the downloaded 13-file release set and every provenance subject
+  also passed. No registry, tag, GitHub Release, staging action, approval, or
+  publication was invoked.
 
 ## Remaining gates
 
 - Recheck both registry names immediately before first publication.
-- With separate explicit authority, invoke the candidate workflow from an exact
-  reviewed `main` commit, inspect the complete attested set, then create its tag and
-  immutable GitHub Release.
+- With separate explicit authority, create tag `v0.1.0` at the verified source
+  revision, then separately authorize creation of the immutable GitHub Release from
+  candidate run 29452526223.
 - Verify the owner-confirmed PyPI pending publisher during the first separately
   authorized OIDC publication. Bootstrap npm 0.1.0 separately with interactive
   two-factor authentication, then configure npm Trusted Publishing with stage-only
