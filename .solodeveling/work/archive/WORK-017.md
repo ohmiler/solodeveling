@@ -27,7 +27,7 @@ verification:
 - Add failing regressions for ancestry enforcement and dynamic-version lookup before implementation.
 - Exercise accepted ancestor and rejected unrelated, descendant, malformed, and missing revision cases.
 - Confirm all prior publication security assertions and the full project gate pass.
-next_action: Merge the CI-verified repair, confirm post-merge main CI, then obtain fresh explicit owner authorization before creating tag v0.1.0 at the verified candidate commit.
+next_action: Obtain fresh explicit owner authorization before creating tag v0.1.0 at the verified candidate commit; GitHub Release creation and publication remain separate.
 security_considerations:
 - The current workflow revision remains bound to refs/heads/main; only candidate identity is decoupled from current HEAD.
 - Existing exact tag, immutable GitHub Release, verified assets, provenance signer, source digest, source ref, hosted-runner, and protected-environment checks must remain unchanged.
