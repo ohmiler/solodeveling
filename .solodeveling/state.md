@@ -1,16 +1,19 @@
 ---
 solodeveling_schema: 1
-current_goal: Review and integrate the portable public-package increment without publishing it.
-active_work: []
+current_goal: Harden a non-publishing Solodeveling 0.1.0 release candidate and its publication gate.
+active_work:
+- WORK-008
 blockers: []
 risks:
-- The stacked feature history is not merged into main; publication remains premature.
-- Release artifacts have checksums but are not signed, attested, or accompanied by an SBOM.
+- No GitHub protected environment or PyPI project exists; publication authority and identity are not configured.
+- Package-name availability is time-sensitive and is not a reservation.
+- Release artifacts need a validated SBOM and source-bound provenance before a public-release decision.
 - cursor-agent remains unavailable locally and complete Tier 1 behavior is unverified.
-next_action: Review pull request 7 and explicitly authorize integration into main; decide tag, GitHub Release, provenance, SBOM, and PyPI publication separately.
+next_action: Define failing candidate bundle, SBOM, release-note, and non-publishing workflow contracts before changing release implementation.
 ---
 # State
 
-WORK-007 is complete on `feat/public-packaging` with Critical evidence. The package
-is review-ready but has not been merged, tagged, signed, released, or published.
-Solodeveling remains single-agent-first; Superpowers was not used.
+PR 7 is merged at `75adc57659d125a04d96780f301ca385df16559f` and post-merge
+CI plus local regression passed. WORK-008 is active as a Critical, non-publishing
+release-candidate hardening increment. Tagging, attestation, GitHub Release creation,
+environment configuration, and PyPI upload remain unauthorized.
