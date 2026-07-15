@@ -59,3 +59,23 @@ on Codex, Claude Code, and Cursor.
   after explicit owner authority.
 - Treat tag creation, GitHub Release, attestation, PyPI publication, and npm staged
   publication as each a separate external action.
+
+## Complete release-set gate
+
+After all upstream checks pass, assemble the coordinated non-publishing input from one
+exact source revision:
+
+    python scripts/assemble_release_set.py <candidate> <native> <npm-tarball> <release-set> --source-revision <sha>
+    python scripts/verify_release_set.py <release-set> --source-revision <sha>
+
+`release-set-manifest.json` must describe exactly two Python distributions, six native
+executables, one npm tarball, one CycloneDX SBOM, and release notes. The verifier
+recomputes size and SHA-256, checks the flat inventory, validates the npm archive
+without extraction, and requires its platform manifest to match all six native bytes.
+The gate provides bounded integrity and provenance input; it is not publication,
+platform code signing, categorical security assurance, or Tier 1 behavior proof.
+
+Recovery before publication is to remove only disposable output and rebuild the
+entire set from the reviewed commit. Do not edit manifests or replace an individual
+artifact. External tag, release, signing, registry configuration, and publication
+actions remain separate authorization checkpoints.
