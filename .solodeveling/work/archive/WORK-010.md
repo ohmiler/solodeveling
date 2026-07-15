@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-010
 title: Assemble one verified cross-ecosystem release set
-status: verifying
+status: done
 level: critical
 type: change
 goal: Produce one non-publishing release set that binds Python distributions, six native executables, the npm tarball, evidence, version, and exact source revision before any external release action.
@@ -30,7 +30,7 @@ verification:
 - Exercise assembly and verification using safe fixture artifacts, then run all Python and Node tests.
 - Inspect the workflow for manual-only triggers, pinned action SHAs, bounded permissions, exact subject attestation, and absence of publishing commands.
 - Run skill suite validation, protocol validation, compileall, dependency health, and diff/status review.
-next_action: Run final verification, record EVIDENCE-010, and integrate through review.
+next_action: Review and integrate pull request 10; separately authorize any manual attestation, tag, release, registry configuration, or publication.
 security_considerations:
 - Inputs and downloaded CI artifacts are untrusted until inventory, containment, size, and SHA-256 checks pass.
 - Do not execute artifacts during assembly; native smoke and npm execution remain isolated upstream gates.
@@ -40,7 +40,8 @@ recovery:
 - Delete only disposable assembly output and rebuild the entire set from the reviewed exact commit.
 - Never repair a release set by editing generated manifests, replacing individual files, or reusing artifacts from another run.
 - Preserve the last known-good main commit and keep all external release actions unperformed in this work item.
-evidence: []
+evidence:
+- EVIDENCE-010
 ---
 
 # Implementation plan
