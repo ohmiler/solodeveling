@@ -1,19 +1,22 @@
 ---
 solodeveling_schema: 1
-current_goal: Review and integrate the source-bound 0.1.0 release-candidate hardening without publishing.
-active_work: []
+current_goal: Unify Solodeveling under one public name and make installation easy through Python and Node.js ecosystems without publishing.
+active_work:
+- WORK-009
 blockers: []
 risks:
-- Pull request 8 is not merged; any publishable candidate must be rebuilt from the eventual main commit.
-- No protected GitHub `pypi` environment or PyPI project exists, so trusted publication identity is not configured.
+- Downloading native executables through npm creates a supply-chain boundary that must fail closed before execution.
+- No protected GitHub npm or pypi environment or registry trusted-publisher configuration exists.
 - Package-name availability and vulnerability data are time-sensitive.
 - The manual provenance workflow has not been invoked and no attestation exists.
 - cursor-agent remains unavailable locally and complete Tier 1 behavior is unverified.
-next_action: Review and merge pull request 8, rebuild from the resulting main commit, then authorize environment configuration, attestation, tag, GitHub Release, and PyPI upload as separate named actions.
+next_action: Add failing unified-CLI and package-metadata tests, then implement one solodeveling entry point.
 ---
 # State
 
-WORK-008 is complete on `release/0.1.0-readiness` with Critical evidence and pull
-request 8 open. The candidate path is review-ready but nothing has been tagged,
-attested, released, configured on PyPI, or published. Solodeveling remained the
-single-agent workflow; Superpowers and subagents were not used.
+WORK-008 was merged as pull request 8 and a candidate was rebuilt from main commit
+b211ff16b4e5f4f1f60a9c2b25432a5d4e6ca7b2; nothing has been tagged, attested,
+released, configured on PyPI, or published. WORK-009 is active on
+feat/unified-cli-installation to provide one public name and comprehensive install
+UX. Solodeveling remains the single-agent workflow; Superpowers and subagents are
+not used.
