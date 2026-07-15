@@ -1,22 +1,22 @@
 ---
 solodeveling_schema: 1
-current_goal: Decide whether to invoke the non-publishing complete release-set provenance workflow from an exact reviewed main commit.
-active_work: []
+current_goal: Prepare guarded PyPI and npm publication automation without invoking or publishing.
+active_work:
+- WORK-011
 blockers: []
 risks:
 - No protected GitHub npm or pypi environment or registry trusted-publisher configuration exists.
-- npm and PyPI package-name availability and vulnerability data are time-sensitive.
-- Native executables are CI artifacts and are not yet signed, attested, or attached to an immutable GitHub Release.
-- The manual provenance workflow has not been invoked and no final release-set attestation exists.
-- cursor-agent remains unavailable locally and complete Tier 1 behavior is unverified.
-next_action: Obtain explicit authorization before invoking the manual non-publishing workflow for a named exact main commit; tag, release, registry configuration, and publication remain separately authorized.
+- npm and PyPI package names remain unreserved and time-sensitive until successful publication.
+- The manual provenance workflow has not been invoked and no complete main release set or attestation exists.
+- npm first-package bootstrap requires a separate owner-controlled publication action because staged publishing requires an existing package.
+- Native executables are not platform-signed, and cursor-agent plus complete Tier 1 behavior remain unverified.
+next_action: Review and merge pull request 11 without invoking either manual release workflow.
 ---
 # State
 
-WORK-010 and PR 10 are merged on main at
-3e225947e6256728524bfe497168815bd44b5807 with EVIDENCE-010. GitHub Actions run
-29437420820 passed the Python/package gates, six native smoke targets, and npm
-pack/npx on the merge commit. The manual complete-release-set workflow was not
-invoked, so no release set, attestation, or external release state exists. Nothing
-has been tagged, released, configured on npm or PyPI, or published. Solodeveling
-remained the single-agent workflow; Superpowers and subagents were not used.
+WORK-011 is verifying on `feat/safe-publish-workflow`. It prepares OIDC publication from
+an exact verified GitHub Release but explicitly excludes workflow invocation, account
+or environment configuration, tags, releases, staging, approval, and publication.
+The latest main commit before this branch is
+a237d5381d915dfa49ec40fe2e9df7f5788924bd. Solodeveling remains the single-agent
+workflow; Superpowers and subagents are not used.

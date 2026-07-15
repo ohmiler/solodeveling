@@ -6,25 +6,37 @@ Each release requires explicit authorization naming the version, exact source co
 tag, GitHub Release, provenance, PyPI publication, and npm publication. Approval for
 one action does not imply the others.
 
-## Intended trusted identities
+## Trusted identities and owner setup
 
-- Repository: `ohmiler/solodeveling`
-- PyPI distribution: `solodeveling`
-- npm package: `solodeveling`
-- Candidate workflow: `.github/workflows/release-candidate.yml`
-- Future protected environments: `pypi` and `npm`
-- Identity mechanism: registry Trusted Publishing through GitHub Actions OIDC
+Enable GitHub release immutability before creating the first public release; the
+setting protects only releases created after it is enabled.
 
-Neither registry project, protected environment, nor registry trusted-publisher
-relationship is configured at this source revision. An owner must create and protect
-them separately, require reviewer approval, bind the exact repository and workflow,
-and disallow long-lived write tokens after OIDC is verified.
+Use these exact identities:
 
-npm Trusted Publishing should use stage-only permission where available so CI can
-prepare a publication that still requires maintainer review and 2FA approval. Public
-packages published from this public repository through npm Trusted Publishing receive
-automatic provenance, but provenance links source and build identity; it does not
-prove the code is safe.
+- repository: `ohmiler/solodeveling`;
+- PyPI distribution: `solodeveling`;
+- npm package: `solodeveling`;
+- candidate workflow: `.github/workflows/release-candidate.yml`;
+- publication workflow: `.github/workflows/publish.yml`;
+- protected registry environments: `environment: pypi` and `environment: npm`.
+
+Before the first PyPI release, an owner must create a PyPI pending publisher for
+project `solodeveling`, owner `ohmiler`, repository `solodeveling`, workflow
+`publish.yml`, and environment `pypi`. In GitHub, create the `pypi` environment,
+limit deployment to the protected `main` branch, and require maintainer approval.
+
+The npm package does not exist yet. Trusted Publishing cannot bootstrap a package
+that has never been published. The first npm publication must therefore be an
+owner-controlled, interactive publication of the verified tarball using two-factor
+authentication, after the matching immutable GitHub Release and all native assets
+exist. It must not use a CI token. After that succeeds, configure the npm trusted
+publisher for repository `ohmiler/solodeveling`, workflow `publish.yml`, and
+environment `npm`; create that GitHub environment with the same branch restriction
+and required approval. Prefer the workflow's staged npm action so the owner can
+review and approve it before the registry makes it public.
+
+A name lookup returning not found is not a reservation. Neither name is owned until
+the registry accepts the first authorized publication.
 
 ## Version-bound release set
 
@@ -33,54 +45,73 @@ source commit:
 
 - Python wheel and source distribution;
 - six native executables for Windows, macOS, and Linux on x64 and arm64;
-- npm tarball with a manifest containing exact native filenames, sizes, and SHA-256;
+- npm tarball with exact native filenames, sizes, and SHA-256 values;
 - release notes, checksums, CycloneDX SBOM, source revision, and build inputs;
 - artifact attestations and registry provenance where supported.
 
 Do not publish the npm tarball until all native files it names exist in the same
-versioned GitHub Release. Do not use a mutable latest URL or edit a generated manifest
-after hashing.
+versioned GitHub Release. Do not use a mutable latest URL or edit a generated
+manifest after hashing.
+
+## Complete release set boundary
+
+The complete release set is an indivisible, non-publishing input. Preparing or
+verifying it does not publish anything and does not grant registry authority.
+Candidate invocation, tag creation, GitHub Release creation, PyPI publication, npm
+staging, and npm publication each require separate explicit authorization.
+## Guarded publication workflow
+
+`publish.yml` is manual-only and accepts an exact version, the exact 40-character
+`main` commit, an exact typed confirmation, a PyPI boolean, and an npm action of
+`skip`, `stage`, or `publish`. It refuses an old workflow revision, a mismatched tag,
+a draft, mutable, or missing GitHub Release, a changed release-set inventory, a failed hash,
+or an attestation not issued by `release-candidate.yml` for that main commit.
+
+The validation job has no write permission. The two registry jobs receive
+`id-token: write` only behind their matching protected environment. There is no
+registry token or password in the workflow. The workflow never creates a tag or
+GitHub Release and never repairs or replaces release files.
 
 ## Authorized release sequence
 
-1. Merge the reviewed release branch and name the exact resulting commit SHA.
-2. Rebuild every artifact from that commit in protected, clean environments.
-3. Verify regression tests, skill validation, protocol validation, installed wheel
-   smoke, six native smoke tests, Node launcher tests, local npm pack/npx smoke,
-   SBOM, vulnerability results, inventories, and checksums.
-4. Invoke the candidate provenance workflow only after explicit authorization and
-   verify attestations against `ohmiler/solodeveling` and exact subjects.
-5. Obtain separate authorization before creating the version tag and immutable GitHub
-   Release containing the six native assets.
-6. Confirm the GitHub assets match the npm manifest, then obtain separate authorization
-   for PyPI and npm staged publication.
-7. Observe clean-machine `uvx`, `pipx`, `npx`, and
-   global npm installation after publication.
+1. Merge the reviewed release branch and record the exact resulting `main` SHA.
+2. With explicit authority, run `release-candidate.yml` from that exact `main` SHA.
+3. Download and independently inspect the complete candidate, checksums, SBOM,
+   manifests, smoke evidence, and attestations.
+4. With separate authority, create tag `v<version>` at that SHA and an immutable,
+   non-draft immutable GitHub Release containing the complete verified release set.
+5. Configure the protected registry environment and trusted publisher described
+   above. For npm 0.1.0, perform the one-time interactive bootstrap instead.
+6. With explicit authority naming the registry targets, run `publish.yml` from the
+   same `main` SHA. Enter exactly
+   `CONFIRM publish solodeveling <version> from <source_revision>`.
+7. Prefer PyPI alone and npm `stage` as independently reviewable choices. Use direct
+   npm `publish` only when that exact action was explicitly authorized.
+8. Complete the post-publication smoke checks before announcing availability.
 
-Ordinary CI builds and uploads only temporary artifacts with `contents: read`. The
-manual release-set workflow grants `id-token: write` and `attestations: write` only
-to its final assembly job so it can attest exact subjects. It has no contents-write,
-packages-write, registry environment, tag, release, or publish capability.
+## Post-publication smoke
 
-## Complete release set gate
+Use clean temporary environments and do not rely on a developer checkout or cache:
 
-The manual workflow builds one complete release set from an exact commit. It verifies
-the Python candidate, six native executables, and npm tarball, then writes
-`release-set-manifest.json` and `SHA256SUMS`. This preparation does not publish,
-create a tag, create a GitHub Release, reserve a registry name, or prove behavior on
-all agent runtimes.
+    python -m pip install --no-cache-dir "solodeveling==<version>"
+    solodeveling version
+    uvx --from "solodeveling==<version>" solodeveling version
+    pipx run --spec "solodeveling==<version>" solodeveling version
+    npm view "solodeveling@<version>" version dist.integrity
+    npx --yes --package "solodeveling@<version>" solodeveling version
 
-Treat the set as indivisible. If source, version, inventory, size, digest, SBOM, npm
-manifest, or build input changes, discard disposable outputs and rebuild the entire
-set. Never repair a candidate by editing a generated manifest or replacing one file.
-Tag creation, GitHub Release creation, platform signing, PyPI publication, and npm
-publication each require separate explicit authorization.
+Confirm that the reported version is exact, the npm launcher downloads only the
+matching versioned native asset, and registry provenance refers to the authorized
+repository, workflow, and source revision.
 
 ## Recovery
 
-Before publication, remove only disposable build outputs and rebuild the complete set
-when any version, source revision, inventory, checksum, SBOM, or attestation differs.
-After an incorrect publication, preserve evidence and never replace registry bytes
-silently. Yank or deprecate the affected version where appropriate, remove unsafe
-GitHub assets or release visibility only through an authorized incident decision,
-publish a corrected new version, and document impact and recovery.
+Before publication, discard only disposable outputs and rebuild the entire set if
+any source, version, inventory, checksum, SBOM, build input, tag, release asset, or
+attestation differs. Never edit a generated manifest or replace one artifact.
+
+After an incorrect publication, preserve evidence and do not silently replace
+registry bytes. Stop further publication, yank the affected PyPI release or
+deprecate the npm version where appropriate, make an authorized decision about
+unsafe GitHub Release visibility, publish a corrected new version, and document the
+impact and recovery.
