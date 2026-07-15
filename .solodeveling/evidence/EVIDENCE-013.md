@@ -4,12 +4,12 @@ id: EVIDENCE-013
 work_item: WORK-013
 claim: Pre-release documentation and project memory accurately distinguish reviewed source readiness from unavailable public registry installation while preserving separate authorization gates for every production-changing release action.
 method: GitHub pull request, release, tag, and workflow inspection; direct npm and PyPI registry lookups; project-memory and skill-suite validation; focused release/documentation policy tests; full Python and Node regressions; compilation, dependency health, and diff review.
-command: gh pr view 8..12; gh release list; git tag --list; npm view solodeveling version --json; PyPI JSON endpoint lookup; python -m pytest -q; npm test --prefix packages/npm; python -m compileall -q src tests scripts; python -m pip check; python scripts/validate_skill_suite.py; python -m solodeveling_protocol.main_cli validate .; git diff --check.
+command: gh pr view 8 through gh pr view 12; gh release list; git tag --list; npm view solodeveling version --json; PyPI JSON endpoint lookup; python -m pytest -q; npm test --prefix packages/npm; python -m compileall -q src tests scripts; python -m pip check; python scripts/validate_skill_suite.py; python -m solodeveling_protocol.main_cli validate .; git diff --check.
 result: passed
 scope: WORK-008 through WORK-012 merge status, reviewed main and CI identity, current npm/PyPI availability, tag and GitHub Release absence, remaining protected-environment and publication gates, roadmap, release-readiness documentation, and project state.
 limitations:
 - npm and PyPI availability is time-sensitive and must be rechecked immediately before publication.
-- Pull-request GitHub Actions for WORK-013 are pending; this evidence currently binds the local verification only.
+- Pull-request GitHub Actions run 29446023982 passed at commit `e2e38490fb09f040fe55db8f3ceca813b92b87ac`; publication workflows were not invoked.
 - No candidate workflow, protected environment, registry configuration, tag, GitHub Release, attestation, staging action, approval, or publication was invoked.
 - Cursor live behavior, complete Tier 1 evaluation, and native platform signing remain unverified.
 ---
@@ -37,6 +37,8 @@ limitations:
   in the local Windows environment.
 - Compilation, dependency health, canonical skill-suite validation, project-memory
   validation, and diff whitespace review passed.
+- Pull-request GitHub Actions run 29446023982 passed the cross-platform Python,
+  package, six-native-target, and npm pack/npx matrix.
 
 ## Boundary
 

@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-013
 title: Reconcile pre-release readiness
-status: verifying
+status: done
 level: standard
 type: change
 goal: Make release documentation and project memory accurately describe the reviewed main revision and the remaining owner-controlled 0.1.0 release gates.
@@ -22,7 +22,7 @@ decisions:
 verification:
 - Validate Solodeveling project memory and canonical skill suite.
 - Run release/documentation policy tests and inspect all changed text and whitespace.
-next_action: Submit the verified documentation reconciliation for pull-request CI; remain in verifying until that CI passes.
+next_action: Obtain explicit owner authorization before enabling release immutability or creating protected registry environments; all later release actions remain separate.
 security_considerations:
 - Preserve least-privilege and trusted-publication requirements without recording credentials or secret values.
 recovery:

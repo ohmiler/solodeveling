@@ -16,7 +16,7 @@ solodeveling_schema: 1
 11. Verified cross-ecosystem release-set assembly - implemented as WORK-010 and merged through pull request 10; no complete main release set or attestation has been created.
 12. Guarded PyPI and npm publication workflow - implemented as WORK-011 and merged through pull request 11; protected environments, trusted publishers, and registries remain unconfigured.
 13. Zero-config project installation, check, and uninstall - implemented as WORK-012 and merged through pull request 12.
-14. Pre-release documentation reconciliation - active as WORK-013; no candidate, tag, GitHub Release, registry setup, or publication is authorized by this work.
+14. Pre-release documentation reconciliation - implemented as WORK-013 and verified through pull request 13; no candidate, tag, GitHub Release, registry setup, or publication was authorized by this work.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
