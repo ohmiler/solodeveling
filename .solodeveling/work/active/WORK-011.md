@@ -33,7 +33,7 @@ verification:
 - Begin with failing fixture tests for exact publication inventory, plan tampering, source/version drift, and output containment.
 - Add static workflow tests for manual-only trigger, exact confirmation, release/tag/attestation checks, pinned actions, least permissions, protected environments, OIDC-only credentials, and guarded npm actions.
 - Run focused tests, full Python and Node suites, official skill validators, protocol validation, compileall, dependency health, YAML parsing, and diff review.
-next_action: Review the final diff, commit and push the guarded workflow branch, and require GitHub CI without invoking publication.
+next_action: Review and merge pull request 11; candidate invocation, release setup, and every publication action remain separately authorized.
 security_considerations:
 - Treat GitHub Release files, manifests, attestations, workflow inputs, and downloaded job artifacts as untrusted until exact identity and digest verification succeeds.
 - Do not expose or accept long-lived registry tokens; OIDC trust must bind repository, workflow filename, environment, and protected branch/tag policy.

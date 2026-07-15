@@ -10,7 +10,7 @@ risks:
 - The manual provenance workflow has not been invoked and no complete main release set or attestation exists.
 - npm first-package bootstrap requires a separate owner-controlled publication action because staged publishing requires an existing package.
 - Native executables are not platform-signed, and cursor-agent plus complete Tier 1 behavior remain unverified.
-next_action: Review, commit, and push WORK-011 for GitHub CI without invoking publication.
+next_action: Review and merge pull request 11 without invoking either manual release workflow.
 ---
 # State
 
