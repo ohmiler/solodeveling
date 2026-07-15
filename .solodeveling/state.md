@@ -1,18 +1,16 @@
 ---
 solodeveling_schema: 1
-current_goal: Prepare portable public packaging and installation UX.
-active_work:
-- WORK-007
+current_goal: Review and integrate the portable public-package increment without publishing it.
+active_work: []
 blockers: []
 risks:
-- GitHub CI has not yet executed the new cross-platform matrix, so Linux, macOS, and Python 3.10 remain unverified.
-- The stacked feature history is not merged into main; publication is premature.
-- cursor-agent remains unavailable locally and full Tier 1 behavior is unverified.
-next_action: Run the complete Critical verification gate, build final artifacts, push the review branch, and require GitHub CI before release authority.
+- The stacked feature history is not merged into main; publication remains premature.
+- Release artifacts have checksums but are not signed, attested, or accompanied by an SBOM.
+- cursor-agent remains unavailable locally and complete Tier 1 behavior is unverified.
+next_action: Review pull request 7 and explicitly authorize integration into main; decide tag, GitHub Release, provenance, SBOM, and PyPI publication separately.
 ---
 # State
 
-WORK-007 is verifying as a Critical release-readiness increment. It will produce
-reviewable packaging, installation, CI, and artifact evidence without merging,
-tagging, publishing, or claiming unverified Tier 1 support. Solodeveling remains the
-single-agent workflow; Superpowers is not used.
+WORK-007 is complete on `feat/public-packaging` with Critical evidence. The package
+is review-ready but has not been merged, tagged, signed, released, or published.
+Solodeveling remains single-agent-first; Superpowers was not used.

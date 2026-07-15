@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-007
 title: Prepare portable public packaging and installation UX
-status: verifying
+status: done
 level: critical
 type: release
 goal: Make Solodeveling installable and verifiable from a built distribution outside the repository, with clear multi-runtime onboarding, secure CI, reproducible release inputs, and evidence-bounded support claims.
@@ -38,7 +38,7 @@ verification:
 - Install the wheel into a fresh isolated environment outside the checkout and exercise init, validate, adapt, and eval dry-run commands.
 - Test safe adapter install/check/uninstall for all runtime mappings against disposable projects and confirm unrelated files survive.
 - Run full tests, suite and official skill validators, protocol validation, compilation, dependency health, and staged diff checks.
-next_action: Run the complete Critical verification gate, build final artifacts, push the review branch, and require GitHub CI before release authority.
+next_action: Review pull request 7, then explicitly authorize integration into main; tagging, signing, GitHub Release creation, and PyPI publication remain separate decisions.
 security_considerations:
 - Do not embed credentials, user paths, live evaluation output, repository tokens, or mutable external downloads in package resources.
 - Pin CI actions to reviewed commit SHAs, grant minimum permissions, avoid pull-request secret access, and never execute untrusted artifacts with publication credentials.
@@ -49,7 +49,8 @@ recovery:
 - Preserve --source for rollback to repository resources and keep installed manifests sufficient for drift checks and safe uninstall.
 - On package smoke failure, discard only the temporary environment and project; never modify canonical skills or user runtime directories.
 - Do not tag, publish, release, or merge until the reviewed commit and recorded artifact hashes are explicitly authorized.
-evidence: []
+evidence:
+- EVIDENCE-007
 ---
 # Implementation plan
 

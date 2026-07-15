@@ -41,15 +41,22 @@ and never uploads, tags, signs, merges, or creates a release.
   and can change before publication.
 - GitHub repository: public, Apache-2.0, default branch `main`, no releases, no existing
   workflows before WORK-007, blank description, and no topics at the time checked.
-- Release integration: the implementation history is stacked on feature branches and
-  not merged into `main`.
+- GitHub Actions: push run
+  [29425874350](https://github.com/ohmiler/solodeveling/actions/runs/29425874350)
+  and pull-request run
+  [29425877305](https://github.com/ohmiler/solodeveling/actions/runs/29425877305)
+  passed all six Windows, Ubuntu, and macOS test combinations for Python 3.10 and 3.14 plus the Ubuntu package job.
+- Final local artifact hashes from commit `1d6a22d`: wheel
+  `6055590863c021ac28839ea996703081e22fbaa445f6753519bb47a988c30a93`; source
+  distribution `9672053da1559464b0131f075946267482397bb9cd900612826218f92fc89354`.
+- Release integration: pull request
+  [7](https://github.com/ohmiler/solodeveling/pull/7) remains open and the
+  implementation history is not merged into `main`.
 
 ## Remaining gates before publication
 
-- GitHub CI must pass on Windows, Linux, and macOS for Python 3.10 and 3.14 after this
-  branch is pushed. Local execution cannot substitute for those platform results.
-- Review and merge the stacked changes into `main` through an explicitly authorized
-  integration path.
+- Review and merge pull request 7 into `main` through an explicitly authorized
+  integration path. The cross-platform CI gate has passed on the reviewed branch.
 - Recheck dependency vulnerabilities, package-name availability, runtime discovery
   documentation, metadata, artifact hashes, and support claims from the release commit.
 - Decide whether to publish a GitHub Release, PyPI distribution, provenance
