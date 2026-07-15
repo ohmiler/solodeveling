@@ -1,26 +1,25 @@
 ---
 solodeveling_schema: 1
-current_goal: Decide whether to configure owner-controlled release prerequisites without invoking a candidate or publishing.
+current_goal: Decide whether to disable environment admin bypass and configure the PyPI pending publisher without invoking a candidate or publishing.
 active_work: []
 blockers: []
 risks:
-- No protected GitHub npm or pypi environment or registry trusted-publisher configuration exists.
-- npm and PyPI package names remain unreserved and time-sensitive until successful publication.
+- GitHub reports can_admins_bypass true for both registry environments; the solo admin can explicitly bypass the ordinary reviewer gate.
+- PyPI and npm Trusted Publishers are not configured, and both package names remain unreserved and time-sensitive until successful publication.
 - The manual provenance workflow has not been invoked and no complete main release set or attestation exists.
 - npm first-package bootstrap requires a separate owner-controlled interactive publication with two-factor authentication.
 - Native executables are not platform-signed, and Cursor plus complete Tier 1 behavior remain unverified.
-next_action: Obtain explicit owner authorization before enabling GitHub release immutability or creating protected pypi/npm environments; candidate invocation, registry configuration, tag, release, staging, approval, and publication remain separate.
+next_action: Obtain explicit owner authority before changing environment admin bypass in the GitHub UI or configuring the PyPI pending publisher; candidate, tag, release, staging, approval, and publication remain separate.
 ---
 # State
 
-WORK-013 reconciled roadmap, release readiness, and project memory with EVIDENCE-013.
-The inspected pre-release base was `main` commit
-`cda0f4854359384f79ea45c50a8ad06f9eba6baf`; its full GitHub Actions run
-29442409991 passed. Pull-request run 29446023982 also passed the complete matrix for
-the reconciliation change.
+WORK-014 enabled GitHub Release immutability and created `pypi` and `npm`
+environments with EVIDENCE-014. Both require reviewer `ohmiler`, permit solo-owner
+self-review, contain only exact `main` branch deployment policy, and contain no
+environment secrets or variables. GitHub reports admin bypass remains enabled.
 
-The source is ready for owner-controlled release preparation, not public registry
-installation. npm and PyPI returned not found on 2026-07-16, and the repository had
-no version tag or GitHub Release. No candidate workflow, GitHub setting, environment,
-registry, tag, release, staging action, approval, or publication changed. Solodeveling
-remained the single-agent workflow; Superpowers and subagents were not used.
+Pull-request CI run 29448771069 passed the complete matrix for the configuration
+record. Post-change checks found no tag, GitHub Release, candidate workflow run,
+publication workflow run, registry staging action, approval, or publication.
+Solodeveling remained the single-agent workflow; Superpowers and subagents were not
+used.
