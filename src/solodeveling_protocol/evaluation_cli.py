@@ -4,6 +4,7 @@ import argparse
 import json
 import shutil
 import tempfile
+from contextlib import ExitStack
 from pathlib import Path
 from typing import Sequence
 
@@ -20,6 +21,7 @@ from solodeveling_protocol.evaluation_runner import (
     run_live_scenario,
     sanitized_result_document,
 )
+from solodeveling_protocol.resources import resource_path
 
 
 DEFAULT_SCENARIOS = Path("evals/scenarios/core.yaml")
@@ -40,9 +42,9 @@ def _parser() -> argparse.ArgumentParser:
         choices=SUPPORTED_RUNTIMES,
         required=True,
     )
-    run.add_argument("--source", type=Path, default=Path("skills"))
-    run.add_argument("--scenarios", type=Path, default=DEFAULT_SCENARIOS)
-    run.add_argument("--schema", type=Path, default=DEFAULT_SCHEMA)
+    run.add_argument("--source", type=Path)
+    run.add_argument("--scenarios", type=Path)
+    run.add_argument("--schema", type=Path)
     run.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     run.add_argument("--temp-parent", type=Path, default=None)
     run.add_argument("--claude-budget-usd", type=float, default=0.25)
@@ -59,8 +61,8 @@ def _parser() -> argparse.ArgumentParser:
         "replay", help="Score saved structured responses without an agent call."
     )
     replay.add_argument("--input", type=Path, required=True)
-    replay.add_argument("--scenarios", type=Path, default=DEFAULT_SCENARIOS)
-    replay.add_argument("--schema", type=Path, default=DEFAULT_SCHEMA)
+    replay.add_argument("--scenarios", type=Path)
+    replay.add_argument("--schema", type=Path)
     replay.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
 
     probe = subparsers.add_parser(
@@ -243,12 +245,34 @@ def _run_probe(arguments) -> int:
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
     try:
-        if arguments.action == "run":
-            return _run_live(arguments)
-        if arguments.action == "replay":
-            return _run_replay(arguments)
-        return _run_probe(arguments)
-    except EvaluationError as error:
+        with ExitStack() as resources:
+            if arguments.action == "run":
+                arguments.source = resources.enter_context(
+                    resource_path("skills", arguments.source)
+                )
+                arguments.scenarios = resources.enter_context(
+                    resource_path("evals/scenarios", arguments.scenarios)
+                ) / "core.yaml"
+                arguments.schema = resources.enter_context(
+                    resource_path(
+                        "evals/evaluation-response.schema.json",
+                        arguments.schema,
+                    )
+                )
+                return _run_live(arguments)
+            if arguments.action == "replay":
+                arguments.scenarios = resources.enter_context(
+                    resource_path("evals/scenarios", arguments.scenarios)
+                ) / "core.yaml"
+                arguments.schema = resources.enter_context(
+                    resource_path(
+                        "evals/evaluation-response.schema.json",
+                        arguments.schema,
+                    )
+                )
+                return _run_replay(arguments)
+            return _run_probe(arguments)
+    except (EvaluationError, FileNotFoundError, ValueError) as error:
         print(f"evaluation-error: {error}")
         return 1
 

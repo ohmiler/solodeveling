@@ -11,6 +11,7 @@ from solodeveling_protocol.adapters import (
     install_adapter,
     uninstall_adapter,
 )
+from solodeveling_protocol.resources import resource_path
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -21,13 +22,13 @@ def _parser() -> argparse.ArgumentParser:
 
     install = subparsers.add_parser("install", help="Install or update managed skills.")
     install.add_argument("--runtime", choices=sorted(RUNTIME_PATHS), required=True)
-    install.add_argument("--source", type=Path, required=True)
+    install.add_argument("--source", type=Path)
     install.add_argument("--project-root", type=Path, default=Path("."))
     install.add_argument("--dry-run", action="store_true")
 
     check = subparsers.add_parser("check", help="Check installed files and source drift.")
     check.add_argument("--runtime", choices=sorted(RUNTIME_PATHS), required=True)
-    check.add_argument("--source", type=Path, required=True)
+    check.add_argument("--source", type=Path)
     check.add_argument("--project-root", type=Path, default=Path("."))
 
     uninstall = subparsers.add_parser(
@@ -42,23 +43,36 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
     try:
-        if arguments.action == "install":
-            report = install_adapter(
-                arguments.source,
+        if arguments.action == "uninstall":
+            report = uninstall_adapter(
                 arguments.project_root,
                 arguments.runtime,
                 dry_run=arguments.dry_run,
             )
-            verb = "would install" if report.dry_run else "installed"
+            verb = "would uninstall" if report.dry_run else "uninstalled"
             print(
                 f"{verb} {report.file_count} files for {report.runtime} "
-                f"at {report.adapter_root.as_posix()}"
+                f"from {report.adapter_root.as_posix()}"
             )
             return 0
 
-        if arguments.action == "check":
+        with resource_path("skills", arguments.source) as source:
+            if arguments.action == "install":
+                report = install_adapter(
+                    source,
+                    arguments.project_root,
+                    arguments.runtime,
+                    dry_run=arguments.dry_run,
+                )
+                verb = "would install" if report.dry_run else "installed"
+                print(
+                    f"{verb} {report.file_count} files for {report.runtime} "
+                    f"at {report.adapter_root.as_posix()}"
+                )
+                return 0
+
             report = check_adapter(
-                arguments.source,
+                source,
                 arguments.project_root,
                 arguments.runtime,
             )
@@ -71,19 +85,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             for issue in report.issues:
                 print(f"{issue.code}: {issue.path}: {issue.message}")
             return 1
-
-        report = uninstall_adapter(
-            arguments.project_root,
-            arguments.runtime,
-            dry_run=arguments.dry_run,
-        )
-        verb = "would uninstall" if report.dry_run else "uninstalled"
-        print(
-            f"{verb} {report.file_count} files for {report.runtime} "
-            f"from {report.adapter_root.as_posix()}"
-        )
-        return 0
-    except AdapterError as error:
+    except (AdapterError, FileNotFoundError, ValueError) as error:
         print(f"adapter-error: {error}")
         return 1
 

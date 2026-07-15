@@ -1,17 +1,16 @@
 ---
 solodeveling_schema: 1
-current_goal: Prepare public packaging, installation UX, and release readiness.
+current_goal: Review and integrate the portable public-package increment without publishing it.
 active_work: []
 blockers: []
 risks:
-- Only one representative scenario has live Codex and Claude evidence; full Tier 1 remains unverified.
-- cursor-agent is unavailable locally, so Cursor behavioral claims remain unavailable.
-- Public installation and release surfaces require a bounded security and recovery review.
-next_action: Shape WORK-007 for public packaging, installation UX, and release readiness without claiming unverified Tier 1 support.
+- The stacked feature history is not merged into main; publication remains premature.
+- Release artifacts have checksums but are not signed, attested, or accompanied by an SBOM.
+- cursor-agent remains unavailable locally and complete Tier 1 behavior is unverified.
+next_action: Review pull request 7 and explicitly authorize integration into main; decide tag, GitHub Release, provenance, SBOM, and PyPI publication separately.
 ---
 # State
 
-WORK-006 delivered a deterministic cross-agent evaluation harness and bounded live
-representative evidence for Codex and Claude Code. Cursor was unavailable and Tier 1
-remains explicitly unverified. Solodeveling remains the active single-agent workflow;
-Superpowers is not used.
+WORK-007 is complete on `feat/public-packaging` with Critical evidence. The package
+is review-ready but has not been merged, tagged, signed, released, or published.
+Solodeveling remains single-agent-first; Superpowers was not used.

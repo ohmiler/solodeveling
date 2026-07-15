@@ -10,7 +10,7 @@ solodeveling_schema: 1
 5. Release and maintenance workflows - implemented as WORK-004.
 6. Runtime adapters - implemented as WORK-005.
 7. Cross-agent behavioral evaluation - deterministic harness and bounded representative Codex/Claude live evidence implemented as WORK-006; full Tier 1 matrix remains unverified.
-8. Public packaging, installation UX, and release readiness - next.
+8. Public packaging, installation UX, and release readiness - implemented as WORK-007 on `feat/public-packaging`; merge and publication remain explicitly authorized follow-up actions.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
