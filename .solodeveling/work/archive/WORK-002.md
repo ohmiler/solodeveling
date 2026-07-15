@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-002
 title: Deliver the core development workflow suite
-status: verifying
+status: done
 level: standard
 type: build
 goal: Let one primary agent shape, plan, execute, debug, and verify ordinary software work using Solodeveling alone.
@@ -29,7 +29,9 @@ verification:
 - Run suite checks for references, metadata, token budgets, and prohibited subagent requirements.
 - Run scenarios for Quick work, ordinary planning, root-cause repair, verification failure, missing capabilities, and lifecycle resumption.
 - Dogfood WORK-002 using only Solodeveling artifacts and workflows.
-next_action: Run the clean release gate and record EVIDENCE-002.
+next_action: Shape the Secure SDLC baseline increment.
+evidence:
+- EVIDENCE-002
 ---
 # Implementation plan
 
