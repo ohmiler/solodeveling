@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solodeveling.dev/schemas/v1/state.schema.json",
+  "type": "object",
+  "required": ["solodeveling_schema", "current_goal", "active_work", "blockers", "risks", "next_action"],
+  "properties": {
+    "solodeveling_schema": {"const": 1},
+    "current_goal": {"type": "string", "minLength": 1},
+    "active_work": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^WORK-[0-9]{3,}$"}},
+    "blockers": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "risks": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "next_action": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solodeveling.dev/schemas/v1/work-item.schema.json",
+  "type": "object",
+  "required": ["solodeveling_schema", "id", "title", "status", "level", "type", "goal", "next_action"],
+  "properties": {
+    "solodeveling_schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^WORK-[0-9]{3,}$"},
+    "title": {"type": "string", "minLength": 1},
+    "status": {"enum": ["captured", "shaped", "ready", "active", "verifying", "done", "blocked", "deferred"]},
+    "level": {"enum": ["quick", "standard", "critical"]},
+    "type": {"enum": ["explore", "build", "change", "repair", "secure", "release", "maintain"]},
+    "goal": {"type": "string", "minLength": 1},
+    "scope": {"type": "string", "minLength": 1},
+    "out_of_scope": {"type": "string"},
+    "acceptance": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "risks": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "decisions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "verification": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "next_action": {"type": "string", "minLength": 1},
+    "security_considerations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "recovery": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "accepted_verification_gaps": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {"properties": {"level": {"enum": ["standard", "critical"]}}},
+      "then": {"required": ["scope", "out_of_scope", "acceptance", "risks", "decisions", "verification"]}
+    }
+  ]
+}
