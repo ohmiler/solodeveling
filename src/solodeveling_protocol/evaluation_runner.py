@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass, replace
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable
 
@@ -409,7 +409,7 @@ def sanitized_result_document(
     items = list(results)
     return {
         "solodeveling_eval_result_schema": 1,
-        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "live": any(result.live for result in items),
         "results": [
             {

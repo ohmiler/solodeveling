@@ -3,7 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 from pathlib import Path
 
 import pytest
@@ -14,6 +17,16 @@ from solodeveling_protocol.release import (
     build_release_bundle,
 )
 
+
+def test_python_310_compatibility_shims_are_explicit() -> None:
+    runner = Path(
+        "src/solodeveling_protocol/evaluation_runner.py"
+    ).read_text("utf-8")
+    this_test = Path(__file__).read_text("utf-8")
+
+    assert "from datetime import UTC" not in runner
+    assert "timezone.utc" in runner
+    assert "import tomli as tomllib" in this_test
 
 def test_public_package_metadata_and_resource_mappings() -> None:
     metadata = tomllib.loads(Path("pyproject.toml").read_text("utf-8"))
