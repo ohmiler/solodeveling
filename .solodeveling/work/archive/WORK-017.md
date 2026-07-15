@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-017
 title: Repair publication candidate ancestry gate
-status: verifying
+status: done
 level: critical
 type: repair
 goal: Allow the current protected main publication workflow to publish the already verified 0.1.0 candidate while preserving exact candidate identity and rejecting untrusted source revisions.
@@ -27,14 +27,15 @@ verification:
 - Add failing regressions for ancestry enforcement and dynamic-version lookup before implementation.
 - Exercise accepted ancestor and rejected unrelated, descendant, malformed, and missing revision cases.
 - Confirm all prior publication security assertions and the full project gate pass.
-next_action: Submit the verified repair through pull request CI; archive only after CI confirms the workflow and full matrix.
+next_action: Merge the CI-verified repair, confirm post-merge main CI, then obtain fresh explicit owner authorization before creating tag v0.1.0 at the verified candidate commit.
 security_considerations:
 - The current workflow revision remains bound to refs/heads/main; only candidate identity is decoupled from current HEAD.
 - Existing exact tag, immutable GitHub Release, verified assets, provenance signer, source digest, source ref, hosted-runner, and protected-environment checks must remain unchanged.
 recovery:
 - Revert the workflow repair before any tag or release if ancestry or version regressions fail.
 - If a later authorized dry validation exposes a new mismatch, stop before protected environment approval and keep registries untouched.
-evidence: []
+evidence:
+- EVIDENCE-017
 ---
 # Execution plan
 

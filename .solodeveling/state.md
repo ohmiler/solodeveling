@@ -1,8 +1,7 @@
 ---
 solodeveling_schema: 1
-current_goal: Repair the protected publication gate so it can safely use the verified 0.1.0 ancestor candidate.
-active_work:
-- WORK-017
+current_goal: Obtain fresh explicit owner authorization for tag v0.1.0 after the publication gate repair is merged and verified.
+active_work: []
 blockers: []
 risks:
 - The PyPI pending publisher is owner-confirmed but cannot be independently read through a public API; exact OIDC matching remains unverified until first authorized use.
@@ -10,7 +9,7 @@ risks:
 - Candidate run 29452526223 produced a complete release set from commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; local integrity verification and strict provenance verification passed for all 13 files.
 - npm first-package bootstrap requires a separate owner-controlled interactive publication with two-factor authentication.
 - Native executables are not platform-signed, and Cursor plus complete Tier 1 behavior remain unverified.
-next_action: Submit WORK-017 through pull request CI, then record evidence and archive only if CI passes; no tag, release, or publication is authorized.
+next_action: Merge PR 17, verify post-merge main and CI, then request fresh explicit authorization before creating and pushing tag v0.1.0 at candidate commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; release and publication remain separate.
 ---
 # State
 
@@ -26,3 +25,9 @@ run, coordinated release set, local integrity verification, and strict provenanc
 verification for all 13 files. No tag, GitHub Release, staging action, approval, or
 publication was invoked. Solodeveling remained the single-agent workflow;
 Superpowers and subagents were not used.
+
+WORK-017 and EVIDENCE-017 record the repaired publication gate: current protected
+`main` may validate an older candidate only when it is an available ancestor, and
+its canonical dynamic version is parsed without executing candidate code. Downstream
+tag, immutable-release, asset, attestation, permission, and environment checks remain.
+No tag, release, publish workflow, registry action, or publication was invoked.

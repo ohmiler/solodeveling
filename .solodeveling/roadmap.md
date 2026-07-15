@@ -20,6 +20,7 @@ solodeveling_schema: 1
 15. Owner-controlled GitHub release prerequisites - implemented as WORK-014 and verified through pull request 14; immutable releases and protected pypi/npm environments are configured without invoking release workflows.
 16. Owner release-setup verification - implemented as WORK-015; admin bypass is API-verified disabled and the PyPI pending publisher is owner-confirmed without invoking release workflows.
 17. Non-publishing 0.1.0 release candidate - produced and independently verified as WORK-016 from exact main commit `700a9b9dafc877507232b84a94ff3d6eaf7afda4`; tag, GitHub Release, registry actions, and publication remain separately authorized work.
+18. Publication candidate ancestry repair - implemented and verified as WORK-017; current protected `main` can validate the exact verified ancestor candidate without weakening tag, release, provenance, or registry gates.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
