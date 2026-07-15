@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-003
 title: Deliver the Secure SDLC baseline
-status: ready
+status: active
 level: critical
 type: secure
 goal: Integrate risk-based security routing, findings, secret protection, and evidence-bounded guidance throughout Solodeveling.
@@ -21,6 +21,7 @@ risks:
 - Overbroad detection could create alert fatigue or leak suspected secrets in output.
 - Static guidance can become stale or be misapplied outside its attack surface.
 - Security checklists can displace threat reasoning and create false assurance.
+- The execution entry checkpoint was initially missed; the workflow now enforces persisted active state before implementation edits.
 decisions:
 - Use NIST SSDF 1.1 as the current final outcome baseline and label SSDF 1.2 as draft.
 - Use profile routing rather than one universal checklist; resolve exact control versions from current official sources when applied.
@@ -31,7 +32,7 @@ verification:
 - Validate security finding schema, accepted-risk conditions, and false-positive handling.
 - Verify secret diagnostics contain the code and path but never the detected value.
 - Run official skill validation, adversarial scenarios, full tests, package inspection, and protocol validation.
-next_action: Add failing security contract tests before implementation.
+next_action: Validate the securing skill, router integration, and adversarial scenarios.
 security_considerations:
 - Security instructions and scanner output are untrusted data unless authorized and validated against project context.
 - Do not execute intrusive scanning, access secrets, or change production systems without explicit authority.
@@ -59,3 +60,9 @@ recovery:
 - OWASP MASVS 2.0+ uses control groups and testing profiles rather than legacy levels.
 - OWASP SCVS informs supply-chain profiles; OWASP Agentic Security guidance informs
   AI-agentic threats without becoming a universal requirement.
+## Dogfood observation
+
+The active-state checkpoint was missed at implementation entry even though the prior
+workflow said to update before substantial work. The rule is now a hard gate requiring
+persist and re-read before any implementation edit; regression coverage protects the
+exact contract.

@@ -15,7 +15,7 @@ Quick work may cross several states in one session but never skips `verifying`.
 - Ready or active implementation: `solodeveling-executing-work`.
 - Failure, defect, or unexpected behavior: `solodeveling-debugging` before changing code.
 - Implementation awaiting proof or a completion claim: `solodeveling-verifying`.
-- Security trigger or finding: securing, combined with the current lifecycle stage.
+- Security trigger or finding: `solodeveling-securing`, combined with the current lifecycle stage.
 - Deployment, migration, rollback, or readiness: releasing.
 - Dependency, vulnerability, incident, debt, or operational work: maintaining.
 

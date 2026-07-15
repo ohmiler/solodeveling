@@ -27,6 +27,7 @@ scenarios:
       - "dirty worktree"
       - "preserve"
       - "one primary agent"
+      - "before any implementation edit"
 
   - id: debugging-precedes-fix
     skill: solodeveling-debugging

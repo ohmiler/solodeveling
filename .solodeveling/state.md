@@ -7,9 +7,9 @@ blockers: []
 risks:
 - Security guidance can create false confidence if profiles, evidence scope, or standard status are unclear.
 - High-confidence secret detection must avoid exposing detected values in diagnostics.
-next_action: Add failing tests for security routing, finding validation, and secret detection.
+next_action: Validate the securing skill, router integration, and adversarial scenarios.
 ---
 # State
 
-WORK-003 is ready as a Critical secure-development increment based on current official
+WORK-003 is active as a Critical secure-development increment based on current official
 NIST and OWASP sources.

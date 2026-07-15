@@ -63,4 +63,8 @@ def test_validator_discovers_every_scenario_file() -> None:
     assert {path.name for path in discovered} == {
         "router-onboarding.yaml",
         "lifecycle-workflows.yaml",
+        "security.yaml",
     }
+
+def test_securing_skill_exists() -> None:
+    assert Path("skills/solodeveling-securing/SKILL.md").is_file()
