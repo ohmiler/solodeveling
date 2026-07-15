@@ -1,6 +1,6 @@
 ---
 solodeveling_schema: 1
-current_goal: Review and integrate the verified cross-ecosystem release-set implementation without publishing.
+current_goal: Decide whether to invoke the non-publishing complete release-set provenance workflow from an exact reviewed main commit.
 active_work: []
 blockers: []
 risks:
@@ -9,14 +9,14 @@ risks:
 - Native executables are CI artifacts and are not yet signed, attested, or attached to an immutable GitHub Release.
 - The manual provenance workflow has not been invoked and no final release-set attestation exists.
 - cursor-agent remains unavailable locally and complete Tier 1 behavior is unverified.
-next_action: Review and integrate pull request 10; separately authorize any manual attestation, tag, release, registry configuration, or publication.
+next_action: Obtain explicit authorization before invoking the manual non-publishing workflow for a named exact main commit; tag, release, registry configuration, and publication remain separately authorized.
 ---
 # State
 
-WORK-010 is complete on `feat/verified-release-set` with EVIDENCE-010. Commit
-99645c70ae465d322bcda7f63a69bda4a315ee18 passed local verification plus GitHub
-Actions runs 29436818797 and 29436838206, including Python/package gates, six native
-smoke targets, and npm pack/npx. The manual complete-release-set workflow was not
-invoked, so no attestation or external release state exists. Nothing has been tagged,
-released, configured on npm or PyPI, or published. Solodeveling remained the
-single-agent workflow; Superpowers and subagents were not used.
+WORK-010 and PR 10 are merged on main at
+3e225947e6256728524bfe497168815bd44b5807 with EVIDENCE-010. GitHub Actions run
+29437420820 passed the Python/package gates, six native smoke targets, and npm
+pack/npx on the merge commit. The manual complete-release-set workflow was not
+invoked, so no release set, attestation, or external release state exists. Nothing
+has been tagged, released, configured on npm or PyPI, or published. Solodeveling
+remained the single-agent workflow; Superpowers and subagents were not used.

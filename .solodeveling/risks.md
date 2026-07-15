@@ -3,7 +3,7 @@ solodeveling_schema: 1
 ---
 # Risks
 
-- WORK-010 changes the release-set pipeline on a feature branch; any authorized public release must rebuild the entire set from the eventual reviewed `main` commit.
+- Any authorized public release must rebuild the entire set from the explicitly approved current `main` commit; feature-branch and prior-CI artifacts are not release inputs.
 - Checksums, manifests, SBOM, and GitHub artifact attestation provide bounded integrity and provenance evidence only; they do not sign platform executables, prove safety, or establish a SLSA level by themselves.
 - npm and PyPI names are not reserved, protected registry environments and Trusted Publishers are not configured, and availability can change before publication.
 - One representative live scenario does not prove stable behavior across the full core matrix, model versions, repetitions, or sessions.
