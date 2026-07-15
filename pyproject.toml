@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "solodeveling-protocol"
+version = "0.1.0"
+description = "Portable protocol validation for the Solodeveling agent skill suite"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = [
+  "PyYAML==6.0.3",
+  "jsonschema==4.26.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1"]
+
+[project.scripts]
+solodeveling-validate = "solodeveling_protocol.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/solodeveling_protocol"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/solodeveling_protocol/schemas" = "solodeveling_protocol/schemas"
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --strict-config"
+pythonpath = ["src"]
+testpaths = ["tests"]
