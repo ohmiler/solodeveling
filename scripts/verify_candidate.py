@@ -15,7 +15,7 @@ from verify_release import VerificationError, verify_bundle
 def verify_candidate(project_root: Path, bundle: Path, source_revision: str) -> None:
     verify_bundle(project_root, bundle)
     verify_candidate_bundle(bundle, source_revision=source_revision)
-    sbom = bundle / f"solodeveling-protocol-{__version__}.cdx.json"
+    sbom = bundle / f"solodeveling-{__version__}.cdx.json"
     validation_error = JsonStrictValidator(SchemaVersion.V1_6).validate_str(
         sbom.read_text("utf-8")
     )

@@ -24,4 +24,4 @@ Every protocol artifact includes `solodeveling_schema: 1`. A future schema chang
 
 ## Validation
 
-Run `solodeveling-validate <project-root>`. Exit code 0 means the inspected artifacts satisfy the implemented structural and cross-reference checks. It does not prove that the software itself is correct or secure.
+Run `solodeveling validate <project-root>`. Exit code 0 means the inspected artifacts satisfy the implemented structural and cross-reference checks. It does not prove that the software itself is correct or secure.

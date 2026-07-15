@@ -10,7 +10,7 @@ risks:
 - Package-name availability and vulnerability data are time-sensitive.
 - The manual provenance workflow has not been invoked and no attestation exists.
 - cursor-agent remains unavailable locally and complete Tier 1 behavior is unverified.
-next_action: Add failing unified-CLI and package-metadata tests, then implement one solodeveling entry point.
+next_action: Commit and push WORK-009, require all Python, native, and npm CI jobs to pass, then record source-bound evidence.
 ---
 # State
 

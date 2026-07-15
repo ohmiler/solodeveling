@@ -47,15 +47,15 @@ disposable fixture. Do not copy that flag into evaluation of an untrusted worksp
 
 Inspect availability without an agent call:
 
-    solodeveling-eval probe
+    solodeveling eval probe
 
 Preview the representative matrix without an agent call:
 
-    solodeveling-eval run --runtime codex --runtime claude-code --smoke --dry-run
+    solodeveling eval run --runtime codex --runtime claude-code --smoke --dry-run
 
 Run three smoke scenarios on Codex and Claude Code:
 
-    solodeveling-eval run --runtime codex --runtime claude-code --smoke --claude-budget-usd 0.25
+    solodeveling eval run --runtime codex --runtime claude-code --smoke --claude-budget-usd 0.25
 
 The Claude ceiling applies per fresh scenario, so three smoke scenarios have a maximum
 configured ceiling of USD 0.75. Actual cost is recorded when Claude returns it. Codex
@@ -63,12 +63,12 @@ usage follows the authenticated CLI account and currently has no harness cost fl
 
 Validate one scenario before expanding a live matrix:
 
-    solodeveling-eval run --runtime codex --smoke --scenario quick-local-documentation
+    solodeveling eval run --runtime codex --smoke --scenario quick-local-documentation
 
 
 Run Cursor only when cursor-agent is installed and authenticated:
 
-    solodeveling-eval run --runtime cursor --smoke
+    solodeveling eval run --runtime cursor --smoke
 
 Cursor print mode is deliberately used without force. Cursor result JSON wraps the
 assistant text, so the harness parses and validates the inner JSON locally.
@@ -80,7 +80,7 @@ commit raw runtime logs, credentials, session identifiers, or sensitive prompts.
 
 Replay scores a saved structured response without calling an agent:
 
-    solodeveling-eval replay --input evals/results/replay-input.json
+    solodeveling eval replay --input evals/results/replay-input.json
 
 Replay input contains a runtime and a responses mapping keyed by scenario ID. A replay
 pass proves only that those saved fields satisfy the current deterministic rubric. It

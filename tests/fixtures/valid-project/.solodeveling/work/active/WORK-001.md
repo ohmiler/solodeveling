@@ -13,7 +13,7 @@ acceptance:
 risks: []
 decisions: []
 verification:
-  - Run solodeveling-validate against the fixture.
+  - Run solodeveling validate against the fixture.
 next_action: Run the project validator.
 evidence:
   - EVIDENCE-001

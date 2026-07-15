@@ -29,8 +29,9 @@ DEFAULT_SCHEMA = Path("evals/evaluation-response.schema.json")
 DEFAULT_OUTPUT = Path("evals/results/latest.json")
 
 
-def _parser() -> argparse.ArgumentParser:
+def _parser(prog: str = "solodeveling eval") -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
+        prog=prog,
         description="Run deterministic Solodeveling cross-agent evaluations."
     )
     subparsers = parser.add_subparsers(dest="action", required=True)
@@ -242,8 +243,10 @@ def _run_probe(arguments) -> int:
     return 0
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    arguments = _parser().parse_args(argv)
+def main(
+    argv: Sequence[str] | None = None, *, prog: str = "solodeveling eval"
+) -> int:
+    arguments = _parser(prog).parse_args(argv)
     try:
         with ExitStack() as resources:
             if arguments.action == "run":

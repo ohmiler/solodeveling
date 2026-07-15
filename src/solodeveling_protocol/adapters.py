@@ -13,7 +13,7 @@ import yaml
 
 
 ADAPTER_SCHEMA = 1
-MANIFEST_NAME = ".solodeveling-adapter.json"
+MANIFEST_NAME = ".solodeveling-manifest.json"
 RUNTIME_PATHS = {
     "codex": Path(".agents/skills"),
     "claude-code": Path(".claude/skills"),

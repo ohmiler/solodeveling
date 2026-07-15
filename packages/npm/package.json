@@ -1,0 +1,29 @@
+{
+  "name": "solodeveling",
+  "version": "0.1.0",
+  "description": "Single-agent-first software delivery for solo developers",
+  "license": "Apache-2.0",
+  "author": "ohmiler",
+  "type": "commonjs",
+  "bin": {
+    "solodeveling": "bin/solodeveling.js"
+  },
+  "files": ["artifacts.json", "bin", "lib", "README.md"],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohmiler/solodeveling.git"
+  },
+  "homepage": "https://github.com/ohmiler/solodeveling#readme",
+  "bugs": {
+    "url": "https://github.com/ohmiler/solodeveling/issues"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

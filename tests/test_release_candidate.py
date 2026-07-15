@@ -26,7 +26,7 @@ def _sbom(path: Path) -> Path:
         "metadata": {
             "component": {
                 "type": "library",
-                "name": "solodeveling-protocol",
+                "name": "solodeveling",
                 "version": "0.1.0",
             }
         },
@@ -42,7 +42,7 @@ def _sbom(path: Path) -> Path:
 def test_candidate_manifest_binds_revision_and_all_subjects(tmp_path: Path) -> None:
     wheel = _write(tmp_path / "package.whl", b"wheel")
     sdist = _write(tmp_path / "package.tar.gz", b"sdist")
-    sbom = _sbom(tmp_path / "solodeveling-protocol-0.1.0.cdx.json")
+    sbom = _sbom(tmp_path / "solodeveling-0.1.0.cdx.json")
     notes = _write(tmp_path / "RELEASE-NOTES.md", b"notes")
 
     manifest = release.candidate_manifest(
@@ -55,13 +55,17 @@ def test_candidate_manifest_binds_revision_and_all_subjects(tmp_path: Path) -> N
 
     assert manifest["solodeveling_candidate_manifest_schema"] == 1
     assert manifest["source_revision"] == REVISION
+    assert manifest["target"] == (
+        "Python input for coordinated GitHub Release, PyPI, and npm release "
+        "(not published)"
+    )
     assert [item["filename"] for item in manifest["distributions"]] == [
         "package.tar.gz",
         "package.whl",
     ]
     assert [item["filename"] for item in manifest["evidence"]] == [
         "RELEASE-NOTES.md",
-        "solodeveling-protocol-0.1.0.cdx.json",
+        "solodeveling-0.1.0.cdx.json",
     ]
     assert manifest["build_inputs"]["cyclonedx_bom"] == "7.3.0"
     assert manifest["evidence"][0]["sha256"] == hashlib.sha256(b"notes").hexdigest()
@@ -99,13 +103,13 @@ def test_release_candidate_docs_and_manual_workflow_are_bounded() -> None:
     for phrase in (
         "0.1.0",
         "Tier 1 remains unverified",
-        "solodeveling-adapt uninstall",
+        "solodeveling uninstall",
         "SHA-256",
     ):
         assert phrase in notes
     for phrase in (
         "ohmiler/solodeveling",
-        "solodeveling-protocol",
+        "solodeveling",
         "release-candidate.yml",
         "pypi",
         "explicit authorization",
@@ -153,7 +157,7 @@ def test_finalize_and_verify_candidate_bundle(tmp_path: Path) -> None:
 
     assert verified == manifest
     assert (bundle / "RELEASE-NOTES.md").read_bytes() == b"release notes"
-    assert (bundle / "solodeveling-protocol-0.1.0.cdx.json").is_file()
+    assert (bundle / "solodeveling-0.1.0.cdx.json").is_file()
     sums = (bundle / "SHA256SUMS").read_text("utf-8").splitlines()
     assert len(sums) == 4
     assert all(re.fullmatch(r"[0-9a-f]{64}  [^/\\]+", line) for line in sums)

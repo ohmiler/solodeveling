@@ -1,65 +1,61 @@
 # Release readiness
 
-WORK-007 prepares reviewable artifacts but does not publish them. Python packaging
-guidance recommends distributing both a wheel and source distribution, while GitHub
-recommends immutable full-SHA action pins and least-privilege workflow permissions.
-See the [PyPA package formats guide](https://packaging.python.org/en/latest/discussions/package-formats/)
-and [GitHub secure use reference](https://docs.github.com/en/actions/reference/security/secure-use).
+WORK-009 extends the non-publishing release gate to one public name and two install
+ecosystems. Ordinary CI builds Python distributions, six platform executables, and an
+npm tarball for verification; it does not publish, tag, create a GitHub Release, or
+configure a registry.
 
-## Local release gate
+## Local gate
 
-1. Run the full test, suite, official skill, protocol, compilation, dependency, and
-   diff checks.
-2. Build into a path that does not already exist:
+1. Run the full test suite, ten official skill validations, protocol validation,
+   compilation, dependency checks, Node launcher tests, and diff review.
+2. Build the current-platform executable into a new path:
 
-       python scripts/build_release.py C:\tmp\solodeveling-release
+       python scripts/build_native.py C:/tmp/solodeveling-native
 
-3. Verify checksums, archive structure, canonical resource bytes, metadata, and entry
-   points:
+3. Exercise embedded templates, schemas, skills, evaluations, and all unified
+   subcommands:
 
-       python scripts/verify_release.py C:\tmp\solodeveling-release
+       python scripts/smoke_native.py C:/tmp/solodeveling-native C:/tmp/native-smoke
 
-4. Install the wheel in a fresh virtual environment outside the checkout and run all
-   four console commands plus adapter install/check/uninstall for every runtime
-   mapping.
-5. Review `release-manifest.json` and `SHA256SUMS`. Checksums are integrity evidence,
-   not a signature, attestation, or proof of publisher identity.
+4. Build the source-bound Python candidate from a clean exact revision and verify its
+   checksums, contents, SBOM, release notes, and manifest.
+5. Collect all six CI-native artifacts, prepare the version-bound npm package, inspect
+   `npm pack` contents, and run the local tarball through `npx`
+   with a verified cached artifact.
+6. Review manifests and SHA-256 values. Integrity hashes are not a signature,
+   attestation, or proof of publisher identity.
 
-The builder refuses an existing output directory, builds in temporary staging, emits
-exactly one wheel and one sdist, writes a deterministic manifest without timestamps,
-and never uploads, tags, signs, merges, or creates a release.
+The builders refuse unsafe or existing destinations, require exact inventories, use
+temporary staging, and never upload to a registry.
 
 ## Evidence checked 2026-07-15
 
-- Windows with Python 3.14: full installed-wheel smoke passed from a fresh virtual
-  environment outside the checkout for Codex, Claude Code, Cursor, and generic adapter
-  mappings. No agent was called.
-- Dependency audit: `pip-audit` 2.10.1 reported no known vulnerabilities in installed
-  dependencies. The unpublished `solodeveling-protocol` package itself was skipped
-  because it was not found on PyPI.
-- PyPI name lookup: `solodeveling-protocol` returned HTTP 404. This is not a reservation
-  and can change before publication.
-- GitHub repository: public, Apache-2.0, default branch `main`, no releases, no existing
-  workflows before WORK-007, blank description, and no topics at the time checked.
-- GitHub Actions: push run
-  [29426760418](https://github.com/ohmiler/solodeveling/actions/runs/29426760418)
-  and pull-request run
-  [29426763270](https://github.com/ohmiler/solodeveling/actions/runs/29426763270)
-  passed all six Windows, Ubuntu, and macOS test combinations for Python 3.10 and 3.14 plus the Ubuntu package job.
-- Final local artifact hashes from commit `1d6a22d`: wheel
-  `6055590863c021ac28839ea996703081e22fbaa445f6753519bb47a988c30a93`; source
-  distribution `9672053da1559464b0131f075946267482397bb9cd900612826218f92fc89354`.
-- Release integration: pull request
-  [7](https://github.com/ohmiler/solodeveling/pull/7) remains open and the
-  implementation history is not merged into `main`.
+- Python 3.10 and 3.14 remain the supported Python bounds in cross-platform CI.
+- The unified Python CLI regression and full suite passed locally after removing the
+  four split console entry points.
+- A Windows x64 PyInstaller 6.21.0 executable embedded schemas, templates, skills,
+  evaluations, and required dependency grammar data; full installed smoke passed.
+- A dependency-free npm tarball was prepared locally without lifecycle install scripts
+  and `npx` executed the verified cached Windows binary successfully.
+- Node tests rejected unsafe names, invalid versions, unsupported platforms, corrupt
+  downloads, tampered cache files, wrong sizes, and wrong hashes before execution.
+- npm and PyPI name lookups returned not found earlier on this date. That is not a
+  reservation and can change before publication.
+- No npm project, PyPI project, trusted publisher, protected registry environment,
+  tag, GitHub Release, or registry publication exists from this work.
 
-## Remaining gates before publication
+Tier 1 remains unverified because the full behavioral scenario matrix has not passed
+on Codex, Claude Code, and Cursor.
 
-- Review and merge pull request 7 into `main` through an explicitly authorized
-  integration path. The cross-platform CI gate has passed on the reviewed branch.
-- Recheck dependency vulnerabilities, package-name availability, runtime discovery
-  documentation, metadata, artifact hashes, and support claims from the release commit.
-- Decide whether to publish a GitHub Release, PyPI distribution, provenance
-  attestation, and SBOM. Each is a separate external action and none is automatic.
-- Do not claim Tier 1 until the full behavioral matrix passes on Codex, Claude Code,
-  and Cursor. Current live evidence is one representative pass on Codex and Claude.
+## Remaining gates
+
+- Push WORK-009 and require the new six-target native and npm-package CI jobs to pass.
+- Review CI cost, public-preview runner stability, artifact inventories, and every
+  current dependency vulnerability result.
+- Merge through an authorized review path, then rebuild the release candidate from
+  the resulting exact main commit.
+- Recheck both registry names and configure protected OIDC trusted publishers only
+  after explicit owner authority.
+- Treat tag creation, GitHub Release, attestation, PyPI publication, and npm staged
+  publication as each a separate external action.

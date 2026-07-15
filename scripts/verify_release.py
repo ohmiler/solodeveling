@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import configparser
 import hashlib
 import json
 import tarfile
@@ -76,15 +77,16 @@ def verify_bundle(project_root: Path, bundle: Path) -> None:
         entry_name = next(
             name for name in names if name.endswith(".dist-info/entry_points.txt")
         )
-        entries = archive.read(entry_name).decode("utf-8")
-        for command in (
-            "solodeveling-adapt",
-            "solodeveling-eval",
-            "solodeveling-init",
-            "solodeveling-validate",
-        ):
-            if command not in entries:
-                raise VerificationError(f"wheel entry point missing: {command}")
+        entries = configparser.ConfigParser()
+        entries.optionxform = str
+        entries.read_string(archive.read(entry_name).decode("utf-8"))
+        console_scripts = dict(entries["console_scripts"])
+        if console_scripts != {
+            "solodeveling": "solodeveling_protocol.main_cli:main"
+        }:
+            raise VerificationError(
+                "wheel must expose exactly one solodeveling entry point"
+            )
         metadata_name = next(
             name for name in names if name.endswith(".dist-info/METADATA")
         )

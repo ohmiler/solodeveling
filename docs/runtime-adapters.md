@@ -31,10 +31,10 @@ core matrix to pass in actual Codex, Claude Code, and Cursor surfaces.
 After installing the Python distribution, preview and install its packaged canonical
 suite without a source argument:
 
-    solodeveling-adapt install --runtime codex --project-root . --dry-run
-    solodeveling-adapt install --runtime codex --project-root .
-    solodeveling-adapt install --runtime claude-code --project-root .
-    solodeveling-adapt install --runtime cursor --project-root .
+    solodeveling install --runtime codex --project-root . --dry-run
+    solodeveling install --runtime codex --project-root .
+    solodeveling install --runtime claude-code --project-root .
+    solodeveling install --runtime cursor --project-root .
 
 Use `--runtime generic` for a compatible client that discovers `.agents/skills`.
 Contributors and auditors may override packaged resources explicitly with
@@ -42,7 +42,7 @@ Contributors and auditors may override packaged resources explicitly with
 
 Installation validates every canonical `SKILL.md`, rejects source or target symlinks,
 preflights all collisions, copies files atomically, and writes
-`.solodeveling-adapter.json` inside the runtime skill root. Re-running install updates
+`.solodeveling-manifest.json` inside the runtime skill root. Re-running install updates
 only files still matching the prior managed manifest. It refuses modified managed
 files and unmanaged collisions.
 
@@ -53,7 +53,7 @@ configuration.
 
 ## Check drift
 
-    solodeveling-adapt check --runtime codex --project-root .
+    solodeveling check --runtime codex --project-root .
 
 A successful check proves managed files match their recorded hashes and the packaged
 canonical source digest at that moment. Hash equality detects change; it does not prove
@@ -63,11 +63,11 @@ publisher identity, authenticity, safety, or behavioral compliance.
 
 Preview first:
 
-    solodeveling-adapt uninstall --runtime codex --project-root . --dry-run
+    solodeveling uninstall --runtime codex --project-root . --dry-run
 
 Then remove unchanged managed files:
 
-    solodeveling-adapt uninstall --runtime codex --project-root .
+    solodeveling uninstall --runtime codex --project-root .
 
 Uninstall preflights every manifest path and hash. If any managed file is missing,
 modified, replaced by a symlink, or outside the adapter root, it stops before deletion.
