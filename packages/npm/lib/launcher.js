@@ -196,7 +196,10 @@ async function ensureBinary(options) {
   }
 
   await fs.promises.mkdir(root, { recursive: true, mode: 0o700 });
-  if (await isVerified(destination, record)) return destination;
+  if (await isVerified(destination, record)) {
+    if (platform !== "win32") await fs.promises.chmod(destination, 0o755);
+    return destination;
+  }
 
   await fs.promises.rm(destination, { force: true });
   const temporary = path.join(
