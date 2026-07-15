@@ -23,7 +23,5 @@ def test_runtime_adapter_documentation_covers_safe_operations_and_evidence() -> 
 def test_adapter_cli_is_packaged() -> None:
     text = Path("pyproject.toml").read_text("utf-8")
 
-    assert (
-        'solodeveling-adapt = "solodeveling_protocol.adapter_cli:main"'
-        in text
-    )
+    assert 'solodeveling = "solodeveling_protocol.main_cli:main"' in text
+    assert "solodeveling-adapt" not in text

@@ -11,9 +11,9 @@ from solodeveling_protocol.memory import (
 )
 
 
-def _parser() -> argparse.ArgumentParser:
+def _parser(prog: str = "solodeveling init") -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="solodeveling-init",
+        prog=prog,
         description="Create validated Solodeveling project memory without overwriting it.",
     )
     parser.add_argument("root", type=Path)
@@ -29,8 +29,10 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    arguments = _parser().parse_args(argv)
+def main(
+    argv: Sequence[str] | None = None, *, prog: str = "solodeveling init"
+) -> int:
+    arguments = _parser(prog).parse_args(argv)
     try:
         result = initialize_memory(
             arguments.root,

@@ -100,7 +100,10 @@ def candidate_manifest(
         "solodeveling_candidate_manifest_schema": 1,
         "version": version,
         "source_revision": source_revision,
-        "target": "GitHub Release and PyPI (not published)",
+        "target": (
+            "Python input for coordinated GitHub Release, PyPI, and npm release "
+            "(not published)"
+        ),
         "distributions": [_record(path) for path in distribution_paths],
         "evidence": [_record(path) for path in evidence_paths],
         "build_inputs": dict(sorted((build_inputs or {}).items())),
@@ -125,7 +128,7 @@ def bind_candidate_sbom_identity(path: Path, *, version: str) -> dict[str, objec
     if (
         component.get("type") != "library"
         or _normalized_component_name(component.get("name"))
-        != "solodeveling-protocol"
+        != "solodeveling"
     ):
         raise ReleaseError("candidate SBOM root identity is invalid")
     existing = component.get("version")
@@ -154,7 +157,7 @@ def validate_candidate_sbom(path: Path, *, version: str) -> dict[str, object]:
         or document.get("specVersion") != "1.6"
         or component.get("type") != "library"
         or _normalized_component_name(component.get("name"))
-        != "solodeveling-protocol"
+        != "solodeveling"
         or component.get("version") != version
         or not isinstance(components, list)
     ):
@@ -229,7 +232,7 @@ def finalize_candidate_bundle(
     release_notes_path = Path(release_notes_path)
     if not release_notes_path.is_file() or release_notes_path.is_symlink():
         raise ReleaseError("candidate release notes are missing or unsafe")
-    sbom_destination = bundle / f"solodeveling-protocol-{version}.cdx.json"
+    sbom_destination = bundle / f"solodeveling-{version}.cdx.json"
     notes_destination = bundle / "RELEASE-NOTES.md"
     if sbom_destination.exists() or notes_destination.exists():
         raise ReleaseError("candidate evidence destination already exists")
@@ -300,7 +303,7 @@ def verify_candidate_bundle(
     if (bundle / "SHA256SUMS").read_text("utf-8").splitlines() != expected_sums:
         raise ReleaseError("candidate SHA256SUMS does not match the manifest")
     sbom_names = [name for name in names if name.endswith(".cdx.json")]
-    if sbom_names != [f"solodeveling-protocol-{__version__}.cdx.json"]:
+    if sbom_names != [f"solodeveling-{__version__}.cdx.json"]:
         raise ReleaseError("candidate SBOM filename is missing or ambiguous")
     validate_candidate_sbom(bundle / sbom_names[0], version=__version__)
     return manifest

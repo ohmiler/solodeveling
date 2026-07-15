@@ -57,3 +57,78 @@ jobs:
           name: solodeveling-distributions
           path: ci-release/
           if-no-files-found: error
+
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            key: linux-x64
+          - os: ubuntu-24.04-arm
+            key: linux-arm64
+          - os: macos-15-intel
+            key: darwin-x64
+          - os: macos-15
+            key: darwin-arm64
+          - os: windows-latest
+            key: win32-x64
+          - os: windows-11-arm
+            key: win32-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install native build dependencies
+        run: python -m pip install ".[native]"
+      - name: Build current-platform executable
+        run: python scripts/build_native.py native
+      - name: Smoke-test embedded commands and resources
+        run: python scripts/smoke_native.py native "${{ runner.temp }}/solodeveling-native-smoke"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: native-${{ matrix.key }}
+          path: native/
+          if-no-files-found: error
+
+  npm-package:
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: native-*
+          path: native
+          merge-multiple: true
+      - name: Install Python package
+        run: python -m pip install .
+      - name: Test dependency-free Node launcher
+        run: npm test --prefix packages/npm
+      - name: Bind native inventory and pack npm tarball
+        run: |
+          python scripts/prepare_npm_package.py native npm-stage
+          mkdir npm-dist
+          npm pack ./npm-stage --pack-destination npm-dist
+      - name: Smoke-test local npx tarball without network download
+        run: |
+          mkdir -p npm-cache/0.1.0/linux-x64
+          cp native/solodeveling-0.1.0-linux-x64 npm-cache/0.1.0/linux-x64/
+          tarball="$(find npm-dist -name '*.tgz' -type f -print -quit)"
+          tarball="$PWD/$tarball"
+          SOLODEVELING_CACHE_DIR="$PWD/npm-cache" npx --yes --package "$tarball" solodeveling version
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: solodeveling-npm-package
+          path: npm-dist/
+          if-no-files-found: error

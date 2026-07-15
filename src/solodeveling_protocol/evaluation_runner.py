@@ -206,7 +206,7 @@ def run_live_scenario(
 
     Path(temp_parent).mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(
-        prefix=f"solodeveling-eval-{runtime}-",
+        prefix=f"solodeveling-evaluation-{runtime}-",
         dir=temp_parent,
     ) as temporary:
         root = Path(temporary)

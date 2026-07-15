@@ -85,7 +85,7 @@ def initialize_memory(
             )
         return InitializationResult(memory_root, created=False)
 
-    with TemporaryDirectory(prefix=".solodeveling-init-", dir=root) as temporary:
+    with TemporaryDirectory(prefix=".solodeveling-memory-", dir=root) as temporary:
         staging_root = Path(temporary)
         staged_memory = staging_root / ".solodeveling"
         for relative in ("decisions", "work/active", "work/archive", "evidence"):

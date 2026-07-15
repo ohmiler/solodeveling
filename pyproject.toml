@@ -3,7 +3,7 @@ requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [project]
-name = "solodeveling-protocol"
+name = "solodeveling"
 dynamic = ["version"]
 description = "Single-agent-first software delivery protocol and portable skill suite"
 readme = "README.md"
@@ -30,10 +30,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+native = [
+  "pyinstaller==6.21.0",
+]
 dev = [
   "build>=1.2,<2",
   "cyclonedx-bom==7.3.0",
   "pytest==9.1.1",
+  "pyinstaller==6.21.0",
   "tomli>=2.2,<3; python_version < '3.11'",
 ]
 
@@ -44,10 +48,7 @@ Issues = "https://github.com/ohmiler/solodeveling/issues"
 Documentation = "https://github.com/ohmiler/solodeveling#readme"
 
 [project.scripts]
-solodeveling-init = "solodeveling_protocol.memory_cli:main"
-solodeveling-validate = "solodeveling_protocol.cli:main"
-solodeveling-adapt = "solodeveling_protocol.adapter_cli:main"
-solodeveling-eval = "solodeveling_protocol.evaluation_cli:main"
+solodeveling = "solodeveling_protocol.main_cli:main"
 
 [tool.hatch.version]
 path = "src/solodeveling_protocol/__init__.py"
@@ -68,6 +69,7 @@ include = [
   "/pyproject.toml",
   "/docs",
   "/evals",
+  "/packages",
   "/scripts",
   "/skills",
   "/src",

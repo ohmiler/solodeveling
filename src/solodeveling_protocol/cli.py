@@ -7,9 +7,11 @@ from pathlib import Path
 from solodeveling_protocol.validation import validate_project
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(
+    argv: Sequence[str] | None = None, *, prog: str = "solodeveling validate"
+) -> int:
     parser = argparse.ArgumentParser(
-        prog="solodeveling-validate",
+        prog=prog,
         description="Validate Solodeveling project-memory artifacts.",
     )
     parser.add_argument("project_root", nargs="?", default=".")

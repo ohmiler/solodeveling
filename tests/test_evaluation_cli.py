@@ -157,7 +157,5 @@ def test_replay_rejects_unknown_scenario(
 def test_evaluation_cli_is_packaged() -> None:
     text = Path("pyproject.toml").read_text("utf-8")
 
-    assert (
-        'solodeveling-eval = "solodeveling_protocol.evaluation_cli:main"'
-        in text
-    )
+    assert 'solodeveling = "solodeveling_protocol.main_cli:main"' in text
+    assert "solodeveling-eval" not in text

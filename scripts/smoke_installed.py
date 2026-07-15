@@ -30,24 +30,23 @@ def _run(argv: tuple[str, ...], cwd: Path) -> None:
     )
     if process.returncode != 0:
         raise SmokeError(
-            f"command failed with exit code {process.returncode}: {argv[0]}"
+            f"command failed with exit code {process.returncode}: "
+            + " ".join(argv[:2])
         )
 
 
-def installed_smoke(workspace: Path) -> None:
+def installed_smoke(workspace: Path, executable: str | None = None) -> None:
     workspace = workspace.resolve()
     if workspace.exists():
         raise SmokeError(f"smoke workspace already exists: {workspace}")
     workspace.mkdir(parents=True)
-    init = _command("solodeveling-init")
-    validate = _command("solodeveling-validate")
-    adapt = _command("solodeveling-adapt")
-    evaluate = _command("solodeveling-eval")
+    command = executable or _command("solodeveling")
 
     memory = workspace / "memory-project"
     _run(
         (
-            init,
+            command,
+            "init",
             str(memory),
             "--name",
             "installed-smoke",
@@ -66,24 +65,25 @@ def installed_smoke(workspace: Path) -> None:
         ),
         workspace,
     )
-    _run((validate, str(memory)), workspace)
+    _run((command, "validate", str(memory)), workspace)
 
     for runtime in ("codex", "claude-code", "cursor", "generic"):
         project = workspace / f"adapter-{runtime}"
         project.mkdir()
         unrelated = project / "unrelated.txt"
         unrelated.write_text("preserve", encoding="utf-8")
-        base = (adapt, "--runtime", runtime, "--project-root", str(project))
-        _run((adapt, "install", *base[1:]), workspace)
-        _run((adapt, "check", *base[1:]), workspace)
-        _run((adapt, "uninstall", *base[1:], "--dry-run"), workspace)
-        _run((adapt, "uninstall", *base[1:]), workspace)
+        options = ("--runtime", runtime, "--project-root", str(project))
+        _run((command, "install", *options), workspace)
+        _run((command, "check", *options), workspace)
+        _run((command, "uninstall", *options, "--dry-run"), workspace)
+        _run((command, "uninstall", *options), workspace)
         if unrelated.read_text("utf-8") != "preserve":
             raise SmokeError(f"unrelated file changed for runtime: {runtime}")
 
     _run(
         (
-            evaluate,
+            command,
+            "eval",
             "run",
             "--runtime",
             "codex",
@@ -98,12 +98,13 @@ def installed_smoke(workspace: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Smoke-test installed Solodeveling commands outside a checkout."
+        description="Smoke-test installed Solodeveling outside a checkout."
     )
     parser.add_argument("workspace", type=Path)
+    parser.add_argument("--executable")
     arguments = parser.parse_args()
     try:
-        installed_smoke(arguments.workspace)
+        installed_smoke(arguments.workspace, arguments.executable)
     except (OSError, SmokeError) as error:
         print(f"installed-smoke-error: {error}")
         return 1

@@ -14,8 +14,9 @@ from solodeveling_protocol.adapters import (
 from solodeveling_protocol.resources import resource_path
 
 
-def _parser() -> argparse.ArgumentParser:
+def _parser(prog: str | None = None) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
+        prog=prog,
         description="Materialize and verify Solodeveling runtime adapters safely."
     )
     subparsers = parser.add_subparsers(dest="action", required=True)
@@ -40,8 +41,10 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    arguments = _parser().parse_args(argv)
+def main(
+    argv: Sequence[str] | None = None, *, prog: str | None = None
+) -> int:
+    arguments = _parser(prog).parse_args(argv)
     try:
         if arguments.action == "uninstall":
             report = uninstall_adapter(

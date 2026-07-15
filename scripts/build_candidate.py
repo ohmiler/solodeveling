@@ -102,7 +102,7 @@ def build_candidate(
             project_root,
             "candidate installation",
         )
-        sbom = root / f"solodeveling-protocol-{__version__}.cdx.json"
+        sbom = root / f"solodeveling-{__version__}.cdx.json"
         _run(
             (
                 sys.executable,

@@ -3,109 +3,112 @@
 Solodeveling is a single-agent-first software delivery protocol for solo developers.
 It keeps a single primary agent oriented across discovery, planning, implementation,
 verification, security, release, and maintenance without requiring subagents. The
-same canonical skill suite can be materialized for Codex, Claude Code, Cursor, or a
-generic Agent Skills client.
+same canonical skill suite works with Codex, Claude Code, Cursor, and generic Agent
+Skills clients.
 
 Status: alpha. Codex and Claude Code each passed one bounded representative live
-scenario. Cursor has structural adapter evidence only because `cursor-agent` was not
-available in the verification environment. Tier 1 remains unverified until the full
-core scenario matrix passes on all three runtimes.
+scenario. Cursor has structural adapter evidence only because `cursor-agent`
+was unavailable. Tier 1 remains unverified until the full core scenario matrix passes.
 
-## Requirements
+## Quick start
 
-- Python 3.10 or newer
-- A supported coding-agent runtime
-- A project directory under version control, with current work committed or backed up
-  before installing any automation
+After the first reviewed 0.1.0 release is published, Node.js users can preview and
+install into the current project without installing Python:
 
-## Install the package
+~~~console
+npx solodeveling install --runtime codex --dry-run
+npx solodeveling install --runtime codex
+~~~
 
-Until the first reviewed release is published, install from a trusted checkout:
+Install the same command globally if you prefer:
 
-```console
+~~~console
+npm install -g solodeveling
+solodeveling install --runtime codex --dry-run
+solodeveling install --runtime codex
+~~~
+
+Python users can run it without a permanent install or install it as a tool:
+
+~~~console
+uvx solodeveling install --runtime codex --dry-run
+uv tool install solodeveling
+pipx install solodeveling
+~~~
+
+The npm and PyPI projects have not been published yet. Until the reviewed release,
+install from this trusted checkout:
+
+~~~console
 git clone https://github.com/ohmiler/solodeveling.git
 cd solodeveling
 python -m pip install .
-```
+solodeveling install --runtime codex --dry-run
+~~~
 
-This installs the canonical skills and four local commands. It does not modify a
-project until `solodeveling-adapt install` is run explicitly.
+All channels expose only one public command: `solodeveling`. See
+[Installation](docs/installation.md) for prerequisites, platform support, upgrades,
+integrity controls, and current publication status.
 
-## Install skills into a project
+## Runtime installation
 
-Run exactly one native adapter unless the project intentionally supports several
-agent discovery roots. Preview first:
+Choose the runtime whose native skill-discovery directory should be managed:
 
-```console
-solodeveling-adapt install --runtime codex --project-root . --dry-run
-solodeveling-adapt install --runtime codex --project-root .
-```
+~~~console
+solodeveling install --runtime codex
+solodeveling install --runtime claude-code
+solodeveling install --runtime cursor
+solodeveling install --runtime generic
+~~~
 
-Choose the runtime mapping you need:
+The default project root is the current directory. Use `--project-root PATH`
+for another project. The mappings are `.agents/skills`,
+`.claude/skills`, `.cursor/skills`, and
+`.agents/skills` respectively.
 
-```console
-solodeveling-adapt install --runtime codex --project-root .
-solodeveling-adapt install --runtime claude-code --project-root .
-solodeveling-adapt install --runtime cursor --project-root .
-solodeveling-adapt install --runtime generic --project-root .
-```
+Installation validates the skill suite, rejects symlinks and path traversal, refuses
+unmanaged collisions, copies files atomically, and records managed hashes. It does
+not change coding-agent settings or grant tools. Start a fresh agent session after
+first installation, then invoke `$solodeveling` in Codex,
+`/solodeveling` in Claude Code or Cursor, or the client-defined invocation
+in another Agent Skills runtime.
 
-The mappings are `.agents/skills`, `.claude/skills`, `.cursor/skills`, and
-`.agents/skills` respectively. Installation validates the suite, rejects symlink and
-path traversal, refuses unmanaged collisions, copies files atomically, and records a
-managed hash manifest. It never changes runtime settings or grants tools.
+## One command, complete lifecycle
 
-Start a fresh agent session after first installation. Invoke `$solodeveling` in Codex,
-`/solodeveling` in Claude Code or Cursor, and use the client-defined invocation in a
-generic Agent Skills runtime.
+~~~console
+solodeveling check --runtime codex
+solodeveling uninstall --runtime codex --dry-run
+solodeveling uninstall --runtime codex
+solodeveling init --help
+solodeveling validate .
+solodeveling eval probe
+solodeveling version
+~~~
 
-## Verify, upgrade, and recover
-
-Check installed bytes against the packaged canonical suite:
-
-```console
-solodeveling-adapt check --runtime codex --project-root .
-```
-
-Upgrade the Python package from a reviewed source, preview the adapter update, then
-run install again. Managed files modified by a user are never overwritten.
-
-Preview removal before applying it:
-
-```console
-solodeveling-adapt uninstall --runtime codex --project-root . --dry-run
-solodeveling-adapt uninstall --runtime codex --project-root .
-```
-
-Uninstall removes only unchanged managed files. If anything drifted, it stops and
-preserves the files for manual recovery; there is no force-delete mode.
-
-## Project memory and evaluation
-
-Create validated project memory with `solodeveling-init`, then check it with
-`solodeveling-validate`. Contributors can inspect the bounded cross-agent harness
-without making an agent call:
-
-```console
-solodeveling-eval probe
-solodeveling-eval run --runtime codex --smoke --dry-run
-```
-
-Live evaluation uses external model services and may consume plan usage or API
-credits. Review `docs/cross-agent-evaluation.md` before authorizing a live call.
+Check detects missing, changed, or unexpected managed files. Uninstall removes only
+unchanged managed files and preserves drift for manual recovery; there is no
+force-delete mode. Live evaluation can consume model-service usage or API credits,
+so review [Cross-agent evaluation](docs/cross-agent-evaluation.md) before authorizing
+a live run.
 
 ## Security and support boundaries
 
-Solodeveling applies risk-scaled verification and Secure SDLC guidance, but installing
-it does not make a project secure or compliant. Hashes detect drift; they do not prove
-publisher identity. Current support claims and known limitations are documented in
-`docs/runtime-adapters.md`, `docs/cross-agent-evaluation.md`, and the committed
-evidence records.
+The npm launcher has no runtime dependencies and no install lifecycle script. On an
+explicit invocation it selects an exact-version native artifact, downloads only from
+the versioned GitHub Release, verifies its bundled size and SHA-256, caches it, and
+executes it without a shell. Windows, macOS, and Linux on x64 and arm64 are release
+targets only after their CI builds and native smoke tests pass. Unsupported targets
+fail closed and show the Python-tool fallback.
 
-No telemetry is collected. No publishing credentials are included. Release builds are
-local and non-publishing until a reviewed tag or registry action is separately
-authorized.
+Solodeveling applies risk-scaled verification and Secure SDLC guidance, but installing
+it does not make a project categorically secure or compliant. Hashes detect byte
+changes; they do not by themselves prove publisher identity. No telemetry is
+collected and no publishing credentials are included.
+
+No tag, GitHub Release, npm package, or PyPI package is created by ordinary CI.
+External publication requires a reviewed source revision and separate explicit
+authorization.
 
 ## License
 
-Apache-2.0. See `LICENSE`.
+Apache-2.0. See [LICENSE](LICENSE).
