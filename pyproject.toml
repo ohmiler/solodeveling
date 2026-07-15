@@ -19,6 +19,7 @@ dev = ["pytest==9.1.1"]
 [project.scripts]
 solodeveling-init = "solodeveling_protocol.memory_cli:main"
 solodeveling-validate = "solodeveling_protocol.cli:main"
+solodeveling-adapt = "solodeveling_protocol.adapter_cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/solodeveling_protocol"]
