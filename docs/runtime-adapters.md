@@ -1,8 +1,9 @@
 # Runtime adapters
 
-Solodeveling keeps one canonical suite in skills/. Adapters copy those bytes into a
-runtime discovery path and record a hash manifest; they do not rewrite workflow
-instructions or add runtime-only lifecycle rules.
+Solodeveling keeps one canonical suite in `skills/`. Built distributions map those
+exact bytes into packaged resources. Adapters copy the packaged bytes into a runtime
+discovery path and record a hash manifest; they do not rewrite workflow instructions
+or add runtime-only lifecycle rules.
 
 ## Evidence-based support
 
@@ -10,10 +11,10 @@ Checked 2026-07-15:
 
 | Runtime | Adapter path | Explicit invocation | Current evidence |
 | --- | --- | --- | --- |
-| Codex | .agents/skills | $solodeveling | Structural adapter and canonical byte conformance pass. Live evaluation is pending. |
-| Claude Code | .claude/skills | /solodeveling | Structural adapter and canonical byte conformance pass. Live evaluation is pending. |
-| Cursor | .cursor/skills | /solodeveling | Structural adapter and canonical byte conformance pass. cursor-agent was unavailable in the verification environment, so live behavior is unverified. |
-| Generic Agent Skills client | .agents/skills | Runtime-defined | Format and byte conformance pass; discovery behavior is client-specific. |
+| Codex | `.agents/skills` | `$solodeveling` | Structural byte conformance and one bounded representative live scenario pass. |
+| Claude Code | `.claude/skills` | `/solodeveling` | Structural byte conformance and one bounded representative live scenario pass after response-contract clarification. |
+| Cursor | `.cursor/skills` | `/solodeveling` | Structural byte conformance passes. `cursor-agent` was unavailable, so live behavior is unverified. |
+| Generic Agent Skills client | `.agents/skills` | Runtime-defined | Format and byte conformance pass; discovery behavior is client-specific. |
 
 The paths and invocation forms follow the current
 [Codex skill documentation](https://learn.chatgpt.com/docs/build-skills.md),
@@ -22,39 +23,41 @@ The paths and invocation forms follow the current
 [Agent Skills specification](https://agentskills.io/specification). Recheck primary
 documentation when discovery or invocation behavior affects a current decision.
 
-Adapter conformance is not a Tier 1 behavioral claim. Tier 1 requires shared scenarios
-to run successfully in the actual Codex, Claude Code, and Cursor agent surfaces.
+One representative pass is not a Tier 1 behavioral claim. Tier 1 requires the shared
+core matrix to pass in actual Codex, Claude Code, and Cursor surfaces.
 
 ## Install or update
 
-Run from a checkout or distribution containing the canonical skills/ directory:
+After installing the Python distribution, preview and install its packaged canonical
+suite without a source argument:
 
-    solodeveling-adapt install --runtime codex --source ./skills --project-root .
-    solodeveling-adapt install --runtime claude-code --source ./skills --project-root .
-    solodeveling-adapt install --runtime cursor --source ./skills --project-root .
+    solodeveling-adapt install --runtime codex --project-root . --dry-run
+    solodeveling-adapt install --runtime codex --project-root .
+    solodeveling-adapt install --runtime claude-code --project-root .
+    solodeveling-adapt install --runtime cursor --project-root .
 
-Use --runtime generic for a compatible client that discovers .agents/skills.
-Preview without writes by adding --dry-run.
+Use `--runtime generic` for a compatible client that discovers `.agents/skills`.
+Contributors and auditors may override packaged resources explicitly with
+`--source ./skills` from a trusted checkout.
 
-Installation validates every canonical SKILL.md, rejects source or target symlinks,
+Installation validates every canonical `SKILL.md`, rejects source or target symlinks,
 preflights all collisions, copies files atomically, and writes
-.solodeveling-adapter.json inside the runtime skill root. Re-running install updates
+`.solodeveling-adapter.json` inside the runtime skill root. Re-running install updates
 only files still matching the prior managed manifest. It refuses modified managed
 files and unmanaged collisions.
 
 Installing several native adapters into one project creates separate copies. Some
 runtimes may also scan compatibility paths, which can surface duplicate skill names.
-Until live co-install evaluation is complete, install only the adapter paths actually
-needed in that workspace and use check before switching runtime configuration.
+Install only the paths needed in that workspace and run check before switching runtime
+configuration.
 
 ## Check drift
 
-    solodeveling-adapt check --runtime codex --source ./skills --project-root .
+    solodeveling-adapt check --runtime codex --project-root .
 
-A successful check proves that managed files match their recorded hashes and the
-canonical source digest at that moment. It reports missing, modified, unexpected, and
-source-drifted content. Hash equality detects change; it does not prove publisher
-identity, authenticity, safety, or behavioral compliance.
+A successful check proves managed files match their recorded hashes and the packaged
+canonical source digest at that moment. Hash equality detects change; it does not prove
+publisher identity, authenticity, safety, or behavioral compliance.
 
 ## Remove safely
 
@@ -68,11 +71,8 @@ Then remove unchanged managed files:
 
 Uninstall preflights every manifest path and hash. If any managed file is missing,
 modified, replaced by a symlink, or outside the adapter root, it stops before deletion.
-Unrelated skills and user files remain. Review modified files and recover or relocate
-them explicitly; there is intentionally no force-delete option.
+Unrelated skills and user files remain. There is intentionally no force-delete option.
 
-After adding a top-level skill directory, start a fresh agent session if the runtime
-does not discover it. Claude Code documents live detection for existing skill roots
-but requires restart when the top-level skills directory was absent at session start;
-Codex also recommends restart when an update does not appear. Treat Cursor refresh
-behavior as unverified until the live evaluation suite runs.
+Start a fresh agent session after adding a top-level skill directory if the runtime
+does not discover it. Treat refresh and co-install behavior as runtime-specific and
+unverified until exercised by the live evaluation matrix.
