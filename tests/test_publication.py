@@ -133,6 +133,9 @@ def test_publish_workflow_is_manual_pinned_oidc_only_and_environment_gated() -> 
     assert "pull_request_target:" not in workflow
     assert "permissions:\n  contents: read" in workflow
     assert "CONFIRM publish solodeveling" in workflow
+    assert "scripts/publication_gate.py" in workflow
+    assert "source_revision must equal the publish workflow commit" not in workflow
+    assert "fetch-depth: 0" in workflow
     assert "release is draft" in workflow
     assert "release is not immutable" in workflow
     assert "gh release verify " in workflow
@@ -178,6 +181,7 @@ def test_publication_docs_cover_owner_setup_bootstrap_and_recovery() -> None:
         "environment: pypi",
         "environment: npm",
         "publish.yml",
+        "ancestor",
         "rebuild the entire set",
         "post-publication smoke",
     ):

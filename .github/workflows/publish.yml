@@ -40,6 +40,10 @@ jobs:
       contents: read
       attestations: read
     steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
       - name: Validate immutable publication authority
         env:
           VERSION: ${{ inputs.version }}
@@ -63,13 +67,17 @@ jobs:
               raise SystemExit("source_revision must be a lowercase 40-character Git SHA")
           if os.environ["WORKFLOW_REF"] != "refs/heads/main":
               raise SystemExit("publish workflow must run from refs/heads/main")
-          if revision != os.environ["WORKFLOW_REVISION"]:
-              raise SystemExit("source_revision must equal the publish workflow commit")
+
           if os.environ["CONFIRMATION"] != expected:
               raise SystemExit(f"confirmation must equal: {expected}")
           if os.environ["PUBLISH_PYPI"] != "true" and os.environ["NPM_ACTION"] == "skip":
               raise SystemExit("publication request is a no-op")
           PY
+          python scripts/publication_gate.py \
+            --repo . \
+            --source-revision "$SOURCE_REVISION" \
+            --workflow-revision "$WORKFLOW_REVISION" \
+            --expected-version "$VERSION"
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           ref: ${{ inputs.source_revision }}
@@ -78,14 +86,12 @@ jobs:
         with:
           python-version: "3.14"
           cache: pip
-      - name: Verify package, tag, and published GitHub Release identity
+      - name: Verify tag and published GitHub Release identity
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
           SOURCE_REVISION: ${{ inputs.source_revision }}
         run: |
-          package_version="$(python -c 'from pathlib import Path; import re; print(re.search(r"""^version = "([^"]+)"$""", Path("pyproject.toml").read_text(), re.MULTILINE).group(1))')"
-          test "$package_version" = "$VERSION"
           git fetch --force origin "refs/tags/v$VERSION:refs/tags/v$VERSION"
           test "$(git rev-list -n 1 "v$VERSION")" = "$SOURCE_REVISION"
           release_json="$(gh release view "v$VERSION" --repo ohmiler/solodeveling --json isDraft,isImmutable)"
