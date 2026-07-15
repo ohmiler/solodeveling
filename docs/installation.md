@@ -9,29 +9,27 @@ Solodeveling uses one package name and one public executable name in every ecosy
 Node.js 20 or newer:
 
 ~~~console
-npx solodeveling install --runtime codex --dry-run
-npx solodeveling install --runtime codex
+npx solodeveling install
 ~~~
 
-`npx` is the shortest path and does not require a global package install.
-For a persistent command:
+`npx` is the shortest path and does not require a global package install. For a
+persistent command:
 
 ~~~console
 npm install -g solodeveling
-solodeveling version
+solodeveling install
 ~~~
 
 Python 3.10 or newer:
 
 ~~~console
-uvx solodeveling version
+uvx solodeveling install
 uv tool install solodeveling
 pipx install solodeveling
 ~~~
 
-`uvx` runs the tool ephemerally. `uv tool install` and
-`pipx install` keep an isolated installation and place
-`solodeveling` on the user PATH.
+`uvx` runs the tool ephemerally. `uv tool install` and `pipx install` keep an isolated
+installation and place `solodeveling` on the user PATH.
 
 The npm and PyPI projects are not published at the current source revision. Registry
 commands above describe the reviewed-release UX and will work only after publication.
@@ -39,7 +37,7 @@ For development or pre-release verification, use a trusted checkout:
 
 ~~~console
 python -m pip install .
-solodeveling version
+solodeveling install
 ~~~
 
 ## Supported release targets
@@ -80,27 +78,25 @@ version-matched native artifacts pass.
 
 ## Install into a project
 
-The project root defaults to the current directory:
+Run from the project root:
 
 ~~~console
-solodeveling install --runtime codex --dry-run
-solodeveling install --runtime codex
-solodeveling check --runtime codex
+solodeveling install
 ~~~
 
-Use `--project-root PATH` when the target is elsewhere. Valid runtime
-values are `codex`, `claude-code`, `cursor`, and
-`generic`.
+Solodeveling reuses valid managed manifests first. For a new installation it detects
+fixed project-local markers for Codex/Agent Skills, Claude Code, and Cursor, installs
+each distinct detected target, and defaults to `.agents/skills` when no marker exists.
+It does not inspect global programs, environment-provided paths, or agent account
+settings.
 
-## Upgrade and remove
+## Upgrade, check, and remove
 
 For npm:
 
 ~~~console
 npm install -g solodeveling@latest
-solodeveling install --runtime codex --dry-run
-solodeveling install --runtime codex
-npm uninstall -g solodeveling
+solodeveling install
 ~~~
 
 For uv or pipx:
@@ -108,17 +104,32 @@ For uv or pipx:
 ~~~console
 uv tool upgrade solodeveling
 pipx upgrade solodeveling
+solodeveling install
+~~~
+
+Verify or safely remove every managed project installation without remembering its
+runtime:
+
+~~~console
+solodeveling check
+solodeveling uninstall
 ~~~
 
 Package removal removes the command, not managed skills already copied into projects.
-Remove project skills separately and preview first:
+Uninstall refuses to delete managed files whose bytes changed.
+
+### Advanced overrides
+
+Use these only for automation, a non-current project, or deliberate single-runtime
+control:
 
 ~~~console
+solodeveling install --runtime claude-code
+solodeveling check --runtime cursor --project-root PATH
 solodeveling uninstall --runtime codex --dry-run
-solodeveling uninstall --runtime codex
 ~~~
 
-Uninstall refuses to delete managed files whose bytes changed.
+`--dry-run` previews an operation but is never required for install or uninstall.
 
 ## Publication trust
 

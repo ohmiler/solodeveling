@@ -52,11 +52,11 @@ def test_readme_has_safe_multi_runtime_install_and_evidence_language() -> None:
 
     for phrase in (
         "single primary agent",
-        "solodeveling install --runtime codex",
-        "solodeveling install --runtime claude-code",
-        "solodeveling install --runtime cursor",
+        "npx solodeveling install",
+        "solodeveling install",
         "solodeveling check",
-        "--dry-run",
+        "Automatic project installation",
+        ".agents/skills",
         "Tier 1 remains unverified",
         "Apache-2.0",
     ):
