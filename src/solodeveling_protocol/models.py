@@ -32,6 +32,17 @@ class WorkStatus(str, Enum):
     BLOCKED = "blocked"
     DEFERRED = "deferred"
 
+class SecurityProfile(str, Enum):
+    WEB_APPLICATION = "web-application"
+    MOBILE = "mobile"
+    IDENTITY_ACCESS = "identity-access"
+    SENSITIVE_DATA = "sensitive-data"
+    DATA_MIGRATION = "data-migration"
+    SUPPLY_CHAIN = "supply-chain"
+    INFRASTRUCTURE = "infrastructure"
+    AI_AGENTIC = "ai-agentic"
+    PAYMENTS = "payments"
+
 
 @dataclass(frozen=True)
 class ArtifactDocument:
