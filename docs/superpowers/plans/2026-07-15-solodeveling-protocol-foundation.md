@@ -1,4 +1,4 @@
-﻿# Solodeveling Protocol Foundation Implementation Plan
+# Solodeveling Protocol Foundation Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task in one primary agent. Do not use subagents.
 
@@ -134,8 +134,6 @@ solodeveling-validate = "solodeveling_protocol.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/solodeveling_protocol"]
 
-[tool.hatch.build.targets.wheel.force-include]
-"src/solodeveling_protocol/schemas" = "solodeveling_protocol/schemas"
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers --strict-config"
