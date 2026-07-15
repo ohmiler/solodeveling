@@ -8,8 +8,8 @@ one action does not imply the others.
 
 ## Trusted identities and owner setup
 
-Enable GitHub release immutability before creating the first public release; the
-setting protects only releases created after it is enabled.
+GitHub release immutability was enabled for this repository on 2026-07-16. It
+protects only releases created after the setting was enabled.
 
 Use these exact identities:
 
@@ -20,10 +20,16 @@ Use these exact identities:
 - publication workflow: `.github/workflows/publish.yml`;
 - protected registry environments: `environment: pypi` and `environment: npm`.
 
+Both GitHub environments exist, require reviewer `ohmiler`, permit the solo owner to
+review a workflow they initiated, and allow deployment only from exact branch
+`main`. They contain no secrets or variables. GitHub reports that administrators can
+explicitly bypass the ordinary reviewer gate; reconsider disabling this recovery
+path in the repository UI before first publication.
+
 Before the first PyPI release, an owner must create a PyPI pending publisher for
 project `solodeveling`, owner `ohmiler`, repository `solodeveling`, workflow
-`publish.yml`, and environment `pypi`. In GitHub, create the `pypi` environment,
-limit deployment to the protected `main` branch, and require maintainer approval.
+`publish.yml`, and environment `pypi`. The existing GitHub `pypi` environment
+provides the required owner review and exact `main` branch restriction.
 
 The npm package does not exist yet. Trusted Publishing cannot bootstrap a package
 that has never been published. The first npm publication must therefore be an
@@ -31,8 +37,8 @@ owner-controlled, interactive publication of the verified tarball using two-fact
 authentication, after the matching immutable GitHub Release and all native assets
 exist. It must not use a CI token. After that succeeds, configure the npm trusted
 publisher for repository `ohmiler/solodeveling`, workflow `publish.yml`, and
-environment `npm`; create that GitHub environment with the same branch restriction
-and required approval. Prefer the workflow's staged npm action so the owner can
+environment `npm`; use the existing GitHub environment with its owner-review and
+exact `main` restriction. Prefer the workflow's staged npm action so the owner can
 review and approve it before the registry makes it public.
 
 A name lookup returning not found is not a reservation. Neither name is owned until

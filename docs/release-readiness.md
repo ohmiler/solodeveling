@@ -57,17 +57,18 @@ on Codex, Claude Code, and Cursor.
 - The npm and PyPI registry endpoints for `solodeveling` returned not found. The
   repository has no version tag or GitHub Release, so public `npx`, `uvx`, `pipx`,
   and registry installation remain unavailable.
+- GitHub Release immutability is enabled. The `pypi` and `npm` environments require
+  reviewer `ohmiler`, permit solo-owner self-review, contain exact `main`-only branch
+  policy, and contain no secrets or variables. Administrator bypass remains enabled
+  as an explicit residual recovery path.
 - Source and guarded workflows are ready for owner-controlled release preparation.
-  No candidate workflow, environment, registry, tag, release, attestation, staging
-  action, approval, or publication has been invoked.
+  No candidate workflow, registry, tag, release, attestation, staging action,
+  approval, or publication has been invoked.
 
 ## Remaining gates
 
-- Obtain explicit owner authorization before enabling GitHub release immutability or
-  creating the protected `pypi` and `npm` environments. These settings do not
-  authorize candidate creation or publication.
-- Enable GitHub release immutability and create protected `pypi` and `npm`
-  environments with required approval and `main`-only deployment policy.
+- Decide whether to disable administrator bypass for `pypi` and `npm` through the
+  GitHub environment UI before first publication.
 - Recheck both registry names immediately before first publication.
 - With separate explicit authority, invoke the candidate workflow from an exact
   reviewed `main` commit, inspect the complete attested set, then create its tag and
