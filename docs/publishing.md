@@ -69,10 +69,13 @@ staging, and npm publication each require separate explicit authorization.
 ## Guarded publication workflow
 
 `publish.yml` is manual-only and accepts an exact version, the exact 40-character
-`main` commit, an exact typed confirmation, a PyPI boolean, and an npm action of
-`skip`, `stage`, or `publish`. It refuses an old workflow revision, a mismatched tag,
-a draft, mutable, or missing GitHub Release, a changed release-set inventory, a failed hash,
-or an attestation not issued by `release-candidate.yml` for that main commit.
+candidate commit, an exact typed confirmation, a PyPI boolean, and an npm action of
+`skip`, `stage`, or `publish`. The workflow itself must run from current protected
+`main`; it accepts an older candidate only when Git proves that commit is an ancestor
+of the current workflow revision and the canonical dynamic source version matches.
+It refuses a candidate outside that history, a mismatched tag, a draft, mutable, or
+missing GitHub Release, a changed release-set inventory, a failed hash, or an
+attestation not issued by `release-candidate.yml` for that candidate commit.
 
 The validation job has no write permission. The two registry jobs receive
 `id-token: write` only behind their matching protected environment. There is no
@@ -89,8 +92,8 @@ GitHub Release and never repairs or replaces release files.
    non-draft immutable GitHub Release containing the complete verified release set.
 5. Configure the protected registry environment and trusted publisher described
    above. For npm 0.1.0, perform the one-time interactive bootstrap instead.
-6. With explicit authority naming the registry targets, run `publish.yml` from the
-   same `main` SHA. Enter exactly
+6. With explicit authority naming the registry targets, run the current `publish.yml`
+   from protected `main` while naming the exact verified candidate SHA. Enter exactly
    `CONFIRM publish solodeveling <version> from <source_revision>`.
 7. Prefer PyPI alone and npm `stage` as independently reviewable choices. Use direct
    npm `publish` only when that exact action was explicitly authorized.

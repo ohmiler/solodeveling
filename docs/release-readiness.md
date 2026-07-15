@@ -69,6 +69,10 @@ on Codex, Claude Code, and Cursor.
   verification of the downloaded 13-file release set and every provenance subject
   also passed. No registry, tag, GitHub Release, staging action, approval, or
   publication was invoked.
+- WORK-017 repaired the publication gate so current protected `main` accepts that
+  exact candidate only as a verified ancestor and reads its canonical dynamic version
+  without executing candidate code. Adversarial tests and cross-platform CI passed;
+  `publish.yml` itself remains uninvoked pending separate external authority.
 
 ## Remaining gates
 
