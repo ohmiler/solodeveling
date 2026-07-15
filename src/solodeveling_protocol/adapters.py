@@ -20,6 +20,12 @@ RUNTIME_PATHS = {
     "cursor": Path(".cursor/skills"),
     "generic": Path(".agents/skills"),
 }
+_RUNTIME_ORDER = ("codex", "claude-code", "cursor", "generic")
+_RUNTIME_MARKERS = {
+    "codex": (Path(".codex"), Path(".agents")),
+    "claude-code": (Path(".claude"),),
+    "cursor": (Path(".cursor"),),
+}
 
 
 class AdapterError(ValueError):
@@ -234,6 +240,60 @@ def _load_manifest(project_root: Path, runtime: str) -> dict[str, Any]:
             raise AdapterError(f"invalid managed hash for {relative}")
     return document
 
+
+def discover_managed_runtimes(project_root: Path) -> tuple[str, ...]:
+    project_root = Path(project_root)
+    discovered: list[str] = []
+    seen_roots: set[Path] = set()
+    for candidate in _RUNTIME_ORDER:
+        adapter_root = RUNTIME_PATHS[candidate]
+        if adapter_root in seen_roots:
+            continue
+        seen_roots.add(adapter_root)
+        path = project_root / adapter_root / MANIFEST_NAME
+        _ensure_target_path(project_root, path)
+        if not path.exists():
+            continue
+        if not path.is_file() or path.is_symlink():
+            raise AdapterError(f"managed adapter manifest is invalid: {path}")
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as error:
+            raise AdapterError(
+                f"managed adapter manifest is invalid: {error}"
+            ) from error
+        runtime = document.get("runtime") if isinstance(document, dict) else None
+        if (
+            not isinstance(runtime, str)
+            or runtime not in RUNTIME_PATHS
+            or RUNTIME_PATHS[runtime] != adapter_root
+        ):
+            raise AdapterError(
+                "managed adapter manifest has an invalid runtime identity"
+            )
+        _load_manifest(project_root, runtime)
+        discovered.append(runtime)
+    return tuple(discovered)
+
+
+def detect_install_runtimes(project_root: Path) -> tuple[str, ...]:
+    project_root = Path(project_root)
+    by_root = {
+        RUNTIME_PATHS[runtime]: runtime
+        for runtime in discover_managed_runtimes(project_root)
+    }
+    for runtime in _RUNTIME_ORDER:
+        for marker in _RUNTIME_MARKERS.get(runtime, ()):
+            path = project_root / marker
+            if path.is_symlink():
+                raise AdapterError(f"runtime marker symlink is not allowed: {path}")
+            if path.is_dir():
+                by_root.setdefault(RUNTIME_PATHS[runtime], runtime)
+                break
+    if not by_root:
+        by_root[RUNTIME_PATHS["codex"]] = "codex"
+    rank = {runtime: index for index, runtime in enumerate(_RUNTIME_ORDER)}
+    return tuple(sorted(by_root.values(), key=rank.__getitem__))
 
 def _atomic_write(content: bytes, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)

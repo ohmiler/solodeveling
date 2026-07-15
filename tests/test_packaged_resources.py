@@ -36,13 +36,13 @@ def test_adapter_cli_uses_canonical_resource_without_source_flag(
     project.mkdir()
 
     installed = adapter_main(
-        ["install", "--runtime", "codex", "--project-root", str(project)]
+        ["install", "--project-root", str(project)]
     )
     checked = adapter_main(
-        ["check", "--runtime", "codex", "--project-root", str(project)]
+        ["check", "--project-root", str(project)]
     )
     removed = adapter_main(
-        ["uninstall", "--runtime", "codex", "--project-root", str(project)]
+        ["uninstall", "--project-root", str(project)]
     )
 
     assert (installed, checked, removed) == (0, 0, 0)

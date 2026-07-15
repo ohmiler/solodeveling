@@ -10,6 +10,8 @@ from solodeveling_protocol.adapters import (
     AdapterError,
     RUNTIME_PATHS,
     check_adapter,
+    detect_install_runtimes,
+    discover_managed_runtimes,
     install_adapter,
     manifest_path,
     uninstall_adapter,
@@ -237,6 +239,7 @@ def test_tampered_manifest_cannot_escape_project(
 
     assert victim.read_text("utf-8") == "do not delete"
 
+
 def test_parent_path_collision_is_rejected_before_copy(
     source_skills: Path,
     tmp_path: Path,
@@ -307,6 +310,7 @@ def test_real_canonical_suite_is_byte_identical_and_conformant(
     assert check_adapter(source, project, runtime).ok
     assert uninstall_adapter(project, runtime).ok
 
+
 def test_dangling_target_symlink_is_rejected_in_preflight(
     source_skills: Path,
     tmp_path: Path,
@@ -326,3 +330,31 @@ def test_dangling_target_symlink_is_rejected_in_preflight(
         install_adapter(source_skills, project, "codex")
 
     assert not (project / ".agents/skills").exists()
+
+
+def test_discovery_preserves_existing_shared_path_runtime_identity(
+    source_skills: Path, tmp_path: Path
+) -> None:
+    project = tmp_path / "project"
+    install_adapter(source_skills, project, "generic")
+    (project / ".codex").mkdir()
+
+    assert discover_managed_runtimes(project) == ("generic",)
+    assert detect_install_runtimes(project) == ("generic",)
+
+
+def test_detection_rejects_runtime_marker_symlink(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = tmp_path / "project"
+    project.mkdir()
+    marker = project / ".cursor"
+    original = Path.is_symlink
+
+    def report_simulated_link(path: Path) -> bool:
+        return path == marker or original(path)
+
+    monkeypatch.setattr(Path, "is_symlink", report_simulated_link)
+
+    with pytest.raises(AdapterError, match="symlink"):
+        detect_install_runtimes(project)

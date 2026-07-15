@@ -12,26 +12,23 @@ was unavailable. Tier 1 remains unverified until the full core scenario matrix p
 
 ## Quick start
 
-After the first reviewed 0.1.0 release is published, Node.js users can preview and
-install into the current project without installing Python:
+After the first reviewed 0.1.0 release is published, Node.js users need one command:
 
 ~~~console
-npx solodeveling install --runtime codex --dry-run
-npx solodeveling install --runtime codex
+npx solodeveling install
 ~~~
 
-Install the same command globally if you prefer:
+For a permanent command:
 
 ~~~console
 npm install -g solodeveling
-solodeveling install --runtime codex --dry-run
-solodeveling install --runtime codex
+solodeveling install
 ~~~
 
 Python users can run it without a permanent install or install it as a tool:
 
 ~~~console
-uvx solodeveling install --runtime codex --dry-run
+uvx solodeveling install
 uv tool install solodeveling
 pipx install solodeveling
 ~~~
@@ -43,53 +40,62 @@ install from this trusted checkout:
 git clone https://github.com/ohmiler/solodeveling.git
 cd solodeveling
 python -m pip install .
-solodeveling install --runtime codex --dry-run
+solodeveling install
 ~~~
 
 All channels expose only one public command: `solodeveling`. See
 [Installation](docs/installation.md) for prerequisites, platform support, upgrades,
 integrity controls, and current publication status.
 
-## Runtime installation
+## Automatic project installation
 
-Choose the runtime whose native skill-discovery directory should be managed:
+The ordinary workflow has no required options:
 
 ~~~console
-solodeveling install --runtime codex
-solodeveling install --runtime claude-code
-solodeveling install --runtime cursor
-solodeveling install --runtime generic
+solodeveling install
+solodeveling check
+solodeveling uninstall
 ~~~
 
-The default project root is the current directory. Use `--project-root PATH`
-for another project. The mappings are `.agents/skills`,
-`.claude/skills`, `.cursor/skills`, and
-`.agents/skills` respectively.
+Solodeveling first reuses any installation it already manages. Otherwise it detects
+project-local Codex/Agent Skills, Claude Code, and Cursor directories. It installs
+every distinct runtime found, and defaults to the standard `.agents/skills` path when
+the project has no runtime marker. It never searches global executables or writes
+outside the current project.
 
-Installation validates the skill suite, rejects symlinks and path traversal, refuses
-unmanaged collisions, copies files atomically, and records managed hashes. It does
-not change coding-agent settings or grant tools. Start a fresh agent session after
-first installation, then invoke `$solodeveling` in Codex,
-`/solodeveling` in Claude Code or Cursor, or the client-defined invocation
-in another Agent Skills runtime.
+Installation validates the skill suite, preflights every detected target, rejects
+symlinks and path traversal, refuses unmanaged collisions, copies files atomically,
+and records managed hashes. Check detects missing, changed, or unexpected managed
+files. Uninstall removes only unchanged managed files and has no force-delete mode.
 
-## One command, complete lifecycle
+Start a fresh agent session after first installation, then invoke `$solodeveling` in
+Codex, `/solodeveling` in Claude Code or Cursor, or the client-defined invocation in
+another Agent Skills runtime.
+
+### Advanced overrides
+
+Automation and unusual workspaces may still select an exact runtime or another
+project. `--dry-run` remains available as an optional preview, not a required step:
 
 ~~~console
-solodeveling check --runtime codex
-solodeveling uninstall --runtime codex --dry-run
-solodeveling uninstall --runtime codex
-solodeveling init --help
+solodeveling install --runtime claude-code --project-root PATH
+solodeveling install --runtime cursor --dry-run
+~~~
+
+## Other commands
+
+The install flow stays short; project memory and evaluation remain explicit:
+
+~~~console
+solodeveling init
 solodeveling validate .
 solodeveling eval probe
 solodeveling version
 ~~~
 
-Check detects missing, changed, or unexpected managed files. Uninstall removes only
-unchanged managed files and preserves drift for manual recovery; there is no
-force-delete mode. Live evaluation can consume model-service usage or API credits,
-so review [Cross-agent evaluation](docs/cross-agent-evaluation.md) before authorizing
-a live run.
+Live evaluation can consume model-service usage or API credits, so review
+[Cross-agent evaluation](docs/cross-agent-evaluation.md) before authorizing a live
+run.
 
 ## Security and support boundaries
 
