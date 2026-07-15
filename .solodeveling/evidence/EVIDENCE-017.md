@@ -49,6 +49,9 @@ limitations:
 - GitHub Actions push run 29454177208 and pull-request run 29454180651 passed the
   complete cross-platform CI matrix for commit
   `ae6ec6d1c35f3f4f6b2b40eb968e36335aa5e16d`.
+- PR 17 merged as `481b1158f47a1f7be312f00e22d552c73d725218`; the real
+  candidate passed against that main revision and post-merge CI run 29454644936
+  passed the complete matrix.
 
 ## Authorization boundary
 

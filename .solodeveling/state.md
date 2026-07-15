@@ -9,7 +9,7 @@ risks:
 - Candidate run 29452526223 produced a complete release set from commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; local integrity verification and strict provenance verification passed for all 13 files.
 - npm first-package bootstrap requires a separate owner-controlled interactive publication with two-factor authentication.
 - Native executables are not platform-signed, and Cursor plus complete Tier 1 behavior remain unverified.
-next_action: Merge PR 17, verify post-merge main and CI, then request fresh explicit authorization before creating and pushing tag v0.1.0 at candidate commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; release and publication remain separate.
+next_action: Obtain fresh explicit owner authorization before creating and pushing tag v0.1.0 at candidate commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; GitHub Release creation and publication remain separate.
 ---
 # State
 
