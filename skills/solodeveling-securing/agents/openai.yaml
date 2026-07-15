@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Securing"
+  short_description: "Route and verify security work by attack surface"
+  default_prompt: "Use $solodeveling-securing to identify applicable security profiles, threats, controls, findings, and bounded evidence."

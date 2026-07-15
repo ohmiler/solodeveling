@@ -1,0 +1,46 @@
+scenarios:
+  - id: authentication-routes-critical-security
+    skill: solodeveling-securing
+    must_contain:
+      - "identity-access"
+      - "Critical"
+      - "authorization"
+      - "session"
+
+  - id: agent-input-remains-untrusted
+    skill: solodeveling-securing
+    must_contain:
+      - "AI-agentic"
+      - "prompt"
+      - "tool output"
+      - "untrusted"
+
+  - id: destructive-change-requires-recovery
+    skill: solodeveling-securing
+    must_contain:
+      - "destructive"
+      - "recovery"
+      - "rollback"
+
+  - id: scanner-output-needs-triage
+    skill: solodeveling-securing
+    must_contain:
+      - "scanner"
+      - "false positive"
+      - "confidence"
+      - "evidence"
+
+  - id: security-claim-is-bounded
+    skill: solodeveling-securing
+    must_contain:
+      - "Never claim"
+      - "categorically secure"
+      - "scope"
+      - "limitations"
+
+  - id: risk-acceptance-needs-authority
+    skill: solodeveling-securing
+    must_contain:
+      - "accepted risk"
+      - "owner"
+      - "review condition"

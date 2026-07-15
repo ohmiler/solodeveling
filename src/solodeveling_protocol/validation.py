@@ -8,10 +8,12 @@ from jsonschema import Draft202012Validator
 
 from solodeveling_protocol.frontmatter import ArtifactReadError, read_artifact
 from solodeveling_protocol.models import ArtifactDocument, ValidationIssue
+from solodeveling_protocol.secrets import detect_secret_kinds
 
 
 SCHEMA_FILES = {
     "project": "project.schema.json",
+    "security-finding": "security-finding.schema.json",
     "work-item": "work-item.schema.json",
     "state": "state.schema.json",
     "evidence": "evidence.schema.json",
@@ -51,6 +53,8 @@ def validate_document(
 
 def _artifact_kind(path: Path) -> str | None:
     normalized = path.as_posix()
+    if not normalized.startswith("/"):
+        normalized = "/" + normalized
     if normalized.endswith("/.solodeveling/project.md"):
         return "project"
     if normalized.endswith("/.solodeveling/state.md"):
@@ -59,6 +63,8 @@ def _artifact_kind(path: Path) -> str | None:
         return "work-item"
     if "/.solodeveling/evidence/" in normalized:
         return "evidence"
+    if "/.solodeveling/security/findings/" in normalized:
+        return "security-finding"
     return None
 
 
@@ -96,6 +102,20 @@ def validate_project(root: Path) -> list[ValidationIssue]:
     evidence_ids: set[str] = set()
 
     for path in sorted(memory_root.rglob("*.md")):
+        try:
+            raw_text = path.read_text(encoding="utf-8")
+        except OSError as error:
+            issues.append(ValidationIssue(path, "read-error", str(error)))
+            continue
+        for secret_kind in detect_secret_kinds(raw_text):
+            issues.append(
+                ValidationIssue(
+                    path,
+                    "secret-like-material",
+                    f"High-confidence {secret_kind} pattern detected; value omitted",
+                )
+            )
+
         kind = _artifact_kind(path)
         if kind is None:
             continue

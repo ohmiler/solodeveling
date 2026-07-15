@@ -18,7 +18,9 @@ Git provider.
    and stop only if overlapping changes cannot be handled safely.
 3. Use an existing branch strategy. Create a branch only when useful; a worktree is
    optional and never a correctness requirement.
-4. Mark the item `active` and update state before substantial work.
+4. Before any implementation edit, validate the `ready -> active` transition, persist
+   the work item and state, then re-read both to confirm the checkpoint. Do not
+   continue implementation while durable status remains `ready`.
 
 ## Implement in slices
 

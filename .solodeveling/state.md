@@ -1,14 +1,14 @@
 ---
 solodeveling_schema: 1
-current_goal: Implement the Secure SDLC baseline and security-routing workflows.
+current_goal: Implement release and maintenance workflows.
 active_work: []
 blockers: []
 risks:
-- Dedicated security, release, and maintenance workflows are not implemented, so public Version 1 readiness has not been reached.
+- Release and maintenance workflows are not implemented, so public Version 1 readiness has not been reached.
 - Live cross-agent behavior is not yet verified on Codex, Claude Code, and Cursor.
-next_action: Shape WORK-003 for security baseline, findings, and system profiles.
+next_action: Shape WORK-004 for release readiness, rollback, maintenance, vulnerabilities, and incidents.
 ---
 # State
 
-The ordinary development loop now uses Solodeveling for shaping, planning, execution,
-debugging, and verification without Superpowers.
+The ordinary development loop and Secure SDLC baseline now use Solodeveling without
+Superpowers. Security claims remain bounded by performed checks and limitations.

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solodeveling.dev/schemas/v1/security-finding.schema.json",
+  "type": "object",
+  "required": ["solodeveling_schema", "id", "title", "severity", "confidence", "source", "affected_asset", "evidence", "impact", "recommendation", "status", "verification"],
+  "properties": {
+    "solodeveling_schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^FINDING-[0-9]{3,}$"},
+    "title": {"type": "string", "minLength": 1},
+    "severity": {"enum": ["info", "low", "medium", "high", "critical"]},
+    "confidence": {"enum": ["unconfirmed", "low", "medium", "high", "confirmed"]},
+    "source": {"enum": ["manual-review", "automated-scanner", "test", "external-report", "incident"]},
+    "affected_asset": {"type": "string", "minLength": 1},
+    "evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "impact": {"type": "string", "minLength": 1},
+    "recommendation": {"type": "string", "minLength": 1},
+    "status": {"enum": ["open", "in-progress", "mitigated", "accepted-risk", "false-positive"]},
+    "verification": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "confirmation": {"type": "string", "minLength": 1},
+    "risk_acceptance": {
+      "type": "object",
+      "required": ["rationale", "owner", "review_condition"],
+      "properties": {
+        "rationale": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "review_condition": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": ["source", "confidence"],
+        "properties": {
+          "source": {"const": "automated-scanner"},
+          "confidence": {"const": "confirmed"}
+        }
+      },
+      "then": {"required": ["confirmation"]}
+    },
+    {
+      "if": {"required": ["status"], "properties": {"status": {"const": "accepted-risk"}}},
+      "then": {"required": ["risk_acceptance"]}
+    },
+    {
+      "if": {"required": ["status"], "properties": {"status": {"enum": ["mitigated", "false-positive"]}}},
+      "then": {"properties": {"verification": {"minItems": 1}}}
+    }
+  ]
+}
