@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 from importlib.resources import files
@@ -11,6 +11,7 @@ from solodeveling_protocol.models import ArtifactDocument, ValidationIssue
 
 
 SCHEMA_FILES = {
+    "project": "project.schema.json",
     "work-item": "work-item.schema.json",
     "state": "state.schema.json",
     "evidence": "evidence.schema.json",
@@ -50,6 +51,8 @@ def validate_document(
 
 def _artifact_kind(path: Path) -> str | None:
     normalized = path.as_posix()
+    if normalized.endswith("/.solodeveling/project.md"):
+        return "project"
     if normalized.endswith("/.solodeveling/state.md"):
         return "state"
     if "/.solodeveling/work/" in normalized:
@@ -71,6 +74,24 @@ def validate_project(root: Path) -> list[ValidationIssue]:
         ]
 
     issues: list[ValidationIssue] = []
+    required_paths = {
+        "missing-project": memory_root / "project.md",
+        "missing-state": memory_root / "state.md",
+        "missing-active-work": memory_root / "work" / "active",
+        "missing-work-archive": memory_root / "work" / "archive",
+        "missing-evidence-directory": memory_root / "evidence",
+    }
+    for code, path in required_paths.items():
+        exists = path.is_file() if path.suffix else path.is_dir()
+        if not exists:
+            issues.append(
+                ValidationIssue(
+                    path,
+                    code,
+                    f"Required project-memory path is missing: {path.name}",
+                )
+            )
+
     work_items: dict[str, ArtifactDocument] = {}
     evidence_ids: set[str] = set()
 

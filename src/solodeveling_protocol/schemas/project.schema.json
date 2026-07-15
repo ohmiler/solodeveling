@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solodeveling.dev/schemas/v1/project.schema.json",
+  "type": "object",
+  "required": ["solodeveling_schema", "name", "purpose", "users", "architecture", "stack", "constraints"],
+  "properties": {
+    "solodeveling_schema": {"const": 1},
+    "name": {"type": "string", "minLength": 1},
+    "purpose": {"type": "string", "minLength": 1},
+    "users": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "architecture": {"type": "string", "minLength": 1},
+    "stack": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "constraints": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "sources": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  },
+  "additionalProperties": false
+}
