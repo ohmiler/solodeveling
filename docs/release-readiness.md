@@ -48,9 +48,24 @@ temporary staging, and never upload to a registry.
 Tier 1 remains unverified because the full behavioral scenario matrix has not passed
 on Codex, Claude Code, and Cursor.
 
+## Status reconciled 2026-07-16
+
+- Pull requests 8 through 12 and WORK-008 through WORK-012 are merged. The reviewed
+  pre-release base is `main` commit
+  `cda0f4854359384f79ea45c50a8ad06f9eba6baf`; GitHub Actions run 29442409991
+  passed the full Python/package, six-native-target, and npm pack/npx matrix.
+- The npm and PyPI registry endpoints for `solodeveling` returned not found. The
+  repository has no version tag or GitHub Release, so public `npx`, `uvx`, `pipx`,
+  and registry installation remain unavailable.
+- Source and guarded workflows are ready for owner-controlled release preparation.
+  No candidate workflow, environment, registry, tag, release, attestation, staging
+  action, approval, or publication has been invoked.
+
 ## Remaining gates
 
-- Merge WORK-011 after its full local and GitHub CI verification.
+- Obtain explicit owner authorization before enabling GitHub release immutability or
+  creating the protected `pypi` and `npm` environments. These settings do not
+  authorize candidate creation or publication.
 - Enable GitHub release immutability and create protected `pypi` and `npm`
   environments with required approval and `main`-only deployment policy.
 - Recheck both registry names immediately before first publication.
