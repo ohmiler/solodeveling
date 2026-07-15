@@ -72,8 +72,10 @@ def test_ci_is_least_privilege_pinned_and_non_publishing() -> None:
     assert "id-token: write" not in workflow
     assert "pytest" in workflow
     assert "validate_skill_suite.py" in workflow
-    assert "build_release.py" in workflow
-    assert "verify_release.py" in workflow
+    assert "build_candidate.py" in workflow
+    assert "verify_candidate.py" in workflow
+    candidate_verifier = Path("scripts/verify_candidate.py").read_text("utf-8")
+    assert "from verify_release import" in candidate_verifier
     assert "smoke_installed.py" in workflow
     lowered = workflow.lower()
     for forbidden in (

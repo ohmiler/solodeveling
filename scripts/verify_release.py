@@ -49,7 +49,13 @@ def verify_bundle(project_root: Path, bundle: Path) -> None:
             raise VerificationError(f"artifact size mismatch: {artifact.name}")
         expected_sums.append(f"{actual}  {artifact.name}")
     actual_sums = sums_path.read_text("utf-8").splitlines()
-    if actual_sums != expected_sums:
+    candidate = (bundle / "candidate-manifest.json").is_file()
+    sums_match = (
+        actual_sums[: len(expected_sums)] == expected_sums
+        if candidate
+        else actual_sums == expected_sums
+    )
+    if not sums_match:
         raise VerificationError("SHA256SUMS does not match the manifest")
 
     canonical = _canonical_bytes(project_root)

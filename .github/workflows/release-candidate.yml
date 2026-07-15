@@ -1,0 +1,46 @@
+name: Release candidate provenance
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_revision:
+        description: Exact lowercase 40-character commit SHA to build
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ inputs.source_revision }}
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install candidate tools
+        run: python -m pip install ".[dev]"
+      - name: Build and verify non-publishing candidate
+        run: |
+          python scripts/build_candidate.py candidate --source-revision "${{ inputs.source_revision }}"
+          python scripts/verify_candidate.py candidate --source-revision "${{ inputs.source_revision }}"
+      - name: Attest exact candidate subjects
+        uses: actions/attest@f6bf1532d7d6793fce74eac584813a8eee607999 # v4
+        with:
+          subject-path: |
+            candidate/*.whl
+            candidate/*.tar.gz
+            candidate/*.cdx.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: solodeveling-0.1.0-candidate
+          path: candidate/
+          if-no-files-found: error
