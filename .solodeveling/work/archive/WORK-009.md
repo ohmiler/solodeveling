@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-009
 title: Unify the Solodeveling name and installation experience
-status: verifying
+status: done
 level: critical
 type: change
 goal: Give every user one public name and command, solodeveling, with easy Python and Node.js installation paths that run the same canonical implementation.
@@ -36,7 +36,7 @@ verification:
 - Pack the npm package, install/run it from a local tarball, and exercise the launcher against local verified fixtures without registry publication.
 - Build standalone binaries on the supported CI matrix and verify embedded skills/evaluation resources plus representative commands.
 - Run the complete Python suite, Node tests, package-content inspections, dependency/security checks, protocol validation, and clean-diff review.
-next_action: Commit and push the implementation, require all Python, native, and npm CI jobs to pass, then record source-bound evidence.
+next_action: Review and integrate pull request 9; publication, tags, releases, attestations, and registry configuration remain separately authorized actions.
 security_considerations:
 - Never execute before digest verification; never use mutable latest URLs, shell command composition, PATH lookup for downloaded artifacts, or writable manifest-selected traversal paths.
 - Bind npm version, release tag, asset names, sizes, and hashes; download to a temporary file and atomically promote only after validation.
@@ -47,7 +47,8 @@ recovery:
 - Delete only launcher cache entries created for a failed exact version; never modify user projects during download/verification.
 - If version or asset identity drifts, rebuild all packages and artifacts from the reviewed source commit rather than editing generated manifests.
 - Do not publish partial ecosystems; release Python, npm, manifests, and native assets only from one reviewed version-bound release process.
-evidence: []
+evidence:
+- EVIDENCE-009
 ---
 # Implementation plan
 
