@@ -1,0 +1,61 @@
+scenarios:
+  - id: shaping-defines-readiness
+    skill: solodeveling-shaping-work
+    must_contain:
+      - "acceptance criteria"
+      - "out of scope"
+      - "alternatives"
+      - "ready"
+
+  - id: quick-planning-remains-lightweight
+    skill: solodeveling-planning-work
+    must_contain:
+      - "Quick"
+      - "smallest useful plan"
+      - "verification"
+
+  - id: critical-planning-includes-recovery
+    skill: solodeveling-planning-work
+    must_contain:
+      - "Critical"
+      - "security"
+      - "recovery"
+
+  - id: execution-preserves-user-changes
+    skill: solodeveling-executing-work
+    must_contain:
+      - "dirty worktree"
+      - "preserve"
+      - "one primary agent"
+
+  - id: debugging-precedes-fix
+    skill: solodeveling-debugging
+    must_contain:
+      - "reproduce"
+      - "root cause"
+      - "failing regression"
+      - "before implementation"
+
+  - id: verification-failure-blocks-done
+    skill: solodeveling-verifying
+    must_contain:
+      - "recent evidence"
+      - "acceptance criterion"
+      - "must not transition to done"
+      - "unverified"
+
+  - id: no-core-workflow-requires-subagents
+    skill: solodeveling-executing-work
+    must_contain:
+      - "Do not require subagents"
+    must_not_contain:
+      - "subagents are required"
+  - id: router-selects-lifecycle-skills
+    skill: solodeveling
+    must_contain:
+      - "captured -> shaped -> ready -> active -> verifying -> done"
+      - "solodeveling-shaping-work"
+      - "solodeveling-planning-work"
+      - "solodeveling-executing-work"
+      - "solodeveling-debugging"
+      - "solodeveling-verifying"

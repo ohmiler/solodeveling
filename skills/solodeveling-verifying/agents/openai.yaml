@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Verifying"
+  short_description: "Bind completion claims to recent evidence"
+  default_prompt: "Use $solodeveling-verifying to verify this work against every acceptance criterion before completion."

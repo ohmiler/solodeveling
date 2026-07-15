@@ -1,12 +1,14 @@
 ---
 solodeveling_schema: 1
-current_goal: Implement the core development workflows needed to replace Superpowers.
+current_goal: Implement the Secure SDLC baseline and security-routing workflows.
 active_work: []
 blockers: []
 risks:
-- Core development workflows are not implemented yet, so the full Superpowers replacement boundary has not been reached.
-next_action: Shape and plan the lifecycle workflow increment from the approved design.
+- Dedicated security, release, and maintenance workflows are not implemented, so public Version 1 readiness has not been reached.
+- Live cross-agent behavior is not yet verified on Codex, Claude Code, and Cursor.
+next_action: Shape WORK-003 for security baseline, findings, and system profiles.
 ---
 # State
 
-Protocol foundation, core router, and onboarding are implemented and verified.
+The ordinary development loop now uses Solodeveling for shaping, planning, execution,
+debugging, and verification without Superpowers.

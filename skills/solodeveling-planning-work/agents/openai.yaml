@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Planning Work"
+  short_description: "Plan software work in proportion to risk"
+  default_prompt: "Use $solodeveling-planning-work to create a proportional executable plan for this work item."
