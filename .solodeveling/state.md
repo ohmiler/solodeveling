@@ -1,12 +1,13 @@
 ---
 solodeveling_schema: 1
-current_goal: Memory Workflow Simplification is merged and GitHub-verified; Ephemeral Quick dogfood passed while docs-only CI remains broader than needed.
-active_work: []
+current_goal: Implement WORK-025 so changes strictly under docs/** receive a safe focused CI path before returning to npm publication.
+active_work:
+- WORK-025
 blockers: []
 risks:
-- Safe docs-only changes still run the full package and native matrix on both pull request and main push.
+- Docs-only classification must remain limited to docs/** and mixed or ambiguous changes must fall back to full CI.
 - The npm name remains unreserved while npm publication is deferred.
-next_action: Decide whether to add a narrowly safe docs-only CI path before returning to npm publication.
+next_action: Deliver WORK-025 through full CI, then dogfood and verify the docs-only path on GitHub.
 ---
 # State
 
