@@ -16,6 +16,10 @@ limitations:
 
 # Results
 
+PR #37 merged as main commit
+`28c11ed2e1ddc1a8386debb7784d83452184ead9`. PR CI run `29516520634` and
+post-merge main CI run `29516757752` passed the complete matrix.
+
 - Pilot-3 completed 18/18 processes with return code zero, nine per methodology.
   Visible baselines passed, hidden checks failed, and every worktree remained
   unchanged. Both methodologies scored 0/9 with zero correct pairs.
@@ -32,4 +36,4 @@ limitations:
   `failure_code: zero-mutation`, stops the sequence, and cannot resume.
 - Eighteen focused recovery tests and the complete 240-test suite pass. Protocol
   and skill validators, compilation, dependency health, package build, and diff
-  checks pass. Pilot-4 remains not run.
+  checks pass. Protected PR and post-merge main CI pass. Pilot-4 remains not run.

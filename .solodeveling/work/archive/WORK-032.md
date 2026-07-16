@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-032
 title: Comparative Pilot Sandbox Execution Recovery
-status: active
+status: done
 level: standard
 type: repair
 goal: Preserve Pilot-3 as invalid execution-sandbox evidence and prevent another multi-call benchmark when Codex cannot execute sandboxed tools or the first mutation-required task changes nothing.
@@ -27,7 +27,7 @@ decisions:
 verification:
 - Validate and score sanitized Pilot-3 offline.
 - Test helper acceptance/rejection, archived live gate, zero-mutation checkpoint rejection, deterministic plan, full suite, validators, compilation, dependencies, package build, and diff checks.
-next_action: Deliver through protected main, then repair Codex Windows sandbox support before any Pilot-4 authorization.
+next_action: Repair Codex Windows sandbox support and pass the non-live Pilot-4 probe before considering any live authorization.
 evidence:
 - EVIDENCE-032
 ---
@@ -46,3 +46,9 @@ including the Solodeveling project cwd.
 Pilot-4 is a non-live successor. It cannot pass local probe or live preflight
 while the helper remains missing. Its confirmation is
 `RUN CONTROLLED PILOT 4 18`, which has not been authorized.
+
+# Delivery
+
+PR #37 passed the full CI matrix and merged as
+`28c11ed2e1ddc1a8386debb7784d83452184ead9`. Post-merge main CI run
+`29516757752` also passed. Pilot-4 remains blocked and not run.
