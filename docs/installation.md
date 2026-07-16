@@ -31,11 +31,11 @@ pipx install solodeveling
 `uvx` runs the tool ephemerally. `uv tool install` and `pipx install` keep an isolated
 installation and place `solodeveling` on the user PATH.
 
-Version 0.1.0 is published on
+Published versions are available on
 [npm](https://www.npmjs.com/package/solodeveling) and
 [PyPI](https://pypi.org/project/solodeveling/). The npm launcher retrieves only the
 matching native asset from the
-[immutable GitHub Release](https://github.com/ohmiler/solodeveling/releases/tag/v0.1.0).
+[matching immutable GitHub Release](https://github.com/ohmiler/solodeveling/releases/latest).
 For development against an unreleased checkout, install the local Python project:
 
 ~~~console
@@ -136,9 +136,9 @@ solodeveling uninstall --runtime codex --dry-run
 
 ## Publication trust
 
-Release 0.1.0 binds the Python distributions, npm tarball, six native executables,
+Each release binds the Python distributions, npm tarball, six native executables,
 manifest, checksums, SBOM, source commit, and attestations in one immutable release
-set. The public npm and PyPI bytes were verified against that set after publication.
+set. Public npm and PyPI bytes are verified against that set after publication.
 
 Later registry releases use OIDC trusted publishing with protected GitHub
 environments rather than long-lived write tokens. npm automation is restricted to
