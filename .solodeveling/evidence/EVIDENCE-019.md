@@ -8,7 +8,6 @@ command: python -m pytest -q; python scripts/validate_skill_suite.py; python -m 
 result: passed
 scope: WORK-019 protocol skills, public contract, project-memory validator and dashboard, behavioral scenarios, CI classifier, and CI routing policy.
 limitations:
-- The changed GitHub Actions workflow has not yet executed on GitHub; local evidence covers deterministic path classification, policy assertions, and YAML parsing.
 - No live cross-runtime agent evaluation was run; deterministic scenario coverage verifies required routing language and escalation boundaries.
 ---
 
@@ -26,6 +25,9 @@ limitations:
   empty, ambiguous, mixed, source, and skill changes fall back to full CI.
 - CI listens to pull requests, main pushes, and `v*` tags, avoiding feature-branch
   push duplication while preserving tag-triggered full gates.
+- GitHub PR run 29490790013 and main run 29490939374 confirmed full-path routing.
+  Memory-only PR run 29491629890 selected only `changes` and `memory-only`, passing
+  those jobs in 6 and 20 seconds while skipping test, package, native, and npm jobs.
 - The final local gate passed 218 tests. Skill-suite validation, protocol validation,
   source compilation, dependency health, CI YAML parsing, and diff checks passed.
 - The core router measures 1,092 estimated tokens against its 1,200-token budget.
