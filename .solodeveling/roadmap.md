@@ -31,7 +31,7 @@ solodeveling_schema: 1
 26. Controlled comparison recovery - deterministic harness implemented as WORK-029; pilot-1 archived as invalid runtime evidence by WORK-030; pilot-2 archived as invalid methodology-activation evidence by WORK-031 after 18 inference processes found a project skill-path mismatch; corrected pilot-3 is preregistered but not run.
 27. Comparative execution-sandbox recovery - Pilot-3 completed 18 inference processes but produced zero mutations while the local Codex Windows sandbox helper was unavailable; WORK-032 archives it as invalid evidence, adds a missing-helper preflight and zero-mutation circuit breaker, and preregisters blocked Pilot-4 without live execution.
 28. Low-ceremony workflow enforcement - WORK-033 applies an explicit zero-artifact Quick path, a one-WORK/one-EVIDENCE Standard budget, same-boundary follow-up reuse, event-only roadmap updates, single-owner memory, and validated lifecycle helper commands.
-29. Non-publishing 0.1.2 release candidate - WORK-034 prepares and independently verifies an exact protected-main candidate for the low-ceremony workflow without authorizing a tag, GitHub Release, PyPI, or npm action.
+29. Non-publishing 0.1.2 release candidate - WORK-034 produced and independently verified the exact 13-file candidate from protected-main SHA `00efc22a01daad1cddb544b4d97ffb6a45b283fc` in run `29521649767`; all internal checks and strict attestations passed without creating a tag, GitHub Release, PyPI, or npm action.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.

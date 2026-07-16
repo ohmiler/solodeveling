@@ -1,8 +1,8 @@
 ---
 solodeveling_schema: 1
-current_goal: Produce and independently verify a non-publishing Solodeveling 0.1.2 release candidate.
-active_work:
-- WORK-034
+current_goal: Preserve the verified 0.1.2 candidate pending separately authorized
+  release actions.
+active_work: []
 blockers: []
 risks:
 - Published npm and PyPI versions 0.1.0 and 0.1.1 plus immutable GitHub Release assets
@@ -13,11 +13,9 @@ risks:
   review.
 - Comparative speed or quality claims remain unsupported until a controlled repeated
   benchmark exists.
-next_action: Deliver the 0.1.2 source boundary through protected pull-request and main CI.
+next_action: If desired, separately authorize tag v0.1.2 at SHA 00efc22a01daad1cddb544b4d97ffb6a45b283fc
+  and an immutable GitHub Release from candidate run 29521649767.
 ---
 # State
 
-WORK-034 is preparing an exact non-publishing 0.1.2 candidate for the merged
-low-ceremony workflow. Tag creation, GitHub Release, PyPI, npm staging, and npm
-publication remain outside this authorization. Pilot-4 remains blocked and was not
-run. Releases 0.1.0 and 0.1.1 remain immutable and unchanged.
+WORK-034 produced and independently verified the exact non-publishing 0.1.2 candidate from protected-main SHA 00efc22a01daad1cddb544b4d97ffb6a45b283fc in run 29521649767. All 13 files, internal hashes, inventory, source identity, SBOM, npm/native binding, downloaded package smokes, and strict GitHub attestations passed. No tag, GitHub Release, PyPI, npm staging, or npm publication action occurred. Releases 0.1.0 and 0.1.1 remain immutable.

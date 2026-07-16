@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-034
 title: Prepare verified release candidate 0.1.2
-status: active
+status: done
 level: critical
 type: release
 goal: Produce and independently verify an exact non-publishing 0.1.2 release candidate
@@ -48,7 +48,7 @@ recovery:
 - Discard only disposable candidate output and rebuild the entire set from a newly
   reviewed exact main commit.
 - Never repair a generated manifest or replace one candidate file after hashing.
-next_action: Deliver the source boundary through protected CI, then dispatch the exact main candidate.
+next_action: None; archived.
 evidence:
 - EVIDENCE-034
 ---
