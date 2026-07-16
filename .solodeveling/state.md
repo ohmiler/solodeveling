@@ -1,7 +1,8 @@
 ---
 solodeveling_schema: 1
-current_goal: Prepare the verified low-ceremony workflow for its next reviewed release.
-active_work: []
+current_goal: Produce and independently verify a non-publishing Solodeveling 0.1.2 release candidate.
+active_work:
+- WORK-034
 blockers: []
 risks:
 - Published npm and PyPI versions 0.1.0 and 0.1.1 plus immutable GitHub Release assets
@@ -12,8 +13,11 @@ risks:
   review.
 - Comparative speed or quality claims remain unsupported until a controlled repeated
   benchmark exists.
-next_action: After protected CI and merge, consider a 0.1.2 release candidate.
+next_action: Deliver the 0.1.2 source boundary through protected pull-request and main CI.
 ---
 # State
 
-WORK-033 implements and locally verifies low-ceremony workflow tiers with one cumulative evidence file. Protected CI is required for merge. Pilot-4 remains blocked by the missing external Codex Windows sandbox helper and was not run. Release 0.1.1 remains immutable and unchanged.
+WORK-034 is preparing an exact non-publishing 0.1.2 candidate for the merged
+low-ceremony workflow. Tag creation, GitHub Release, PyPI, npm staging, and npm
+publication remain outside this authorization. Pilot-4 remains blocked and was not
+run. Releases 0.1.0 and 0.1.1 remain immutable and unchanged.

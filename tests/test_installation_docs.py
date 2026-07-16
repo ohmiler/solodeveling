@@ -11,6 +11,7 @@ CURRENT_DOCS = (
     Path('docs/protocol-contract.md'),
     Path('docs/releases/0.1.0.md'),
     Path('docs/releases/0.1.1.md'),
+    Path('docs/releases/0.1.2.md'),
 )
 
 
