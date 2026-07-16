@@ -11,6 +11,7 @@ from solodeveling_protocol.comparative_benchmark import (
     _load_checkpoint,
     _result_document,
     _changed_paths,
+    _build_live_command,
     _initialize_repository,
     _install_methodology,
     _is_zero_mutation_failure,
@@ -26,6 +27,7 @@ from solodeveling_protocol.comparative_benchmark import (
     summarize_results,
     verify_fixtures,
     verify_model_catalog,
+    verify_permission_runtime,
     verify_sandbox_runtime,
     run_live,
 )
@@ -189,6 +191,19 @@ def test_failure_diagnostic_is_local_raw_sidecar(tmp_path: Path) -> None:
     assert document["changed_paths"] == []
 
 
+def test_live_command_uses_workspace_permission_profile_not_legacy_sandbox(tmp_path: Path) -> None:
+    spec = load_spec(Path("benchmarks/comparative/feedback-0.1.1-vs-0.1.2.yaml"))
+    command = _build_live_command(
+        "codex",
+        spec,
+        tmp_path / "worktree",
+        tmp_path / "last-message.txt",
+    )
+    assert "--sandbox" not in command
+    assert 'default_permissions=":workspace"' in command
+    assert "sandbox_workspace_write.network_access=false" not in command
+
+
 def test_scoring_gates_speed_on_correct_pairs_and_forbids_claim() -> None:
     runs = [
         {"task_id": "a", "repetition": 1, "methodology": "solodeveling", "correct": True, "elapsed_seconds": 4},
@@ -216,6 +231,7 @@ def test_archived_invalid_pilot_is_not_live_eligible() -> None:
         Path("benchmarks/comparative/archive/pilot-2-invalid.yaml"),
         Path("benchmarks/comparative/archive/pilot-3-invalid.yaml"),
         Path("benchmarks/comparative/archive/feedback-0.1.1-vs-0.1.2-pilot-1-invalid.yaml"),
+        Path("benchmarks/comparative/archive/feedback-0.1.1-vs-0.1.2-pilot-2-invalid.yaml"),
     ):
         archived = load_spec(path)
         with pytest.raises(BenchmarkError, match="not eligible"):
