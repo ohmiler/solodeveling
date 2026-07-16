@@ -1,16 +1,16 @@
 ---
 solodeveling_schema: 1
-current_goal: Obtain explicit owner direction for the next registry boundary after the immutable v0.1.0 GitHub Release was verified.
+current_goal: Solodeveling 0.1.0 is complete on PyPI with one-command installation verified; npm and next-release workflow simplification remain deferred.
 active_work:
 - WORK-019
 blockers: []
 risks:
-- The PyPI pending publisher is owner-confirmed but cannot be independently read through a public API; exact OIDC matching remains unverified until first authorized use.
-- The pending publisher does not reserve the PyPI name, and npm Trusted Publishing cannot be configured before the first npm publication.
+- PyPI 0.1.0 is public with matching immutable-release digests and public provenance; published bytes require an explicit yank-and-supersede recovery rather than replacement.
+- The npm name remains unreserved, and npm Trusted Publishing cannot be configured before the first owner-controlled interactive publication.
 - Immutable, non-draft GitHub Release v0.1.0 contains all 13 verified candidate assets and resolves through the tag to commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; no publish run exists.
 - npm first-package bootstrap requires a separate owner-controlled interactive publication with two-factor authentication.
 - Native executables are not platform-signed, and Cursor plus complete Tier 1 behavior remain unverified.
-next_action: Obtain separate explicit owner authorization naming PyPI publication and/or the owner-controlled interactive npm first-package bootstrap; do not infer either from GitHub Release authority.
+next_action: Treat 0.1.0 as complete for PyPI installation; keep npm deferred and return to shaping WORK-019 only when opening the next release.
 ---
 # State
 
@@ -45,3 +45,9 @@ All 13 release assets passed release integrity and per-asset digest verification
 after their candidate integrity and strict provenance checks passed. No publish
 workflow, registry approval, token exchange, staging, bootstrap, or publication was
 invoked. PyPI and npm actions remain separate authorization boundaries.
+
+WORK-021 and EVIDENCE-021 record successful PyPI publication through protected OIDC
+workflow run 29487808952. PyPI wheel and sdist digests match the immutable GitHub
+Release, public provenance endpoints are available, and clean pip, uvx, pipx run,
+and pipx install paths report solodeveling 0.1.0. npm was skipped and remains
+unpublished. Version 0.1.0 is complete for the one-command Python installation path.
