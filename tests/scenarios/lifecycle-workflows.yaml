@@ -45,6 +45,16 @@ scenarios:
       - "must not transition to done"
       - "unverified"
 
+  - id: verification-depth-follows-impact
+    skill: solodeveling-verifying
+    must_contain:
+      - Quick
+      - focused check
+      - Standard
+      - affected regression
+      - Critical
+      - broad gate
+
   - id: no-core-workflow-requires-subagents
     skill: solodeveling-executing-work
     must_contain:

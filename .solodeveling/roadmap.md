@@ -21,7 +21,7 @@ solodeveling_schema: 1
 16. Owner release-setup verification - implemented as WORK-015; admin bypass is API-verified disabled and the PyPI pending publisher is owner-confirmed without invoking release workflows.
 17. Non-publishing 0.1.0 release candidate - produced and independently verified as WORK-016 from exact main commit `700a9b9dafc877507232b84a94ff3d6eaf7afda4`; tag, GitHub Release, registry actions, and publication remain separately authorized work.
 18. Publication candidate ancestry repair - implemented and verified as WORK-017; current protected `main` can validate the exact verified ancestor candidate without weakening tag, release, provenance, or registry gates.
-19. Memory Workflow Simplification - deferred as WORK-019 for the release after 0.1.0; it must not change the 0.1.0 candidate, tag target, release set, or publication inputs.
+19. Memory Workflow Simplification - implemented and locally verified as WORK-019 with progressive persistence, compact current state, validator enforcement, impact-based verification, and fail-safe memory-only CI; the 0.1.0 candidate and release set remain unchanged.
 20. Immutable GitHub Release v0.1.0 - created and verified as WORK-020 with all 13 exact candidate assets; PyPI and npm actions remain separately authorized.
 21. PyPI publication 0.1.0 - published and verified as WORK-021 through protected OIDC; clean pip, uvx, and pipx paths pass, while npm remains deferred and unpublished.
 

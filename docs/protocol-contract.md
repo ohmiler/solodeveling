@@ -14,6 +14,20 @@ Every protocol artifact includes `solodeveling_schema: 1`. A future schema chang
 - `.solodeveling/work/active/*.md` and `.solodeveling/work/archive/*.md` use `work-item.schema.json`.
 - `.solodeveling/evidence/*.md` uses `evidence.schema.json`.
 
+## Progressive persistence
+
+- Ephemeral Quick work stays in one session, creates no project-memory artifacts, and
+  still requires a focused verification result before a completion claim.
+- Cross-session work and durable decisions persist compact resumable work and current
+  state.
+- Standard, Critical, security, release, migration, production, destructive, and
+  sensitive work retain the full lifecycle, evidence, recovery, and authorization
+  contract.
+
+`state.md` is a compact current dashboard. Its `active_work` list must not reference
+deferred or done work. Validate memory after relevant memory or schema changes, when
+invalidity is suspected, before committing memory, and before tracked completion.
+
 ## Completion invariants
 
 - Work passes through `verifying` before `done`.

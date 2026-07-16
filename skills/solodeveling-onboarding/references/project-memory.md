@@ -35,12 +35,15 @@ idempotent for valid memory and refuses to overwrite partial memory.
 
 - `project.md`: name, purpose, users, architecture, stack, durable constraints, and
   paths to authoritative sources.
-- `state.md`: current goal, active work IDs, blockers, current risks, and next action.
+- `state.md`: compact current goal, active resumable work IDs, blockers, current
+  risks, and next action; never a completed-work history.
 - `roadmap.md`: milestones and priorities or a link to the established tracker.
 - `standards.md`: Definition of Done and project conventions or authoritative links.
 - `risks.md`: open product, technical, security, privacy, and operational risks.
 - `decisions/`: durable approved decisions with rationale and consequences.
-- `work/active/`: unfinished work items; `work/archive/`: closed work.
+- `work/active/`: unfinished resumable work items. Only actively resumed IDs belong
+  in state `active_work`; deferred items are not loaded until resumed.
+  `work/archive/`: closed work.
 - `evidence/`: durable verification summaries referenced by work items.
 
 Keep the body concise. Do not store secrets, local environment details, raw logs,
