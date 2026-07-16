@@ -39,3 +39,14 @@ invalidity is suspected, before committing memory, and before tracked completion
 ## Validation
 
 Run `solodeveling validate <project-root>`. Exit code 0 means the inspected artifacts satisfy the implemented structural and cross-reference checks. It does not prove that the software itself is correct or secure.
+
+## Repository CI routing
+
+- Changes entirely under `.solodeveling/` run project-memory validation and focused
+  memory regressions.
+- Changes entirely under `docs/` run the complete Python regression suite on one
+  Ubuntu job and check the exact base-to-head diff.
+- README, root Markdown, skills, source, tests, workflows, packages, tags, malformed
+  paths, and mixed path sets use the full test, package, native, and npm gate.
+
+Unknown or ambiguous classification always falls back to the full gate.
