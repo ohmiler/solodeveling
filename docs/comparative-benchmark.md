@@ -1,12 +1,18 @@
 # Controlled comparative benchmark
 
-This repository contains a preregistered pilot for measuring workflow overhead
+This repository contains a preregistered successor pilot for measuring workflow overhead
 between Solodeveling 0.1.1 and Superpowers 6.1.1. It does not contain benchmark
 results and does not support a public claim that either methodology is faster.
 
+Pilot 1 attempted 18 processes with the `gpt-5.6` alias, but every process failed
+before inference with zero tokens and zero tool calls. The alias was absent from
+the fresh local Codex model catalog. That execution is archived as invalid runtime
+evidence. Pilot 2 uses the exact account-visible `gpt-5.6-sol` slug and has not
+been run.
+
 ## Fairness boundary
 
-The pilot uses the same Codex CLI, `gpt-5.6` model, medium reasoning effort,
+The successor pilot uses the same Codex CLI, `gpt-5.6-sol` model, medium reasoning effort,
 offline workspace sandbox, prompts, seed projects, timeouts, and hidden outcome
 checks. Both methodologies are checked out at exact commits, copied into the
 project-local `.codex/skills` directory before timing, and explicitly invoked in
@@ -27,7 +33,7 @@ These commands perform no model calls:
 python scripts/comparative_benchmark.py plan
 python scripts/comparative_benchmark.py verify-fixtures
 python scripts/comparative_benchmark.py probe --solodeveling-source PINNED_SOLODEVELING_CHECKOUT --superpowers-source PINNED_SUPERPOWERS_CHECKOUT
-python scripts/comparative_benchmark.py score benchmarks/results/pilot.json
+python scripts/comparative_benchmark.py score benchmarks/results/solodeveling-superpowers-pilot-2.json
 ```
 
 `plan` prints the exact model, runtime, timeout, pins, mutation boundary, run
@@ -41,12 +47,16 @@ fully resolved live command without contacting a model.
 
 `run-live` is deliberately separate. It requires the exact confirmation printed
 by `plan`, exact pinned Git checkouts supplied as source paths, the preregistered
-Codex CLI version, and all 18 runs. It fails closed on a source or runtime
+Codex CLI version, an exact model slug and reasoning level present in the local
+Codex model catalog, and all 18 runs. It fails closed on a source or runtime
 mismatch. Raw prompts and JSONL are held only in the temporary run process;
 committed evidence may contain only the sanitized result schema.
 After every attempted run, the sanitized result is written through an atomic
 checkpoint. Re-running the exact command resumes only missing run IDs and refuses
 a checkpoint whose preregistration hash, provenance, or run identity differs.
+If a process fails before inference with no tokens or tool calls, a circuit breaker
+checkpoints that attempt, stops before the next call, and makes the checkpoint
+non-resumable. Recovery then requires a distinct successor preregistration.
 
 Model calls consume the signed-in account's capacity or credits. Therefore the
 live command must not be run until the owner separately authorizes the named

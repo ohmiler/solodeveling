@@ -42,6 +42,13 @@ def load_spec(path: Path) -> dict[str, Any]:
     return document
 
 
+def require_live_ready(spec: dict[str, Any]) -> None:
+    if spec.get("status") != "preregistered-not-run":
+        raise BenchmarkError(
+            f"benchmark status {spec.get('status', 'missing')} is not eligible for live execution"
+        )
+
+
 def build_plan(spec: dict[str, Any]) -> list[PlannedRun]:
     tasks = [task["id"] for task in spec["tasks"]]
     methods = [method["id"] for method in spec["methodologies"]]
@@ -68,6 +75,7 @@ def build_plan(spec: dict[str, Any]) -> list[PlannedRun]:
 
 def plan_document(spec: dict[str, Any]) -> dict[str, Any]:
     runtime = spec["runtime"]
+    result_path = f"benchmarks/results/{spec['benchmark_id']}.json"
     return {
         "schema": 1,
         "benchmark_id": spec["benchmark_id"],
@@ -85,14 +93,16 @@ def plan_document(spec: dict[str, Any]) -> dict[str, Any]:
             + spec["claim_policy"]["confirmation"]
             + '" --solodeveling-source <PINNED_SOLODEVELING_CHECKOUT>'
             + " --superpowers-source <PINNED_SUPERPOWERS_CHECKOUT>"
-            + " --output benchmarks/results/pilot.json"
+            + f" --output {result_path}"
         ),
         "runs": [run.__dict__ for run in build_plan(spec)],
     }
 
 
 def _run(command: list[str], cwd: Path, *, timeout: int = 120) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout, check=False, shell=False)
+    environment = dict(os.environ)
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    return subprocess.run(command, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout, check=False, shell=False, env=environment)
 
 
 def verify_fixtures(spec_path: Path) -> list[dict[str, Any]]:
@@ -138,6 +148,19 @@ def parse_codex_jsonl(lines: Iterable[str]) -> dict[str, int | None]:
             if item.get("type") == "agent_message" and str(item.get("text", "")).rstrip().endswith("?"):
                 questions += 1
     return {**usage, "tool_calls": tool_calls, "agent_questions": questions}
+
+
+def classify_runtime_failure(stdout: str, stderr: str) -> str:
+    lowered = (stdout + "\n" + stderr).lower()
+    if "model" in lowered and any(marker in lowered for marker in ("not found", "not available", "unsupported", "does not exist", "unknown model")):
+        return "model-unavailable"
+    if any(marker in lowered for marker in ("not logged in", "unauthorized", "authentication failed", "invalid token")):
+        return "auth-failure"
+    if any(marker in lowered for marker in ("rate limit", "usage limit", "quota", "capacity")):
+        return "capacity-failure"
+    if any(marker in lowered for marker in ("invalid config", "configuration error", "config error")):
+        return "configuration-failure"
+    return "process-exit-nonzero"
 
 
 def _median(values: list[float]) -> float | None:
@@ -236,13 +259,66 @@ def _load_checkpoint(
         identity = (result.get("task_id"), result.get("methodology"), result.get("repetition"))
         if identity != (planned.task_id, planned.methodology, planned.repetition):
             raise BenchmarkError(f"existing checkpoint identity mismatch for {run_id}")
+        if (
+            result.get("state") == "runtime-failure"
+            and result.get("input_tokens") is None
+            and result.get("output_tokens") is None
+            and result.get("tool_calls") == 0
+        ):
+            raise BenchmarkError(
+                f"checkpoint contains pre-inference failure at {run_id}; "
+                "create a successor preregistration instead of resuming"
+            )
         seen.add(run_id)
     return results
 
 
 def _safe_environment() -> dict[str, str]:
     allowed = {"APPDATA", "CODEX_HOME", "COMSPEC", "HOMEDRIVE", "HOMEPATH", "LOCALAPPDATA", "PATH", "PATHEXT", "PROGRAMFILES", "PROGRAMFILES(X86)", "SYSTEMROOT", "TEMP", "TMP", "USERPROFILE", "USERNAME", "WINDIR"}
-    return {key: value for key, value in os.environ.items() if key.upper() in allowed}
+    environment = {key: value for key, value in os.environ.items() if key.upper() in allowed}
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    return environment
+
+
+def _default_model_catalog_path() -> Path:
+    codex_home = os.environ.get("CODEX_HOME")
+    return (Path(codex_home) if codex_home else Path.home() / ".codex") / "models_cache.json"
+
+
+def verify_model_catalog(spec: dict[str, Any], catalog_path: Path | None = None) -> dict[str, str]:
+    path = (catalog_path or _default_model_catalog_path()).resolve()
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise BenchmarkError(f"Codex model catalog is unavailable: {path}") from error
+    models = document.get("models") if isinstance(document, dict) else None
+    if not isinstance(models, list):
+        raise BenchmarkError("Codex model catalog has no models list")
+    requested_model = spec["runtime"]["model"]
+    selected = next(
+        (model for model in models if isinstance(model, dict) and model.get("slug") == requested_model),
+        None,
+    )
+    if selected is None:
+        raise BenchmarkError(f"model {requested_model} is absent from the local Codex catalog")
+    requested_effort = spec["runtime"]["reasoning_effort"]
+    levels = selected.get("supported_reasoning_levels", [])
+    supported = {
+        level.get("effort") if isinstance(level, dict) else level
+        for level in levels
+    }
+    if requested_effort not in supported:
+        raise BenchmarkError(
+            f"reasoning effort {requested_effort} is unavailable for {requested_model}"
+        )
+    catalog_version = document.get("client_version")
+    return {
+        "path": str(path),
+        "fetched_at": str(document.get("fetched_at", "unknown")),
+        "client_version": str(catalog_version or "unknown"),
+        "model": requested_model,
+        "reasoning_effort": requested_effort,
+    }
 
 
 def _initialize_repository(project: Path) -> None:
@@ -296,7 +372,10 @@ def _changed_paths(project: Path, baseline: str) -> list[str]:
         raise BenchmarkError("could not inspect benchmark worktree")
     paths = {line[3:].replace(chr(92), "/") for line in status.stdout.splitlines() if len(line) > 3}
     paths.update(line.replace(chr(92), "/") for line in committed.stdout.splitlines() if line)
-    return sorted(paths)
+    return sorted(
+        path for path in paths
+        if "/__pycache__/" not in f"/{path}" and not path.endswith((".pyc", ".pyo"))
+    )
 
 
 def _runtime_version(executable: str) -> str:
@@ -305,30 +384,34 @@ def _runtime_version(executable: str) -> str:
 
 
 def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
+    require_live_ready(spec)
     executable = shutil.which(spec["runtime"]["executable"])
     if executable is None:
         raise BenchmarkError("codex executable is unavailable")
     version = _runtime_version(executable)
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
+    catalog = verify_model_catalog(spec)
     resolved = {key: value.resolve() for key, value in sources.items()}
     verify_sources(spec, resolved)
     document = plan_document(spec)
     document["source_checkouts"] = {key: str(value) for key, value in resolved.items()}
     document["runtime_verified"] = True
+    document["model_catalog_verified"] = catalog
     document["sources_verified"] = True
     document["live_command"] = (
         "python scripts/comparative_benchmark.py run-live"
         f' --confirm "{spec["claim_policy"]["confirmation"]}"'
         f' --solodeveling-source "{resolved["solodeveling"]}"'
         f' --superpowers-source "{resolved["superpowers"]}"'
-        " --output benchmarks/results/pilot.json"
+        f" --output benchmarks/results/{spec['benchmark_id']}.json"
     )
     return document
 
 
 def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, superpowers_source: Path, output: Path) -> dict[str, Any]:
     spec = load_spec(spec_path)
+    require_live_ready(spec)
     spec_sha256 = hashlib.sha256(spec_path.read_bytes()).hexdigest()
     expected_confirmation = spec["claim_policy"]["confirmation"]
     if confirmation != expected_confirmation:
@@ -339,6 +422,7 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
     version = _runtime_version(executable)
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
+    verify_model_catalog(spec)
     sources = {"solodeveling": solodeveling_source.resolve(), "superpowers": superpowers_source.resolve()}
     verify_sources(spec, sources)
     tasks = {task["id"]: task for task in spec["tasks"]}
@@ -375,10 +459,14 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
             try:
                 process = subprocess.run(command, input=prompt, cwd=worktree, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=int(spec["runtime"]["timeout_seconds"]), check=False, shell=False, env=_safe_environment())
                 state = "completed" if process.returncode == 0 else "runtime-failure"
+                failure_code = None if process.returncode == 0 else classify_runtime_failure(process.stdout, process.stderr)
+                process_returncode = process.returncode
                 lines = process.stdout.splitlines()
             except subprocess.TimeoutExpired as error:
                 process = None
                 state = "timeout"
+                failure_code = "timeout"
+                process_returncode = None
                 stdout = error.stdout.decode("utf-8", "replace") if isinstance(error.stdout, bytes) else (error.stdout or "")
                 lines = stdout.splitlines()
             elapsed = round(time.perf_counter() - started, 4)
@@ -395,10 +483,21 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
                 "repetition": planned.repetition, "order": planned.order, "state": state, "correct": correct,
                 "elapsed_seconds": elapsed, **activity, "changed_files": len(changed), "workflow_artifacts": len(workflow),
                 "human_interventions": 0,
+                "failure_code": failure_code, "process_returncode": process_returncode,
                 "runtime_version": version, "model": spec["runtime"]["model"], "reasoning_effort": spec["runtime"]["reasoning_effort"],
                 "visible_tests_passed": visible.returncode == 0, "hidden_check_passed": hidden.returncode == 0,
             })
             _write_checkpoint(output, _result_document(spec, spec_sha256, results))
+            if (
+                state == "runtime-failure"
+                and activity["input_tokens"] is None
+                and activity["output_tokens"] is None
+                and activity["tool_calls"] == 0
+            ):
+                raise BenchmarkError(
+                    f"pre-inference failure at {planned.run_id} "
+                    f"({failure_code}); stopped before the next call"
+                )
     document = _result_document(spec, spec_sha256, results)
     _write_checkpoint(output, document)
     return document
@@ -426,7 +525,7 @@ def _parser() -> argparse.ArgumentParser:
     live.add_argument("--confirm", required=True)
     live.add_argument("--solodeveling-source", type=Path, required=True)
     live.add_argument("--superpowers-source", type=Path, required=True)
-    live.add_argument("--output", type=Path, default=Path("benchmarks/results/pilot.json"))
+    live.add_argument("--output", type=Path, default=Path("benchmarks/results/pilot-2.json"))
     return parser
 
 

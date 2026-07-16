@@ -8,7 +8,7 @@ command: python scripts/comparative_benchmark.py plan; python scripts/comparativ
 result: passed
 scope: Offline benchmark design and harness only, covering Solodeveling 0.1.1 at 889e07a47a8cbdca15765d00348dbbd7f9849f03, Superpowers 6.1.1 at d884ae04edebef577e82ff7c4e143debd0bbec99, Codex CLI 0.144.5, gpt-5.6 with medium reasoning, three deterministic fixtures, 18 planned runs, sanitized metrics, hidden correctness checks, offline scoring, and live authorization controls.
 limitations:
-- No live benchmark run or model call occurred, so there is no evidence yet that either methodology completes coding tasks faster.
+- At harness delivery no live call had occurred. A later authorized pilot-1 execution made 18 process attempts, but all failed before inference with zero observed tokens and tool calls; it provides no evidence that either methodology is faster.
 - The pilot has only three synthetic tasks and three repetitions; regardless of outcome it is signal for confirmatory design, not sufficient evidence for a public superiority claim.
 - Service load, caching, model nondeterminism, account capacity, and synthetic fixture representativeness can affect observed time and token use.
 - The CLI cannot provide a stable dollar maximum for signed-in ChatGPT capacity or credits; the disclosed boundary is 18 calls with a 1,200-second timeout each.
@@ -41,3 +41,12 @@ limitations:
 - README describes the prepared pilot and explicitly says it has not been run.
   Release 0.1.1 artifacts, tags, registries, and immutable release bytes were not
   changed.
+
+# Subsequent invalid execution
+
+Pilot-1 later attempted all 18 planned processes using the preregistered
+`gpt-5.6` alias. Every process returned a runtime failure in 2.1-3.4 seconds with
+no token usage, no tool activity, no correct run, and no correct pair. The alias
+was absent from the fresh local Codex model catalog. EVIDENCE-030 records the
+recovery and successor preregistration. Pilot-1 is invalid runtime evidence, not a
+comparative result.

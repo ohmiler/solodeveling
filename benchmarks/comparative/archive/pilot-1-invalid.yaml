@@ -1,15 +1,17 @@
 schema: 1
-benchmark_id: solodeveling-superpowers-pilot-2
-status: preregistered-not-run
+benchmark_id: solodeveling-superpowers-pilot-1
+status: invalid-runtime
 classification: pilot-signal-only
-predecessor: solodeveling-superpowers-pilot-1
-amendment_reason: replace unavailable gpt-5.6 alias with exact account-visible gpt-5.6-sol slug
+invalid_reason: preregistered model slug gpt-5.6 was absent from the fresh local Codex model catalog
+attempted_runs: 18
+correct_pairs: 0
+tokens_observed: 0
 seed: 20260716
 repetitions: 3
 runtime:
   executable: codex
   cli_version: codex-cli 0.144.5
-  model: gpt-5.6-sol
+  model: gpt-5.6
   reasoning_effort: medium
   timeout_seconds: 1200
   sandbox: workspace-write
@@ -28,24 +30,24 @@ methodologies:
 tasks:
   - id: quick-docs
     class: documentation
-    fixture: fixtures/quick-docs
-    hidden_check: checks/check_quick_docs.py
+    fixture: ../fixtures/quick-docs
+    hidden_check: ../checks/check_quick_docs.py
     prompt: >-
       Update README.md to document the existing --ignore-case option. Include one
       runnable command and its exact output for the input "Hello hello WORLD".
       Do not change product code. Run the existing tests and finish the task.
   - id: bug-repair
     class: bug-repair
-    fixture: fixtures/bug-repair
-    hidden_check: checks/check_bug_repair.py
+    fixture: ../fixtures/bug-repair
+    hidden_check: ../checks/check_bug_repair.py
     prompt: >-
       Fix slugger.slugify so consecutive spaces or hyphens become one hyphen and
       leading or trailing separators are removed. Preserve the documented lowercase
       ASCII behavior, add focused regression tests, run all tests, and finish the task.
   - id: medium-feature
     class: medium-feature
-    fixture: fixtures/medium-feature
-    hidden_check: checks/check_medium_feature.py
+    fixture: ../fixtures/medium-feature
+    hidden_check: ../checks/check_medium_feature.py
     prompt: >-
       Add bookmark removal by numeric id. BookmarkStore.remove(id) must remove and
       return the matching bookmark, persist the change, and raise KeyError for an
@@ -56,4 +58,4 @@ claim_policy:
   correctness_gates_speed: true
   public_faster_claim_allowed: false
   required_live_runs: 18
-  confirmation: RUN CONTROLLED PILOT 2 18
+  confirmation: RUN CONTROLLED PILOT 18

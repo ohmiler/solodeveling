@@ -88,7 +88,9 @@ fair claim requires the same repository, model, prompt, task set, and repeated r
 The repository now includes a
 [preregistered 18-run Solodeveling/Superpowers pilot](docs/comparative-benchmark.md)
 with exact source and runtime pins, hidden correctness checks, offline planning, and
-a separate live-authorization gate. The pilot has not been run yet.
+a separate live-authorization gate. Its first execution failed before inference
+because the preregistered model alias was unavailable; the corrected exact-model
+successor has not been run yet and there is still no comparative result.
 
 | Evidence from this repository | Observed result | What it supports |
 | --- | --- | --- |
