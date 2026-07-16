@@ -7,6 +7,7 @@ import pytest
 
 from scripts.build_native import native_target
 from scripts.prepare_npm_package import NpmPackageError, prepare_npm_package
+from solodeveling_protocol import __version__
 
 
 TARGETS = (
@@ -35,7 +36,7 @@ def test_prepare_npm_package_binds_complete_native_inventory(
 
     manifest = prepare_npm_package(Path("."), native, output)
 
-    assert manifest["version"] == "0.1.0"
+    assert manifest["version"] == "0.1.1"
     assert set(manifest["artifacts"]) == {
         "win32-x64",
         "win32-arm64",
@@ -57,7 +58,7 @@ def test_prepare_npm_package_refuses_missing_native_target(
 ) -> None:
     native = tmp_path / "native"
     write_native_set(native)
-    (native / "solodeveling-0.1.0-linux-arm64").unlink()
+    (native / "solodeveling-0.1.1-linux-arm64").unlink()
 
     with pytest.raises(NpmPackageError, match="missing or unsafe"):
         prepare_npm_package(Path("."), native, tmp_path / "package")
@@ -109,3 +110,16 @@ def test_prepare_npm_package_refuses_existing_output(
 
     with pytest.raises(NpmPackageError, match="already exists"):
         prepare_npm_package(Path("."), native, output)
+
+
+def test_source_package_versions_and_registry_readme_agree() -> None:
+    metadata = json.loads(Path("packages/npm/package.json").read_text("utf-8"))
+    artifacts = json.loads(Path("packages/npm/artifacts.json").read_text("utf-8"))
+    readme = Path("packages/npm/README.md").read_text("utf-8")
+
+    assert __version__ == "0.1.1"
+    assert metadata["version"] == __version__
+    assert artifacts["version"] == __version__
+    assert "npx solodeveling install" in readme
+    assert "One agent. The right amount of process." in readme
+    assert "not publication-ready" not in readme

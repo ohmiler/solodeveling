@@ -191,8 +191,9 @@ jobs:
           npm pack ./npm-stage --pack-destination npm-dist
       - name: Smoke-test local npx tarball without network download
         run: |
-          mkdir -p npm-cache/0.1.0/linux-x64
-          cp native/solodeveling-0.1.0-linux-x64 npm-cache/0.1.0/linux-x64/
+          VERSION="$(python -c 'from solodeveling_protocol import __version__; print(__version__)')"
+          mkdir -p "npm-cache/$VERSION/linux-x64"
+          cp "native/solodeveling-$VERSION-linux-x64" "npm-cache/$VERSION/linux-x64/"
           tarball="$(find npm-dist -name '*.tgz' -type f -print -quit)"
           tarball="$PWD/$tarball"
           SOLODEVELING_CACHE_DIR="$PWD/npm-cache" npx --yes --package "$tarball" solodeveling version

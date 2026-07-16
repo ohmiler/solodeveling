@@ -25,25 +25,17 @@ review a workflow they initiated, and allow deployment only from exact branch
 `main`. They contain no secrets or variables, and GitHub reports administrator bypass
 is disabled for both environments.
 
-The owner confirmed a PyPI pending publisher for project `solodeveling`, GitHub owner
+PyPI trusted publishing is configured for project `solodeveling`, GitHub owner
 `ohmiler`, repository `solodeveling`, workflow `publish.yml`, and environment `pypi`.
-PyPI does not expose this authenticated account setting through a public read API;
-the first separately authorized OIDC publication must verify exact matching. The
-existing GitHub `pypi` environment provides required owner review and exact `main`
-branch restriction.
+The existing GitHub `pypi` environment provides required owner review and exact
+`main` branch restriction. Version 0.1.0 was published through this OIDC path.
 
-The npm package does not exist yet. Trusted Publishing cannot bootstrap a package
-that has never been published. The first npm publication must therefore be an
-owner-controlled, interactive publication of the verified tarball using two-factor
-authentication, after the matching immutable GitHub Release and all native assets
-exist. It must not use a CI token. After that succeeds, configure the npm trusted
-publisher for repository `ohmiler/solodeveling`, workflow `publish.yml`, and
-environment `npm`; use the existing GitHub environment with its owner-review and
-exact `main` restriction. Prefer the workflow's staged npm action so the owner can
-review and approve it before the registry makes it public.
-
-A name lookup returning not found is not a reservation. Neither name is owned until
-the registry accepts the first authorized publication.
+npm trusted publishing is configured for package `solodeveling`, repository
+`ohmiler/solodeveling`, workflow `publish.yml`, and environment `npm`. Trusted
+publishing is stage-only and the package publishing-access setting disallows
+traditional write tokens. Version 0.1.0 completed its one-time interactive bootstrap;
+later releases use the protected environment and staged npm action so the owner can
+review and approve the exact release before it becomes public.
 
 ## Version-bound release set
 
@@ -90,8 +82,8 @@ GitHub Release and never repairs or replaces release files.
    manifests, smoke evidence, and attestations.
 4. With separate authority, create tag `v<version>` at that SHA and an immutable,
    non-draft immutable GitHub Release containing the complete verified release set.
-5. Configure the protected registry environment and trusted publisher described
-   above. For npm 0.1.0, perform the one-time interactive bootstrap instead.
+5. Confirm the protected registry environments and trusted-publisher identities
+   described above still match the release workflow.
 6. With explicit authority naming the registry targets, run the current `publish.yml`
    from protected `main` while naming the exact verified candidate SHA. Enter exactly
    `CONFIRM publish solodeveling <version> from <source_revision>`.

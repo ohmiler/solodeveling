@@ -12,10 +12,10 @@ Use the same canonical skill suite with Codex, Claude Code, Cursor, and generic 
 Skills clients. Subagents may still be used when useful, but Solodeveling does not
 require a multi-agent team to complete the ordinary workflow.
 
-**Status:** 0.1.0 alpha is published on
+**Status:** Alpha releases are published on
 [npm](https://www.npmjs.com/package/solodeveling),
 [PyPI](https://pypi.org/project/solodeveling/), and as an
-[immutable GitHub Release](https://github.com/ohmiler/solodeveling/releases/tag/v0.1.0).
+[immutable GitHub Release](https://github.com/ohmiler/solodeveling/releases/latest).
 Codex and Claude Code have each passed one bounded representative live scenario.
 Cursor has structural adapter evidence only because `cursor-agent` was unavailable.
 Tier 1 remains unverified until the full core scenario matrix passes.

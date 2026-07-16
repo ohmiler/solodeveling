@@ -66,3 +66,5 @@ def test_ci_avoids_duplicate_feature_branch_pushes_and_routes_jobs() -> None:
     assert 'Run complete Python regression suite' in workflow
     assert f'== {quote}true{quote}' in workflow
     assert f'!= {quote}true{quote}' in workflow
+    assert 'npm-cache/0.1.0' not in workflow
+    assert 'solodeveling-$VERSION-linux-x64' in workflow
