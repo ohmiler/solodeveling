@@ -1,8 +1,8 @@
 schema: 1
-benchmark_id: solodeveling-feedback-0.1.1-vs-0.1.2-pilot-1
+benchmark_id: solodeveling-feedback-0.1.1-vs-0.1.2-pilot-2
 status: preregistered-not-run
 classification: pilot-signal-only
-seed: 20260717
+seed: 20260718
 repetitions: 3
 runtime:
   executable: codex
@@ -70,7 +70,7 @@ claim_policy:
   correctness_gates_speed: true
   public_faster_claim_allowed: false
   required_live_runs: 30
-  confirmation: RUN CONTROLLED FEEDBACK PILOT 30
+  confirmation: RUN CONTROLLED FEEDBACK PILOT 2 30
 evaluation_policy:
   primary: hidden_correctness
   paired_metrics:

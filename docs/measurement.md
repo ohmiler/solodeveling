@@ -23,6 +23,12 @@ the exact 0.1.1 and 0.1.2 source commits. Five tasks cover Quick documentation, 
 code, ordinary bug repair, a same-boundary follow-up, and a medium feature. Three
 paired repetitions produce 30 calls.
 
+Feedback pilot 1 is invalid: its first run completed without mutating the fixture,
+failed the hidden check, and correctly stopped before run 2. Because that runner
+version did not preserve a local failure transcript or final agent message, the
+successor preregistration adds ignored, local-only diagnostics for unsuccessful runs.
+The invalid run is evidence about the harness, not evidence for either skill version.
+
 Correctness is primary. Time, tokens, tool calls, questions, changed files, and
 workflow artifacts are compared only for pairs where both versions pass visible
 tests and the external hidden check. The study is pilot signal only.
