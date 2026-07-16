@@ -31,9 +31,12 @@ pipx install solodeveling
 `uvx` runs the tool ephemerally. `uv tool install` and `pipx install` keep an isolated
 installation and place `solodeveling` on the user PATH.
 
-The npm and PyPI projects are not published at the current source revision. Registry
-commands above describe the reviewed-release UX and will work only after publication.
-For development or pre-release verification, use a trusted checkout:
+Version 0.1.0 is published on
+[npm](https://www.npmjs.com/package/solodeveling) and
+[PyPI](https://pypi.org/project/solodeveling/). The npm launcher retrieves only the
+matching native asset from the
+[immutable GitHub Release](https://github.com/ohmiler/solodeveling/releases/tag/v0.1.0).
+For development against an unreleased checkout, install the local Python project:
 
 ~~~console
 python -m pip install .
@@ -133,8 +136,12 @@ solodeveling uninstall --runtime codex --dry-run
 
 ## Publication trust
 
-A future release must bind the Python distributions, npm tarball, six native
-executables, manifest, checksums, SBOM, source commit, and provenance before either
-registry is published. npm and PyPI publication use OIDC trusted publishing with
-protected GitHub environments rather than long-lived write tokens. Publication is a
-separate authorized action; ordinary CI only builds and tests local artifacts.
+Release 0.1.0 binds the Python distributions, npm tarball, six native executables,
+manifest, checksums, SBOM, source commit, and attestations in one immutable release
+set. The public npm and PyPI bytes were verified against that set after publication.
+
+Later registry releases use OIDC trusted publishing with protected GitHub
+environments rather than long-lived write tokens. npm automation is restricted to
+staged publication so an owner must review and approve it before it becomes public.
+Publication remains a separate authorized action; ordinary CI only builds and tests
+local artifacts.
