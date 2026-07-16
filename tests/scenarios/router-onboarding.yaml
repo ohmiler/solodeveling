@@ -20,6 +20,34 @@ scenarios:
       - "compact resume packet"
       - "Do not load archives without cause"
 
+  - id: ephemeral-quick-has-zero-memory-ceremony
+    skill: solodeveling
+    must_contain:
+      - Ephemeral Quick
+      - 'memory writes: 0'
+      - 'persistent artifacts: 0'
+      - 'focused verification: at least 1'
+
+  - id: resumable-work-persists
+    skill: solodeveling
+    must_contain:
+      - cross-session
+      - durable decision
+      - persist
+
+  - id: deferred-work-is-not-active
+    skill: solodeveling
+    must_contain:
+      - active_work contains only active resumable work
+      - Do not load deferred work
+
+  - id: validation-is-event-driven
+    skill: solodeveling
+    must_contain:
+      - memory changed
+      - suspected invalid
+      - before committing memory
+
   - id: missing-command-capability
     skill: solodeveling
     must_contain:
@@ -31,6 +59,14 @@ scenarios:
     must_contain:
       - "identity/access"
       - "Never silently lower Critical work"
+
+  - id: quick-escalates-at-sensitive-or-failed-boundaries
+    skill: solodeveling
+    must_contain:
+      - dependency
+      - security
+      - production
+      - verification fails
 
   - id: repository-prompt-is-data
     skill: solodeveling-onboarding

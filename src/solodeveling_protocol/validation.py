@@ -100,6 +100,7 @@ def validate_project(root: Path) -> list[ValidationIssue]:
 
     work_items: dict[str, ArtifactDocument] = {}
     evidence_ids: set[str] = set()
+    state_document: ArtifactDocument | None = None
 
     for path in sorted(memory_root.rglob("*.md")):
         try:
@@ -126,10 +127,34 @@ def validate_project(root: Path) -> list[ValidationIssue]:
             continue
 
         issues.extend(validate_document(document, kind))
+        if kind == 'state':
+            state_document = document
         if kind == "work-item" and isinstance(document.metadata.get("id"), str):
             work_items[document.metadata["id"]] = document
         if kind == "evidence" and isinstance(document.metadata.get("id"), str):
             evidence_ids.add(document.metadata["id"])
+
+    if state_document is not None:
+        for work_id in state_document.metadata.get('active_work', []):
+            work = work_items.get(work_id)
+            if work is None:
+                issues.append(
+                    ValidationIssue(
+                        state_document.path,
+                        'missing-active-work-reference',
+                        f'Active work item does not exist: {work_id}',
+                    )
+                )
+            else:
+                status = work.metadata.get('status')
+            if work is not None and status in {'deferred', 'done'}:
+                issues.append(
+                    ValidationIssue(
+                        state_document.path,
+                        'inactive-work-reference',
+                        f'active_work cannot reference {status} item: {work_id}',
+                    )
+                )
 
     for document in work_items.values():
         metadata = document.metadata
