@@ -1,21 +1,26 @@
 # Controlled comparative benchmark
 
 This repository contains a preregistered successor pilot for measuring workflow overhead
-between Solodeveling 0.1.1 and Superpowers 6.1.1. It does not contain benchmark
-results and does not support a public claim that either methodology is faster.
+between Solodeveling 0.1.1 and Superpowers 6.1.1. It does not support a public
+claim that either methodology is faster.
 
 Pilot 1 attempted 18 processes with the `gpt-5.6` alias, but every process failed
 before inference with zero tokens and zero tool calls. The alias was absent from
 the fresh local Codex model catalog. That execution is archived as invalid runtime
-evidence. Pilot 2 uses the exact account-visible `gpt-5.6-sol` slug and has not
-been run.
+evidence. Pilot 2 used the exact account-visible `gpt-5.6-sol` slug and completed
+18 inference processes, but the harness had copied both methodology suites to
+`.codex/skills` instead of Codex's project adapter path `.agents/skills`. Both
+sides produced zero changed files and zero correct runs. Pilot 2 is therefore
+archived as invalid methodology-activation evidence, not comparative evidence.
+Pilot 3 corrects only that activation path and has not been run.
 
 ## Fairness boundary
 
 The successor pilot uses the same Codex CLI, `gpt-5.6-sol` model, medium reasoning effort,
 offline workspace sandbox, prompts, seed projects, timeouts, and hidden outcome
 checks. Both methodologies are checked out at exact commits, copied into the
-project-local `.codex/skills` directory before timing, and explicitly invoked in
+project-local `.agents/skills` directory before timing, verified at their named
+root skill, and explicitly invoked in
 the otherwise identical prompt. Every run receives a fresh linked Git worktree.
 Fixture preparation and skill installation are outside task wall time.
 
@@ -33,7 +38,7 @@ These commands perform no model calls:
 python scripts/comparative_benchmark.py plan
 python scripts/comparative_benchmark.py verify-fixtures
 python scripts/comparative_benchmark.py probe --solodeveling-source PINNED_SOLODEVELING_CHECKOUT --superpowers-source PINNED_SUPERPOWERS_CHECKOUT
-python scripts/comparative_benchmark.py score benchmarks/results/solodeveling-superpowers-pilot-2.json
+python scripts/comparative_benchmark.py score benchmarks/results/solodeveling-superpowers-pilot-3.json
 ```
 
 `plan` prints the exact model, runtime, timeout, pins, mutation boundary, run

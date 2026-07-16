@@ -360,9 +360,15 @@ def verify_sources(spec: dict[str, Any], sources: dict[str, Path]) -> None:
 
 
 def _install_methodology(source: Path, project: Path) -> None:
-    destination = project / ".codex" / "skills"
+    destination = project / ".agents" / "skills"
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source / "skills", destination)
+
+
+def _verify_installed_methodology(project: Path, skill: str) -> None:
+    installed = project / ".agents" / "skills" / skill / "SKILL.md"
+    if not installed.is_file():
+        raise BenchmarkError(f"installed Codex root skill is unavailable: {installed}")
 
 
 def _changed_paths(project: Path, baseline: str) -> list[str]:
@@ -442,6 +448,7 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
             worktree = temp_root / f"{planned.run_id}-worktree"
             shutil.copytree(spec_path.parent / task["fixture"], repository)
             _install_methodology(sources[planned.methodology], repository)
+            _verify_installed_methodology(repository, method["skill"])
             _initialize_repository(repository)
             baseline = _run(["git", "rev-parse", "HEAD"], repository).stdout.strip()
             added = _run(["git", "worktree", "add", "--quiet", "--detach", str(worktree), "HEAD"], repository)
