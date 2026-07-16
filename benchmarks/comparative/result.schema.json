@@ -14,7 +14,7 @@
       "properties": {
         "runtime": {"type": "object"},
         "methodology_pins": {"type": "object"},
-        "expected_runs": {"const": 18}
+        "expected_runs": {"type": "integer", "minimum": 1}
       },
       "additionalProperties": false
     },
@@ -26,7 +26,7 @@
         "properties": {
           "run_id": {"type": "string"},
           "task_id": {"type": "string"},
-          "methodology": {"enum": ["solodeveling", "superpowers"]},
+          "methodology": {"type": "string", "minLength": 1},
           "repetition": {"type": "integer", "minimum": 1},
           "state": {"type": "string"},
           "correct": {"type": "boolean"},

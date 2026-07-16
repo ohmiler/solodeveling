@@ -21,6 +21,10 @@ execution diagnosis rather than verbatim per-run proof. Pilot 3 is archived as
 invalid execution-sandbox evidence. Pilot 4 adds a fail-closed helper preflight
 and has not been run.
 
+The feedback-specific Solodeveling 0.1.1-versus-0.1.2 study and local twenty-task
+field scorecard are documented in [Measuring Solodeveling](measurement.md). They
+do not alter Pilot 4 or the archived Solodeveling-versus-Superpowers boundary.
+
 ## Fairness boundary
 
 The successor pilot uses the same Codex CLI, `gpt-5.6-sol` model, medium reasoning effort,

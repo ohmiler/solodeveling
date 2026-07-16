@@ -1,0 +1,85 @@
+schema: 1
+benchmark_id: solodeveling-feedback-0.1.1-vs-0.1.2-pilot-1
+status: preregistered-not-run
+classification: pilot-signal-only
+seed: 20260717
+repetitions: 3
+runtime:
+  executable: codex
+  cli_version: codex-cli 0.144.5
+  model: gpt-5.6-sol
+  reasoning_effort: medium
+  timeout_seconds: 1200
+  sandbox: workspace-write
+  network: disabled
+methodologies:
+  - id: solodeveling-0.1.1
+    version: 0.1.1
+    commit: 889e07a47a8cbdca15765d00348dbbd7f9849f03
+    invocation: $solodeveling
+    skill: solodeveling
+  - id: solodeveling-0.1.2
+    version: 0.1.2
+    commit: 00efc22a01daad1cddb544b4d97ffb6a45b283fc
+    invocation: $solodeveling
+    skill: solodeveling
+tasks:
+  - id: quick-docs
+    class: quick
+    fixture: fixtures/quick-docs
+    hidden_check: checks/check_quick_docs.py
+    prompt: >-
+      Document the existing ignore-case option in README with one runnable example
+      and exact output for input Hello hello WORLD. Change no product code, create
+      no workflow-memory artifacts, run the existing tests, and finish the task.
+  - id: quick-code
+    class: quick
+    fixture: fixtures/quick-code
+    hidden_check: checks/check_quick_code.py
+    prompt: >-
+      Update normalize_label so surrounding whitespace is removed, internal
+      whitespace runs become one space, and text is lowercase. Add focused tests.
+      Create no workflow-memory artifacts, run all tests, and finish the task.
+  - id: bug-repair
+    class: standard
+    fixture: fixtures/bug-repair
+    hidden_check: checks/check_bug_repair.py
+    prompt: >-
+      Fix slugify so consecutive spaces or hyphens become one hyphen and leading
+      or trailing separators are removed. Preserve lowercase ASCII behavior, add
+      focused regression tests, run all tests, and finish the task.
+  - id: bounded-follow-up
+    class: follow-up
+    fixture: fixtures/bounded-follow-up
+    hidden_check: checks/check_bounded_follow_up.py
+    prompt: >-
+      Continue active WORK-001. Add optional max_length to format_title: shortened
+      values must end with three dots and total max_length; reject limits below 4.
+      Add tests and concise verification to existing EVIDENCE-001. Reuse the
+      existing work and evidence, create no new workflow files, and run all tests.
+  - id: medium-feature
+    class: standard
+    fixture: fixtures/medium-feature
+    hidden_check: checks/check_medium_feature.py
+    prompt: >-
+      Add bookmark removal by numeric id in the store and CLI. Return and persist
+      the removed bookmark, raise KeyError for unknown ids, print the title on CLI
+      success, and print stderr with exit 2 when missing. Preserve add and list,
+      add tests, run all tests, and finish.
+claim_policy:
+  correctness_gates_speed: true
+  public_faster_claim_allowed: false
+  required_live_runs: 30
+  confirmation: RUN CONTROLLED FEEDBACK PILOT 30
+evaluation_policy:
+  primary: hidden_correctness
+  paired_metrics:
+    - elapsed_seconds
+    - input_tokens
+    - output_tokens
+    - tool_calls
+    - agent_questions
+    - changed_files
+    - workflow_artifacts
+  pilot_only: true
+  confirmatory_study_required_for_public_claim: true
