@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -9,13 +10,18 @@ from jsonschema import Draft202012Validator
 from solodeveling_protocol.comparative_benchmark import (
     _load_checkpoint,
     _result_document,
+    _changed_paths,
+    _initialize_repository,
     BenchmarkError,
     build_plan,
+    classify_runtime_failure,
     load_spec,
     parse_codex_jsonl,
     plan_document,
+    require_live_ready,
     summarize_results,
     verify_fixtures,
+    verify_model_catalog,
     run_live,
 )
 
@@ -41,11 +47,11 @@ def test_plan_is_deterministic_and_exactly_eighteen_runs() -> None:
 def test_plan_is_non_live_and_discloses_runtime_boundary() -> None:
     document = plan_document(load_spec(SPEC))
     assert document["live"] is False
-    assert document["runtime"]["model"] == "gpt-5.6"
+    assert document["runtime"]["model"] == "gpt-5.6-sol"
     assert document["runtime"]["reasoning_effort"] == "medium"
     assert document["maximum_live_runs"] == 18
     assert document["maximum_agent_seconds"] == 21600
-    assert document["confirmation_required"] == "RUN CONTROLLED PILOT 18"
+    assert document["confirmation_required"] == "RUN CONTROLLED PILOT 2 18"
     assert "run-live" in document["live_command_template"]
 
 
@@ -64,6 +70,55 @@ def test_jsonl_parser_extracts_usage_activity_and_questions() -> None:
         json.dumps({"type": "turn.completed", "usage": {"input_tokens": 12, "cached_input_tokens": 3, "output_tokens": 4}}),
     ]
     assert parse_codex_jsonl(lines) == {"input_tokens": 12, "cached_input_tokens": 3, "output_tokens": 4, "tool_calls": 1, "agent_questions": 1}
+
+
+def test_model_catalog_requires_exact_slug_and_reasoning(tmp_path: Path) -> None:
+    catalog = tmp_path / "models_cache.json"
+    catalog.write_text(
+        json.dumps(
+            {
+                "client_version": "0.144.5",
+                "fetched_at": "2026-07-16T00:00:00Z",
+                "models": [
+                    {
+                        "slug": "gpt-5.6-sol",
+                        "supported_reasoning_levels": [
+                            {"effort": "low"},
+                            {"effort": "medium"},
+                        ],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    spec = load_spec(SPEC)
+    verified = verify_model_catalog(spec, catalog)
+    assert verified["model"] == "gpt-5.6-sol"
+    invalid = deepcopy(spec)
+    invalid["runtime"]["model"] = "gpt-5.6"
+    with pytest.raises(BenchmarkError, match="absent"):
+        verify_model_catalog(invalid, catalog)
+
+
+def test_runtime_failure_is_reduced_to_fixed_diagnostic_code() -> None:
+    assert classify_runtime_failure("", "requested model is not available") == "model-unavailable"
+    assert classify_runtime_failure("", "401 unauthorized") == "auth-failure"
+    assert classify_runtime_failure("opaque provider failure", "") == "process-exit-nonzero"
+
+
+def test_python_cache_does_not_count_as_agent_change(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    project.mkdir()
+    readme = project / "README.md"
+    readme.write_text("before\n", encoding="utf-8")
+    _initialize_repository(project)
+    baseline = "HEAD"
+    readme.write_text("after\n", encoding="utf-8")
+    cache = project / "__pycache__"
+    cache.mkdir()
+    (cache / "fixture.pyc").write_bytes(b"cache")
+    assert _changed_paths(project, baseline) == ["README.md"]
 
 
 def test_scoring_gates_speed_on_correct_pairs_and_forbids_claim() -> None:
@@ -85,6 +140,12 @@ def test_invalid_claim_policy_fails_closed(tmp_path: Path) -> None:
     path.write_text(document, encoding="utf-8")
     with pytest.raises(BenchmarkError, match="public faster claim"):
         load_spec(path)
+
+
+def test_archived_invalid_pilot_is_not_live_eligible() -> None:
+    archived = load_spec(Path("benchmarks/comparative/archive/pilot-1-invalid.yaml"))
+    with pytest.raises(BenchmarkError, match="not eligible"):
+        require_live_ready(archived)
 
 
 def test_live_runner_requires_exact_confirmation_before_any_runtime_call(tmp_path: Path) -> None:
@@ -116,6 +177,8 @@ def test_sanitized_result_shape_matches_committed_schema() -> None:
             "changed_files": 1,
             "workflow_artifacts": 0,
             "human_interventions": 0,
+            "failure_code": None,
+            "process_returncode": 0,
         }
     ]
     document = {
@@ -142,4 +205,27 @@ def test_checkpoint_resume_rejects_mismatched_preregistration(tmp_path: Path) ->
     checkpoint = tmp_path / "pilot.json"
     checkpoint.write_text(json.dumps({**expected, "spec_sha256": "1" * 64}), encoding="utf-8")
     with pytest.raises(BenchmarkError, match="spec_sha256"):
+        _load_checkpoint(checkpoint, expected, planned)
+
+
+def test_checkpoint_with_pre_inference_failure_cannot_resume(tmp_path: Path) -> None:
+    spec = load_spec(SPEC)
+    planned = build_plan(spec)
+    expected = _result_document(spec, "0" * 64, [])
+    failed = {
+        "run_id": planned[0].run_id,
+        "task_id": planned[0].task_id,
+        "methodology": planned[0].methodology,
+        "repetition": planned[0].repetition,
+        "state": "runtime-failure",
+        "input_tokens": None,
+        "output_tokens": None,
+        "tool_calls": 0,
+    }
+    checkpoint = tmp_path / "pilot.json"
+    checkpoint.write_text(
+        json.dumps({**expected, "runs": [failed]}),
+        encoding="utf-8",
+    )
+    with pytest.raises(BenchmarkError, match="successor preregistration"):
         _load_checkpoint(checkpoint, expected, planned)

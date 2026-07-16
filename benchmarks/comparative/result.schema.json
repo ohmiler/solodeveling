@@ -22,7 +22,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["run_id", "task_id", "methodology", "repetition", "state", "correct", "elapsed_seconds", "human_interventions"],
+        "required": ["run_id", "task_id", "methodology", "repetition", "state", "correct", "elapsed_seconds", "human_interventions", "failure_code", "process_returncode"],
         "properties": {
           "run_id": {"type": "string"},
           "task_id": {"type": "string"},
@@ -38,7 +38,9 @@
           "agent_questions": {"type": "integer", "minimum": 0},
           "changed_files": {"type": "integer", "minimum": 0},
           "workflow_artifacts": {"type": "integer", "minimum": 0},
-          "human_interventions": {"type": "integer", "minimum": 0}
+          "human_interventions": {"type": "integer", "minimum": 0},
+          "failure_code": {"type": ["string", "null"]},
+          "process_returncode": {"type": ["integer", "null"]}
         },
         "additionalProperties": true
       }
