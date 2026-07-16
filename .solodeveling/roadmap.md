@@ -10,11 +10,11 @@ solodeveling_schema: 1
 5. Release and maintenance workflows - implemented as WORK-004.
 6. Runtime adapters - implemented as WORK-005.
 7. Cross-agent behavioral evaluation - deterministic harness and bounded representative Codex/Claude live evidence implemented as WORK-006; full Tier 1 matrix remains unverified.
-8. Public packaging, installation UX, and release readiness - implemented as WORK-007 and merged into `main`; publication remains an explicitly authorized follow-up action.
+8. Public packaging, installation UX, and release readiness - implemented as WORK-007 and merged into `main`; later explicitly authorized work published versions 0.1.0 and 0.1.1.
 9. Source-bound 0.1.0 candidate, CycloneDX SBOM, and manual provenance gate - implemented as WORK-008 and merged through pull request 8; first invoked and verified as WORK-016.
 10. One public `solodeveling` name across Python, npm, native executables, and runtime installation - implemented as WORK-009 and merged through pull request 9.
 11. Verified cross-ecosystem release-set assembly - implemented as WORK-010 and merged through pull request 10; the complete attested main release set was produced and verified as WORK-016.
-12. Guarded PyPI and npm publication workflow - implemented as WORK-011 and merged through pull request 11; Trusted Publishers and registries remain unconfigured.
+12. Guarded PyPI and npm publication workflow - implemented as WORK-011 and merged through pull request 11; protected PyPI OIDC and stage-only npm Trusted Publishing are now verified in production.
 13. Zero-config project installation, check, and uninstall - implemented as WORK-012 and merged through pull request 12.
 14. Pre-release documentation reconciliation - implemented as WORK-013 and verified through pull request 13; no candidate, tag, GitHub Release, registry setup, or publication was authorized by this work.
 15. Owner-controlled GitHub release prerequisites - implemented as WORK-014 and verified through pull request 14; immutable releases and protected pypi/npm environments are configured without invoking release workflows.
@@ -27,6 +27,7 @@ solodeveling_schema: 1
 22. Narrow docs-only CI path - implemented and GitHub-verified as WORK-025; changes strictly under docs/** run one complete Python regression job with exact diff checking, while mixed and non-docs changes retain the full gate.
 23. npm publication 0.1.0 - published and verified as WORK-026 from the exact immutable release tarball; clean install and npx paths pass, with later automation restricted to owner-reviewed staged Trusted Publishing and traditional publishing tokens disallowed.
 24. README positioning and honest comparison - implemented and GitHub-verified as WORK-027 with live installation guidance, risk-scaled value, a documented-default comparison table, best-fit guidance, measured workflow-overhead evidence, and explicit competitive benchmark limits.
+25. Registry landing pages and patch release 0.1.1 - implemented, published, and independently verified as WORK-028 from exact source commit `889e07a47a8cbdca15765d00348dbbd7f9849f03`; immutable GitHub, PyPI OIDC, npm staged Trusted Publishing, registry digests, provenance, and clean pip/npx paths pass.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
