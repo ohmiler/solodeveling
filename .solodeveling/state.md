@@ -1,7 +1,7 @@
 ---
 solodeveling_schema: 1
-current_goal: Preserve immutable GitHub Release v0.1.2 pending separately authorized
-  registry actions.
+current_goal: Maintain the exact public Solodeveling 0.1.2 release and use measured
+  evidence to guide the next version.
 active_work: []
 blockers: []
 risks:
@@ -13,10 +13,9 @@ risks:
   review.
 - Comparative speed or quality claims remain unsupported until a controlled repeated
   benchmark exists.
-next_action: If desired, separately authorize PyPI publication of solodeveling 0.1.2
-  from SHA 00efc22a01daad1cddb544b4d97ffb6a45b283fc and npm staging from candidate
-  run 29521649767.
+next_action: Choose the next bounded improvement or run the remaining controlled
+  comparative benchmark before making speed claims.
 ---
 # State
 
-WORK-035 created annotated tag v0.1.2 at exact candidate SHA 00efc22a01daad1cddb544b4d97ffb6a45b283fc and immutable GitHub Release v0.1.2 from run 29521649767. The non-draft latest release contains exactly 13 byte-identical verified assets; release and per-asset attestations, notes, tag identity, and immutability passed. PyPI and npm remain at 0.1.1 and were not changed. Releases 0.1.0 and 0.1.1 remain immutable.
+WORK-036 published the exact immutable v0.1.2 candidate to PyPI and npm through protected OIDC and staged owner review. Public artifacts match the GitHub Release; PyPI provenance and clean pip/npx version, install, and check paths pass. Releases 0.1.0 and 0.1.1 remain immutable.
