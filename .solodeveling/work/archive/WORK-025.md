@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-025
 title: Narrow Docs-only CI Path
-status: verifying
+status: done
 level: standard
 type: change
 goal: Reduce verified docs-only pull-request and main-push CI time without weakening tests for documentation contracts or broad gates for product changes.
@@ -29,13 +29,14 @@ verification:
 - Add failing classifier and workflow-policy regressions before implementation.
 - Run focused CI-policy tests, the complete local Python suite, skill and protocol validation, compile, dependency health, YAML parsing, and diff checks.
 - Confirm docs-only routing on GitHub for both pull request and main push.
-next_action: Confirm the implementation through full GitHub PR and main CI, then dogfood a docs-only PR and record evidence.
+next_action: Use the verified docs-only path for future docs/** changes and return to the separate npm publication decision.
 security_considerations:
 - Keep least-privilege contents-read permissions and pinned GitHub Actions.
 - Treat unknown, malformed, empty, and mixed paths as full-gate inputs.
 recovery:
 - Revert docs-only classification and job conditions together to restore all changes to the full gate.
-evidence: []
+evidence:
+- EVIDENCE-025
 ---
 
 # Plan
