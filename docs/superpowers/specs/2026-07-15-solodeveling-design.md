@@ -83,17 +83,17 @@ Version 1 uses a protocol-first skill-suite architecture.
 
 ```text
 Portable skill suite
-â”œâ”€â”€ core router
-â”œâ”€â”€ lifecycle workflow skills
-â”œâ”€â”€ project and security profiles
-â”œâ”€â”€ human-readable artifact contracts
-â””â”€â”€ lightweight deterministic validators
+|-- core router
+|-- lifecycle workflow skills
+|-- project and security profiles
+|-- human-readable artifact contracts
+`-- lightweight deterministic validators
 
 Optional runtime adapters
-â”œâ”€â”€ Codex
-â”œâ”€â”€ Claude Code
-â”œâ”€â”€ Cursor
-â””â”€â”€ generic Agent Skills clients
+|-- Codex
+|-- Claude Code
+|-- Cursor
+`-- generic Agent Skills clients
 ```
 
 The protocol consists of work-item states, artifact schemas, routing rules, evidence semantics, risk triggers, and exit criteria. Runtime adapters may provide installation metadata, commands, hooks, permissions, or task UI, but may not change protocol semantics.
@@ -139,19 +139,19 @@ Capability absence changes evidence strength, not workflow correctness:
 
 ```text
 User request
-    â†“
+    v
 Read project state
-    â†“
+    v
 Inspect relevant project evidence
-    â†“
+    v
 Classify work type and risk level
-    â†“
+    v
 Create or update a work item
-    â†“
-Shape â†’ Plan as needed â†’ Execute â†’ Verify
-    â†“
+    v
+Shape -> Plan as needed -> Execute -> Verify
+    v
 Record evidence, decisions, risks, and limitations
-    â†“
+    v
 Close work item and update project state
 ```
 
@@ -207,9 +207,9 @@ Risk levels use observable triggers rather than a misleading numeric score. The 
 ### 6.3 Work-item lifecycle
 
 ```text
-captured â†’ shaped â†’ ready â†’ active â†’ verifying â†’ done
-                    â†˜ blocked
-                    â†˜ deferred
+captured -> shaped -> ready -> active -> verifying -> done
+                    +-> blocked
+                    `-> deferred
 ```
 
 - `captured`: the request is recorded and initially understood.
@@ -242,16 +242,16 @@ The default project structure is:
 
 ```text
 .solodeveling/
-â”œâ”€â”€ project.md
-â”œâ”€â”€ state.md
-â”œâ”€â”€ roadmap.md
-â”œâ”€â”€ standards.md
-â”œâ”€â”€ risks.md
-â”œâ”€â”€ decisions/
-â”œâ”€â”€ work/
-â”‚   â”œâ”€â”€ active/
-â”‚   â””â”€â”€ archive/
-â””â”€â”€ evidence/
+|-- project.md
+|-- state.md
+|-- roadmap.md
+|-- standards.md
+|-- risks.md
+|-- decisions/
+|-- work/
+|   |-- active/
+|   `-- archive/
+`-- evidence/
 ```
 
 ### 7.1 Artifact responsibilities
