@@ -16,7 +16,9 @@ limitations:
 
 # Results
 
-Local verification passed; protected-main delivery remains pending.
+Local verification passed. PR #35 merged as main commit
+`ccedb251a2d4800ed05f82e74dc40250d0b601c6`; PR CI run `29512461711` and
+post-merge main CI run `29512717698` passed the complete matrix.
 
 - Pilot-2 completed 18/18 processes with exit code zero: nine Solodeveling and
   nine Superpowers runs. All visible baselines passed; every hidden check failed.
@@ -37,4 +39,4 @@ Local verification passed; protected-main delivery remains pending.
   live-ready gate rejects it. Pilot-3 preserves the fixed plan and is not run.
 - Fifteen focused tests and the complete 237-test suite pass. Protocol and skill
   validation, compilation, dependency health, result-schema validation, and
-  diff checks pass locally.
+  diff checks pass locally. Protected PR and post-merge main CI pass.
