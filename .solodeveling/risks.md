@@ -14,3 +14,4 @@ solodeveling_schema: 1
 - Security standards, runtime CLIs, structured-output schema subsets, authentication, and billing behavior evolve; exact claims require current primary-source verification.
 - Adjacent workflow projects change independently, and comparative speed or quality claims remain unsupported until a controlled repeated benchmark exists.
 - A methodology benchmark can execute the model without activating the named workflow if project-local skills are installed outside the runtime adapter path; live evidence must verify the adapter path and reject zero-activation results.
+- A Codex process may return zero even when sandboxed tool commands cannot mutate the workspace; Windows live evaluation must verify the sandbox helper before inference and stop after the first zero-mutation execution.

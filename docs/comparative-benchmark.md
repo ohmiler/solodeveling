@@ -12,7 +12,14 @@ evidence. Pilot 2 used the exact account-visible `gpt-5.6-sol` slug and complete
 `.codex/skills` instead of Codex's project adapter path `.agents/skills`. Both
 sides produced zero changed files and zero correct runs. Pilot 2 is therefore
 archived as invalid methodology-activation evidence, not comparative evidence.
-Pilot 3 corrects only that activation path and has not been run.
+Pilot 3 then completed 18 inference processes with the corrected skill path, but
+again produced zero changed files and zero correct runs. The local Codex Windows
+sandbox log records repeated failures to launch
+`codex-windows-sandbox-setup.exe` because the helper is absent. Raw per-run logs
+were intentionally not retained, so this is the strongest supported shared
+execution diagnosis rather than verbatim per-run proof. Pilot 3 is archived as
+invalid execution-sandbox evidence. Pilot 4 adds a fail-closed helper preflight
+and has not been run.
 
 ## Fairness boundary
 
@@ -23,6 +30,10 @@ project-local `.agents/skills` directory before timing, verified at their named
 root skill, and explicitly invoked in
 the otherwise identical prompt. Every run receives a fresh linked Git worktree.
 Fixture preparation and skill installation are outside task wall time.
+On Windows, the live gate also requires the Codex sandbox setup helper before
+the first model call. A completed process that produces zero mutations for these
+mutation-required fixtures is checkpointed as an execution failure and stops
+the sequence before the next call.
 
 The 18-run plan covers three repetitions of a small documentation task, a bug
 repair, and a medium feature for each methodology. A fixed seed determines the
@@ -38,7 +49,7 @@ These commands perform no model calls:
 python scripts/comparative_benchmark.py plan
 python scripts/comparative_benchmark.py verify-fixtures
 python scripts/comparative_benchmark.py probe --solodeveling-source PINNED_SOLODEVELING_CHECKOUT --superpowers-source PINNED_SUPERPOWERS_CHECKOUT
-python scripts/comparative_benchmark.py score benchmarks/results/solodeveling-superpowers-pilot-3.json
+python scripts/comparative_benchmark.py score benchmarks/results/solodeveling-superpowers-pilot-4.json
 ```
 
 `plan` prints the exact model, runtime, timeout, pins, mutation boundary, run
@@ -46,7 +57,8 @@ order, and required confirmation. `verify-fixtures` proves each seed passes its
 visible baseline while failing its hidden completion check. `score` analyzes an
 existing sanitized result without contacting a model. `probe` verifies the exact
 CLI version, source commits, clean checkouts, and root skills, then prints the
-fully resolved live command without contacting a model.
+fully resolved live command without contacting a model. On Windows it also
+rejects a missing Codex sandbox helper without contacting a model.
 
 ## Live authorization boundary
 
@@ -62,6 +74,8 @@ a checkpoint whose preregistration hash, provenance, or run identity differs.
 If a process fails before inference with no tokens or tool calls, a circuit breaker
 checkpoints that attempt, stops before the next call, and makes the checkpoint
 non-resumable. Recovery then requires a distinct successor preregistration.
+The same non-resumable boundary applies when a process returns successfully but
+produces zero mutations and fails the hidden completion check.
 
 Model calls consume the signed-in account's capacity or credits. Therefore the
 live command must not be run until the owner separately authorizes the named

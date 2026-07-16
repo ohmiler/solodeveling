@@ -13,7 +13,7 @@ import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 import yaml
 
@@ -269,6 +269,11 @@ def _load_checkpoint(
                 f"checkpoint contains pre-inference failure at {run_id}; "
                 "create a successor preregistration instead of resuming"
             )
+        if result.get("failure_code") == "zero-mutation":
+            raise BenchmarkError(
+                f"checkpoint contains zero-mutation execution failure at {run_id}; "
+                "create a successor preregistration instead of resuming"
+            )
         seen.add(run_id)
     return results
 
@@ -318,6 +323,29 @@ def verify_model_catalog(spec: dict[str, Any], catalog_path: Path | None = None)
         "client_version": str(catalog_version or "unknown"),
         "model": requested_model,
         "reasoning_effort": requested_effort,
+    }
+
+
+def verify_sandbox_runtime(
+    executable: str,
+    *,
+    platform: str = sys.platform,
+    helper_finder: Callable[[str], str | None] = shutil.which,
+) -> dict[str, str]:
+    if platform != "win32":
+        return {"platform": platform, "status": "not-windows"}
+    helper_name = "codex-windows-sandbox-setup.exe"
+    sibling = Path(executable).resolve().with_name(helper_name)
+    discovered = helper_finder(helper_name)
+    if not sibling.is_file() and discovered is None:
+        raise BenchmarkError(
+            "Codex Windows sandbox helper is unavailable; "
+            "repair the Codex installation before any live call"
+        )
+    return {
+        "platform": platform,
+        "status": "available",
+        "helper": str(sibling if sibling.is_file() else Path(discovered).resolve()),
     }
 
 
@@ -384,6 +412,14 @@ def _changed_paths(project: Path, baseline: str) -> list[str]:
     )
 
 
+def _is_zero_mutation_failure(
+    process_returncode: int | None,
+    correct: bool,
+    changed: list[str],
+) -> bool:
+    return process_returncode == 0 and not correct and not changed
+
+
 def _runtime_version(executable: str) -> str:
     process = subprocess.run([executable, "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=15, check=False, shell=False)
     return (process.stdout or process.stderr).strip().splitlines()[0]
@@ -397,12 +433,14 @@ def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
     version = _runtime_version(executable)
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
+    sandbox = verify_sandbox_runtime(executable)
     catalog = verify_model_catalog(spec)
     resolved = {key: value.resolve() for key, value in sources.items()}
     verify_sources(spec, resolved)
     document = plan_document(spec)
     document["source_checkouts"] = {key: str(value) for key, value in resolved.items()}
     document["runtime_verified"] = True
+    document["sandbox_runtime_verified"] = sandbox
     document["model_catalog_verified"] = catalog
     document["sources_verified"] = True
     document["live_command"] = (
@@ -428,6 +466,7 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
     version = _runtime_version(executable)
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
+    verify_sandbox_runtime(executable)
     verify_model_catalog(spec)
     sources = {"solodeveling": solodeveling_source.resolve(), "superpowers": superpowers_source.resolve()}
     verify_sources(spec, sources)
@@ -484,6 +523,9 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
                 state = "correctness-failure"
             activity = parse_codex_jsonl(lines)
             changed = _changed_paths(worktree, baseline)
+            if _is_zero_mutation_failure(process_returncode, correct, changed):
+                state = "execution-failure"
+                failure_code = "zero-mutation"
             workflow = [path for path in changed if path.startswith((".solodeveling/", "docs/superpowers/"))]
             results.append({
                 "run_id": planned.run_id, "task_id": planned.task_id, "methodology": planned.methodology,
@@ -504,6 +546,11 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
                 raise BenchmarkError(
                     f"pre-inference failure at {planned.run_id} "
                     f"({failure_code}); stopped before the next call"
+                )
+            if failure_code == "zero-mutation":
+                raise BenchmarkError(
+                    f"zero-mutation execution failure at {planned.run_id}; "
+                    "stopped before the next call"
                 )
     document = _result_document(spec, spec_sha256, results)
     _write_checkpoint(output, document)

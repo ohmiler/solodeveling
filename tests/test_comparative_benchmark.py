@@ -13,6 +13,7 @@ from solodeveling_protocol.comparative_benchmark import (
     _changed_paths,
     _initialize_repository,
     _install_methodology,
+    _is_zero_mutation_failure,
     _verify_installed_methodology,
     BenchmarkError,
     build_plan,
@@ -24,6 +25,7 @@ from solodeveling_protocol.comparative_benchmark import (
     summarize_results,
     verify_fixtures,
     verify_model_catalog,
+    verify_sandbox_runtime,
     run_live,
 )
 
@@ -53,7 +55,7 @@ def test_plan_is_non_live_and_discloses_runtime_boundary() -> None:
     assert document["runtime"]["reasoning_effort"] == "medium"
     assert document["maximum_live_runs"] == 18
     assert document["maximum_agent_seconds"] == 21600
-    assert document["confirmation_required"] == "RUN CONTROLLED PILOT 3 18"
+    assert document["confirmation_required"] == "RUN CONTROLLED PILOT 4 18"
     assert "run-live" in document["live_command_template"]
 
 
@@ -109,6 +111,26 @@ def test_runtime_failure_is_reduced_to_fixed_diagnostic_code() -> None:
     assert classify_runtime_failure("opaque provider failure", "") == "process-exit-nonzero"
 
 
+def test_windows_sandbox_helper_is_required_before_live_calls(tmp_path: Path) -> None:
+    executable = tmp_path / "codex.exe"
+    executable.write_bytes(b"codex")
+    with pytest.raises(BenchmarkError, match="sandbox helper is unavailable"):
+        verify_sandbox_runtime(
+            str(executable),
+            platform="win32",
+            helper_finder=lambda name: None,
+        )
+    helper = tmp_path / "codex-windows-sandbox-setup.exe"
+    helper.write_bytes(b"helper")
+    report = verify_sandbox_runtime(
+        str(executable),
+        platform="win32",
+        helper_finder=lambda name: None,
+    )
+    assert report["status"] == "available"
+    assert Path(report["helper"]) == helper.resolve()
+
+
 def test_python_cache_does_not_count_as_agent_change(tmp_path: Path) -> None:
     project = tmp_path / "project"
     project.mkdir()
@@ -138,6 +160,13 @@ def test_methodology_is_installed_at_codex_adapter_path(tmp_path: Path) -> None:
     assert not (project / ".codex" / "skills").exists()
 
 
+def test_zero_mutation_failure_requires_successful_but_incorrect_process() -> None:
+    assert _is_zero_mutation_failure(0, False, [])
+    assert not _is_zero_mutation_failure(1, False, [])
+    assert not _is_zero_mutation_failure(0, True, [])
+    assert not _is_zero_mutation_failure(0, False, ["README.md"])
+
+
 def test_scoring_gates_speed_on_correct_pairs_and_forbids_claim() -> None:
     runs = [
         {"task_id": "a", "repetition": 1, "methodology": "solodeveling", "correct": True, "elapsed_seconds": 4},
@@ -163,6 +192,7 @@ def test_archived_invalid_pilot_is_not_live_eligible() -> None:
     for path in (
         Path("benchmarks/comparative/archive/pilot-1-invalid.yaml"),
         Path("benchmarks/comparative/archive/pilot-2-invalid.yaml"),
+        Path("benchmarks/comparative/archive/pilot-3-invalid.yaml"),
     ):
         archived = load_spec(path)
         with pytest.raises(BenchmarkError, match="not eligible"):
@@ -249,4 +279,22 @@ def test_checkpoint_with_pre_inference_failure_cannot_resume(tmp_path: Path) -> 
         encoding="utf-8",
     )
     with pytest.raises(BenchmarkError, match="successor preregistration"):
+        _load_checkpoint(checkpoint, expected, planned)
+
+
+def test_checkpoint_with_zero_mutation_failure_cannot_resume(tmp_path: Path) -> None:
+    spec = load_spec(SPEC)
+    planned = build_plan(spec)
+    expected = _result_document(spec, "0" * 64, [])
+    failed = {
+        "run_id": planned[0].run_id,
+        "task_id": planned[0].task_id,
+        "methodology": planned[0].methodology,
+        "repetition": planned[0].repetition,
+        "state": "execution-failure",
+        "failure_code": "zero-mutation",
+    }
+    checkpoint = tmp_path / "pilot.json"
+    checkpoint.write_text(json.dumps({**expected, "runs": [failed]}), encoding="utf-8")
+    with pytest.raises(BenchmarkError, match="zero-mutation"):
         _load_checkpoint(checkpoint, expected, planned)
