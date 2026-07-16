@@ -1,0 +1,28 @@
+schema: 1
+benchmark_id: solodeveling-feedback-0.1.1-vs-0.1.2-pilot-2
+status: invalid
+classification: pilot-signal-only
+invalid_reason: >-
+  Run-01 completed with zero changed files because Codex enforced read-only
+  permissions despite the legacy --sandbox workspace-write argument. Local
+  diagnostics showed rejected file patches and blocked test commands. The
+  fail-closed gate stopped before run-02. This is a runtime-policy mismatch,
+  not comparative evidence about either Solodeveling version.
+observed_at: 2026-07-17T03:24:12+07:00
+completed_live_runs: 1
+failure_code: zero-mutation
+runtime:
+  executable: codex
+  cli_version: codex-cli 0.144.5
+  model: gpt-5.6-sol
+  reasoning_effort: medium
+  sandbox: workspace-write
+  network: disabled
+methodologies:
+  - id: solodeveling-0.1.1
+    commit: 889e07a47a8cbdca15765d00348dbbd7f9849f03
+  - id: solodeveling-0.1.2
+    commit: 00efc22a01daad1cddb544b4d97ffb6a45b283fc
+claim_policy:
+  public_faster_claim_allowed: false
+  confirmation: RUN CONTROLLED FEEDBACK PILOT 2 30

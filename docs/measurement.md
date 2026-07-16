@@ -29,6 +29,12 @@ version did not preserve a local failure transcript or final agent message, the
 successor preregistration adds ignored, local-only diagnostics for unsuccessful runs.
 The invalid run is evidence about the harness, not evidence for either skill version.
 
+Feedback pilot 2 is also invalid: its first run was forced read-only by a mismatch
+between the legacy sandbox flag and the active Codex permission-profile runtime. Its
+diagnostic proved that patches and tests were policy-blocked, then the gate stopped
+before run 2. Pilot 3 selects the built-in `:workspace` profile and runs a no-model
+write probe before inference. Neither invalid run is comparative skill evidence.
+
 Correctness is primary. Time, tokens, tool calls, questions, changed files, and
 workflow artifacts are compared only for pairs where both versions pass visible
 tests and the external hidden check. The study is pilot signal only.

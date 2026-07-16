@@ -441,6 +441,44 @@ def verify_sandbox_runtime(
     }
 
 
+def verify_permission_runtime(executable: str, spec: dict[str, Any]) -> dict[str, str]:
+    profile = spec["runtime"].get("permission_profile")
+    if profile != ":workspace":
+        raise BenchmarkError("live benchmark requires the built-in :workspace permission profile")
+    with tempfile.TemporaryDirectory(prefix="solodeveling-permission-probe-") as temporary:
+        root = Path(temporary)
+        marker = root / "permission-probe.txt"
+        command = [
+            executable,
+            "sandbox",
+            "--permission-profile",
+            profile,
+            "--cd",
+            str(root),
+            sys.executable,
+            "-c",
+            "from pathlib import Path; Path('permission-probe.txt').write_text('ok', encoding='utf-8')",
+        ]
+        process = subprocess.run(
+            command,
+            cwd=root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=30,
+            check=False,
+            shell=False,
+            env=_safe_environment(),
+        )
+        if process.returncode or not marker.is_file():
+            raise BenchmarkError(
+                "Codex :workspace permission profile cannot write to its workspace; "
+                "repair runtime permissions before any live call"
+            )
+    return {"profile": profile, "status": "write-verified"}
+
+
 def _initialize_repository(project: Path) -> None:
     commands = [
         ["git", "init", "--quiet"],
@@ -527,6 +565,39 @@ def _runtime_version(executable: str) -> str:
     return (process.stdout or process.stderr).strip().splitlines()[0]
 
 
+def _build_live_command(
+    executable: str,
+    spec: dict[str, Any],
+    worktree: Path,
+    last_message_path: Path,
+) -> list[str]:
+    runtime = spec["runtime"]
+    profile = runtime.get("permission_profile")
+    if profile != ":workspace":
+        raise BenchmarkError("live benchmark requires the built-in :workspace permission profile")
+    return [
+        executable,
+        "exec",
+        "--json",
+        "--ephemeral",
+        "--ignore-user-config",
+        "--ignore-rules",
+        "--model",
+        runtime["model"],
+        "--config",
+        f"model_reasoning_effort={json.dumps(runtime['reasoning_effort'])}",
+        "--config",
+        f"default_permissions={json.dumps(profile)}",
+        "--config",
+        'approval_policy="never"',
+        "--output-last-message",
+        str(last_message_path),
+        "-C",
+        str(worktree),
+        "-",
+    ]
+
+
 def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
     require_live_ready(spec)
     executable = shutil.which(spec["runtime"]["executable"])
@@ -536,6 +607,7 @@ def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
     sandbox = verify_sandbox_runtime(executable)
+    permissions = verify_permission_runtime(executable, spec)
     catalog = verify_model_catalog(spec)
     resolved = {key: value.resolve() for key, value in sources.items()}
     verify_sources(spec, resolved)
@@ -543,6 +615,7 @@ def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
     document["source_checkouts"] = {key: str(value) for key, value in resolved.items()}
     document["runtime_verified"] = True
     document["sandbox_runtime_verified"] = sandbox
+    document["permission_runtime_verified"] = permissions
     document["model_catalog_verified"] = catalog
     document["sources_verified"] = True
     source_arguments = "".join(
@@ -580,6 +653,7 @@ def run_live(
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
     verify_sandbox_runtime(executable)
+    verify_permission_runtime(executable, spec)
     verify_model_catalog(spec)
     if sources is None:
         sources = {}
@@ -614,14 +688,7 @@ def run_live(
                 raise BenchmarkError(f"could not create fresh worktree for {planned.run_id}: {added.stderr.strip()}")
             prompt = f"{method['invocation']}\n\nThe requirements below are final and approved. Work autonomously in this already-isolated git worktree. Do not use the network or ask for approval. Run the tests and report completion.\n\n{task['prompt']}"
             last_message_path = temp_root / f"{planned.run_id}-last-message.txt"
-            command = [
-                executable, "exec", "--json", "--ephemeral", "--ignore-user-config", "--ignore-rules",
-                "--sandbox", spec["runtime"]["sandbox"], "--model", spec["runtime"]["model"],
-                "--config", f"model_reasoning_effort={json.dumps(spec['runtime']['reasoning_effort'])}",
-                "--config", 'approval_policy="never"', "--config", "sandbox_workspace_write.network_access=false",
-                "--output-last-message", str(last_message_path),
-                "-C", str(worktree), "-",
-            ]
+            command = _build_live_command(executable, spec, worktree, last_message_path)
             started = time.perf_counter()
             try:
                 process = subprocess.run(command, input=prompt, cwd=worktree, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=int(spec["runtime"]["timeout_seconds"]), check=False, shell=False, env=_safe_environment())
