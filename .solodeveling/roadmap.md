@@ -32,6 +32,7 @@ solodeveling_schema: 1
 27. Comparative execution-sandbox recovery - Pilot-3 completed 18 inference processes but produced zero mutations while the local Codex Windows sandbox helper was unavailable; WORK-032 archives it as invalid evidence, adds a missing-helper preflight and zero-mutation circuit breaker, and preregisters blocked Pilot-4 without live execution.
 28. Low-ceremony workflow enforcement - WORK-033 applies an explicit zero-artifact Quick path, a one-WORK/one-EVIDENCE Standard budget, same-boundary follow-up reuse, event-only roadmap updates, single-owner memory, and validated lifecycle helper commands.
 29. Non-publishing 0.1.2 release candidate - WORK-034 produced and independently verified the exact 13-file candidate from protected-main SHA `00efc22a01daad1cddb544b4d97ffb6a45b283fc` in run `29521649767`; all internal checks and strict attestations passed without creating a tag, GitHub Release, PyPI, or npm action.
+30. Immutable GitHub Release v0.1.2 - WORK-035 created and independently verified annotated tag `v0.1.2` at candidate SHA `00efc22a01daad1cddb544b4d97ffb6a45b283fc` and an immutable non-draft 13-asset GitHub Release from run `29521649767`; PyPI and npm remained at 0.1.1 and unchanged.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
