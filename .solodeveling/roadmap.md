@@ -25,6 +25,7 @@ solodeveling_schema: 1
 20. Immutable GitHub Release v0.1.0 - created and verified as WORK-020 with all 13 exact candidate assets; PyPI and npm actions remain separately authorized.
 21. PyPI publication 0.1.0 - published and verified as WORK-021 through protected OIDC; clean pip, uvx, and pipx paths pass, while npm remains deferred and unpublished.
 22. Narrow docs-only CI path - implemented and GitHub-verified as WORK-025; changes strictly under docs/** run one complete Python regression job with exact diff checking, while mixed and non-docs changes retain the full gate.
+23. npm publication 0.1.0 - published and verified as WORK-026 from the exact immutable release tarball; clean install and npx paths pass, with later automation restricted to owner-reviewed staged Trusted Publishing and traditional publishing tokens disallowed.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
