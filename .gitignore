@@ -9,4 +9,5 @@ build/
 htmlcov/
 evals/results/
 benchmarks/results/
+benchmarks/field/results/
 benchmarks/comparative/sources/

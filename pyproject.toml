@@ -59,6 +59,7 @@ packages = ["src/solodeveling_protocol"]
 [tool.hatch.build.targets.wheel.force-include]
 "skills" = "solodeveling_protocol/resources/skills"
 "evals" = "solodeveling_protocol/resources/evals"
+"benchmarks/field" = "solodeveling_protocol/resources/benchmarks/field"
 
 [tool.hatch.build.targets.sdist]
 include = [

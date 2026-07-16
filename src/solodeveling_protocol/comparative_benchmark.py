@@ -53,8 +53,13 @@ def build_plan(spec: dict[str, Any]) -> list[PlannedRun]:
     tasks = [task["id"] for task in spec["tasks"]]
     methods = [method["id"] for method in spec["methodologies"]]
     repetitions = int(spec["repetitions"])
-    if len(tasks) != 3 or len(methods) != 2 or repetitions != 3:
-        raise BenchmarkError("pilot design must be exactly 3 tasks x 2 methods x 3 repetitions")
+    if not tasks or len(methods) != 2 or repetitions < 1:
+        raise BenchmarkError(
+            "paired pilot design requires at least one task, exactly two methods, "
+            "and at least one repetition"
+        )
+    if len(tasks) != len(set(tasks)) or len(methods) != len(set(methods)):
+        raise BenchmarkError("task and methodology IDs must be unique")
     rng = random.Random(int(spec["seed"]))
     blocks = [(repetition, task) for repetition in range(1, repetitions + 1) for task in tasks]
     rng.shuffle(blocks)
@@ -76,6 +81,11 @@ def build_plan(spec: dict[str, Any]) -> list[PlannedRun]:
 def plan_document(spec: dict[str, Any]) -> dict[str, Any]:
     runtime = spec["runtime"]
     result_path = f"benchmarks/results/{spec['benchmark_id']}.json"
+    expected_runs = int(spec["claim_policy"]["required_live_runs"])
+    source_arguments = "".join(
+        f' --source "{method["id"]}=<PINNED_{method["id"].upper()}_CHECKOUT>"'
+        for method in spec["methodologies"]
+    )
     return {
         "schema": 1,
         "benchmark_id": spec["benchmark_id"],
@@ -84,15 +94,18 @@ def plan_document(spec: dict[str, Any]) -> dict[str, Any]:
         "runtime": runtime,
         "methodologies": spec["methodologies"],
         "confirmation_required": spec["claim_policy"]["confirmation"],
-        "maximum_live_runs": spec["claim_policy"]["required_live_runs"],
-        "maximum_agent_seconds": int(runtime["timeout_seconds"]) * int(spec["claim_policy"]["required_live_runs"]),
-        "account_boundary": "18 Codex calls use the signed-in account's capacity or credits; no stable dollar maximum is available from the CLI",
+        "maximum_live_runs": expected_runs,
+        "maximum_agent_seconds": int(runtime["timeout_seconds"]) * expected_runs,
+        "account_boundary": (
+            f"{expected_runs} Codex calls use the signed-in account's capacity or "
+            "credits; no stable dollar maximum is available from the CLI"
+        ),
         "mutation_boundary": "only fresh temporary fixture worktrees",
         "live_command_template": (
             'python scripts/comparative_benchmark.py run-live --confirm "'
             + spec["claim_policy"]["confirmation"]
-            + '" --solodeveling-source <PINNED_SOLODEVELING_CHECKOUT>'
-            + " --superpowers-source <PINNED_SUPERPOWERS_CHECKOUT>"
+            + '"'
+            + source_arguments
             + f" --output {result_path}"
         ),
         "runs": [run.__dict__ for run in build_plan(spec)],
@@ -168,18 +181,40 @@ def _median(values: list[float]) -> float | None:
 
 
 def summarize_results(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    metric_names = (
+        "elapsed_seconds",
+        "input_tokens",
+        "output_tokens",
+        "tool_calls",
+        "agent_questions",
+        "changed_files",
+        "workflow_artifacts",
+    )
     methods = sorted({str(run["methodology"]) for run in runs})
     by_method: dict[str, Any] = {}
     for method in methods:
         selected = [run for run in runs if run["methodology"] == method]
         correct = [run for run in selected if run.get("correct") is True]
+        correct_metrics = {
+            metric: _median(
+                [
+                    float(run[metric])
+                    for run in correct
+                    if isinstance(run.get(metric), (int, float))
+                    and not isinstance(run.get(metric), bool)
+                ]
+            )
+            for metric in metric_names
+        }
         by_method[method] = {
             "runs": len(selected),
             "correct": len(correct),
             "success_rate": round(len(correct) / len(selected), 4) if selected else None,
             "median_correct_seconds": _median([float(run["elapsed_seconds"]) for run in correct]),
+            "median_correct_metrics": correct_metrics,
         }
     pairs: list[dict[str, Any]] = []
+    paired_runs: list[dict[str, dict[str, Any]]] = []
     indexed = {(run["task_id"], run["repetition"], run["methodology"]): run for run in runs}
     if len(methods) == 2:
         keys = sorted({(run["task_id"], run["repetition"]) for run in runs})
@@ -188,12 +223,34 @@ def summarize_results(runs: list[dict[str, Any]]) -> dict[str, Any]:
             right = indexed.get((task_id, repetition, methods[1]))
             if left and right and left.get("correct") is True and right.get("correct") is True:
                 pairs.append({"task_id": task_id, "repetition": repetition, f"{methods[0]}_seconds": left["elapsed_seconds"], f"{methods[1]}_seconds": right["elapsed_seconds"]})
+                paired_runs.append({methods[0]: left, methods[1]: right})
     paired_medians = {method: _median([float(pair[f"{method}_seconds"]) for pair in pairs]) for method in methods}
+    paired_metric_medians: dict[str, dict[str, float | None]] = {}
+    paired_metric_pairs: dict[str, int] = {}
+    for metric in metric_names:
+        eligible_pairs = [
+            pair
+            for pair in paired_runs
+            if all(
+                isinstance(pair[method].get(metric), (int, float))
+                and not isinstance(pair[method].get(metric), bool)
+                for method in methods
+            )
+        ]
+        paired_metric_pairs[metric] = len(eligible_pairs)
+        paired_metric_medians[metric] = {
+            method: _median(
+                [float(pair[method][metric]) for pair in eligible_pairs]
+            )
+            for method in methods
+        }
     return {
         "correctness_first": True,
         "by_methodology": by_method,
         "correct_pairs": len(pairs),
         "paired_median_seconds": paired_medians,
+        "paired_median_metrics": paired_metric_medians,
+        "paired_metric_pairs": paired_metric_pairs,
         "public_faster_claim_allowed": False,
         "interpretation": "pilot signal only; preregister a confirmatory benchmark before any public comparative claim",
     }
@@ -371,6 +428,16 @@ def _source_commit(source: Path) -> str:
 
 
 def verify_sources(spec: dict[str, Any], sources: dict[str, Path]) -> None:
+    expected_identifiers = {
+        str(methodology["id"]) for methodology in spec["methodologies"]
+    }
+    if set(sources) != expected_identifiers:
+        missing = sorted(expected_identifiers - set(sources))
+        unexpected = sorted(set(sources) - expected_identifiers)
+        raise BenchmarkError(
+            f"source assignments must exactly match the spec; "
+            f"missing={missing}, unexpected={unexpected}"
+        )
     for methodology in spec["methodologies"]:
         identifier = methodology["id"]
         source = sources.get(identifier)
@@ -443,17 +510,28 @@ def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
     document["sandbox_runtime_verified"] = sandbox
     document["model_catalog_verified"] = catalog
     document["sources_verified"] = True
+    source_arguments = "".join(
+        f' --source "{identifier}={path}"'
+        for identifier, path in resolved.items()
+    )
     document["live_command"] = (
         "python scripts/comparative_benchmark.py run-live"
         f' --confirm "{spec["claim_policy"]["confirmation"]}"'
-        f' --solodeveling-source "{resolved["solodeveling"]}"'
-        f' --superpowers-source "{resolved["superpowers"]}"'
-        f" --output benchmarks/results/{spec['benchmark_id']}.json"
+        + source_arguments
+        + f" --output benchmarks/results/{spec['benchmark_id']}.json"
     )
     return document
 
 
-def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, superpowers_source: Path, output: Path) -> dict[str, Any]:
+def run_live(
+    spec_path: Path,
+    *,
+    confirmation: str,
+    output: Path,
+    sources: dict[str, Path] | None = None,
+    solodeveling_source: Path | None = None,
+    superpowers_source: Path | None = None,
+) -> dict[str, Any]:
     spec = load_spec(spec_path)
     require_live_ready(spec)
     spec_sha256 = hashlib.sha256(spec_path.read_bytes()).hexdigest()
@@ -468,7 +546,13 @@ def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, s
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
     verify_sandbox_runtime(executable)
     verify_model_catalog(spec)
-    sources = {"solodeveling": solodeveling_source.resolve(), "superpowers": superpowers_source.resolve()}
+    if sources is None:
+        sources = {}
+        if solodeveling_source is not None:
+            sources["solodeveling"] = solodeveling_source
+        if superpowers_source is not None:
+            sources["superpowers"] = superpowers_source
+    sources = {identifier: path.resolve() for identifier, path in sources.items()}
     verify_sources(spec, sources)
     tasks = {task["id"]: task for task in spec["tasks"]}
     methods = {method["id"]: method for method in spec["methodologies"]}
@@ -564,6 +648,27 @@ def score_file(path: Path) -> dict[str, Any]:
     return summarize_results(document["runs"])
 
 
+def _source_mapping(
+    assignments: list[str],
+    *,
+    solodeveling_source: Path | None = None,
+    superpowers_source: Path | None = None,
+) -> dict[str, Path]:
+    sources: dict[str, Path] = {}
+    for assignment in assignments:
+        identifier, separator, raw_path = assignment.partition("=")
+        if not separator or not identifier or not raw_path:
+            raise BenchmarkError("--source must use METHODOLOGY_ID=CHECKOUT_PATH")
+        if identifier in sources:
+            raise BenchmarkError(f"duplicate source assignment for {identifier}")
+        sources[identifier] = Path(raw_path)
+    if solodeveling_source is not None:
+        sources.setdefault("solodeveling", solodeveling_source)
+    if superpowers_source is not None:
+        sources.setdefault("superpowers", superpowers_source)
+    return sources
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Controlled Solodeveling/Superpowers pilot benchmark")
     parser.add_argument("--spec", type=Path, default=Path("benchmarks/comparative/pilot.yaml"))
@@ -571,14 +676,16 @@ def _parser() -> argparse.ArgumentParser:
     subparsers.add_parser("plan")
     subparsers.add_parser("verify-fixtures")
     source_probe = subparsers.add_parser("probe")
-    source_probe.add_argument("--solodeveling-source", type=Path, required=True)
-    source_probe.add_argument("--superpowers-source", type=Path, required=True)
+    source_probe.add_argument("--source", action="append", default=[])
+    source_probe.add_argument("--solodeveling-source", type=Path)
+    source_probe.add_argument("--superpowers-source", type=Path)
     score = subparsers.add_parser("score")
     score.add_argument("result", type=Path)
     live = subparsers.add_parser("run-live")
     live.add_argument("--confirm", required=True)
-    live.add_argument("--solodeveling-source", type=Path, required=True)
-    live.add_argument("--superpowers-source", type=Path, required=True)
+    live.add_argument("--source", action="append", default=[])
+    live.add_argument("--solodeveling-source", type=Path)
+    live.add_argument("--superpowers-source", type=Path)
     live.add_argument("--output", type=Path, default=Path("benchmarks/results/pilot-2.json"))
     return parser
 
@@ -593,15 +700,25 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "probe":
             result = probe(
                 load_spec(args.spec),
-                {
-                    "solodeveling": args.solodeveling_source,
-                    "superpowers": args.superpowers_source,
-                },
+                _source_mapping(
+                    args.source,
+                    solodeveling_source=args.solodeveling_source,
+                    superpowers_source=args.superpowers_source,
+                ),
             )
         elif args.command == "score":
             result = score_file(args.result)
         else:
-            result = run_live(args.spec, confirmation=args.confirm, solodeveling_source=args.solodeveling_source, superpowers_source=args.superpowers_source, output=args.output)
+            result = run_live(
+                args.spec,
+                confirmation=args.confirm,
+                sources=_source_mapping(
+                    args.source,
+                    solodeveling_source=args.solodeveling_source,
+                    superpowers_source=args.superpowers_source,
+                ),
+                output=args.output,
+            )
     except BenchmarkError as error:
         print(f"benchmark error: {error}", file=sys.stderr)
         return 2
