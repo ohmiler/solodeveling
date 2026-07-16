@@ -1,15 +1,16 @@
 ---
 solodeveling_schema: 1
-current_goal: Obtain fresh explicit owner authorization for tag v0.1.0 after the publication gate repair is merged and verified.
-active_work: []
+current_goal: Obtain explicit owner authorization for the immutable v0.1.0 GitHub Release after the exact candidate tag was verified.
+active_work:
+- WORK-019
 blockers: []
 risks:
 - The PyPI pending publisher is owner-confirmed but cannot be independently read through a public API; exact OIDC matching remains unverified until first authorized use.
 - The pending publisher does not reserve the PyPI name, and npm Trusted Publishing cannot be configured before the first npm publication.
-- Candidate run 29452526223 produced a complete release set from commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; local integrity verification and strict provenance verification passed for all 13 files.
+- Tag v0.1.0 resolves to candidate commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4 and tag-triggered CI run 29483670381 passed; no GitHub Release or publish run exists.
 - npm first-package bootstrap requires a separate owner-controlled interactive publication with two-factor authentication.
 - Native executables are not platform-signed, and Cursor plus complete Tier 1 behavior remain unverified.
-next_action: Obtain fresh explicit owner authorization before creating and pushing tag v0.1.0 at candidate commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; GitHub Release creation and publication remain separate.
+next_action: Obtain separate explicit owner authorization before creating the immutable, non-draft GitHub Release v0.1.0 from the exact 13-file verified release set; registry publication remains separate.
 ---
 # State
 
@@ -31,3 +32,10 @@ WORK-017 and EVIDENCE-017 record the repaired publication gate: current protecte
 its canonical dynamic version is parsed without executing candidate code. Downstream
 tag, immutable-release, asset, attestation, permission, and environment checks remain.
 No tag, release, publish workflow, registry action, or publication was invoked.
+
+WORK-018 and EVIDENCE-018 record that annotated tag v0.1.0 now resolves locally and
+on origin to exact candidate commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4.
+Tag-triggered CI run 29483670381 passed across tests, native targets, packaging, and
+npm packaging. No GitHub Release or publish workflow run was created. WORK-019
+records Memory Workflow Simplification as deferred work for the release after 0.1.0;
+it is excluded from the candidate, tag target, release set, and publication inputs.

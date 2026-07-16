@@ -21,6 +21,7 @@ solodeveling_schema: 1
 16. Owner release-setup verification - implemented as WORK-015; admin bypass is API-verified disabled and the PyPI pending publisher is owner-confirmed without invoking release workflows.
 17. Non-publishing 0.1.0 release candidate - produced and independently verified as WORK-016 from exact main commit `700a9b9dafc877507232b84a94ff3d6eaf7afda4`; tag, GitHub Release, registry actions, and publication remain separately authorized work.
 18. Publication candidate ancestry repair - implemented and verified as WORK-017; current protected `main` can validate the exact verified ancestor candidate without weakening tag, release, provenance, or registry gates.
+19. Memory Workflow Simplification - deferred as WORK-019 for the release after 0.1.0; it must not change the 0.1.0 candidate, tag target, release set, or publication inputs.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
