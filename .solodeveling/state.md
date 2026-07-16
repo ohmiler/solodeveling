@@ -1,16 +1,16 @@
 ---
 solodeveling_schema: 1
-current_goal: Obtain explicit owner authorization for the immutable v0.1.0 GitHub Release after the exact candidate tag was verified.
+current_goal: Obtain explicit owner direction for the next registry boundary after the immutable v0.1.0 GitHub Release was verified.
 active_work:
 - WORK-019
 blockers: []
 risks:
 - The PyPI pending publisher is owner-confirmed but cannot be independently read through a public API; exact OIDC matching remains unverified until first authorized use.
 - The pending publisher does not reserve the PyPI name, and npm Trusted Publishing cannot be configured before the first npm publication.
-- Tag v0.1.0 resolves to candidate commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4 and tag-triggered CI run 29483670381 passed; no GitHub Release or publish run exists.
+- Immutable, non-draft GitHub Release v0.1.0 contains all 13 verified candidate assets and resolves through the tag to commit 700a9b9dafc877507232b84a94ff3d6eaf7afda4; no publish run exists.
 - npm first-package bootstrap requires a separate owner-controlled interactive publication with two-factor authentication.
 - Native executables are not platform-signed, and Cursor plus complete Tier 1 behavior remain unverified.
-next_action: Obtain separate explicit owner authorization before creating the immutable, non-draft GitHub Release v0.1.0 from the exact 13-file verified release set; registry publication remains separate.
+next_action: Obtain separate explicit owner authorization naming PyPI publication and/or the owner-controlled interactive npm first-package bootstrap; do not infer either from GitHub Release authority.
 ---
 # State
 
@@ -39,3 +39,9 @@ Tag-triggered CI run 29483670381 passed across tests, native targets, packaging,
 npm packaging. No GitHub Release or publish workflow run was created. WORK-019
 records Memory Workflow Simplification as deferred work for the release after 0.1.0;
 it is excluded from the candidate, tag target, release set, and publication inputs.
+
+WORK-020 and EVIDENCE-020 record the non-draft immutable GitHub Release v0.1.0.
+All 13 release assets passed release integrity and per-asset digest verification
+after their candidate integrity and strict provenance checks passed. No publish
+workflow, registry approval, token exchange, staging, bootstrap, or publication was
+invoked. PyPI and npm actions remain separate authorization boundaries.
