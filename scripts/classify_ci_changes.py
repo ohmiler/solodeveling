@@ -5,14 +5,17 @@ import sys
 
 
 MEMORY_PREFIX = '.solodeveling/'
+DOCS_PREFIX = 'docs/'
 
 
-def is_memory_only(paths: list[str]) -> bool:
+def is_only(paths: list[str], prefix: str) -> bool:
     if not paths:
         return False
     return all(
-        path.startswith(MEMORY_PREFIX)
+        path.startswith(prefix)
         and '\\' not in path
+        and not path.startswith('/')
+        and '//' not in path
         and '/./' not in path
         and '/../' not in path
         for path in paths
@@ -38,8 +41,10 @@ def parse_paths(argv: list[str]) -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     paths = parse_paths(sys.argv[1:] if argv is None else argv)
-    value = 'true' if is_memory_only(paths) else 'false'
-    print(f'memory_only={value}')
+    memory = 'true' if is_only(paths, MEMORY_PREFIX) else 'false'
+    docs = 'true' if is_only(paths, DOCS_PREFIX) else 'false'
+    print(f'memory_only={memory}')
+    print(f'docs_only={docs}')
     return 0
 
 
