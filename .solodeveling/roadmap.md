@@ -28,6 +28,7 @@ solodeveling_schema: 1
 23. npm publication 0.1.0 - published and verified as WORK-026 from the exact immutable release tarball; clean install and npx paths pass, with later automation restricted to owner-reviewed staged Trusted Publishing and traditional publishing tokens disallowed.
 24. README positioning and honest comparison - implemented and GitHub-verified as WORK-027 with live installation guidance, risk-scaled value, a documented-default comparison table, best-fit guidance, measured workflow-overhead evidence, and explicit competitive benchmark limits.
 25. Registry landing pages and patch release 0.1.1 - implemented, published, and independently verified as WORK-028 from exact source commit `889e07a47a8cbdca15765d00348dbbd7f9849f03`; immutable GitHub, PyPI OIDC, npm staged Trusted Publishing, registry digests, provenance, and clean pip/npx paths pass.
+26. Controlled comparison recovery - deterministic harness implemented as WORK-029; pilot-1 archived as invalid runtime evidence by WORK-030; pilot-2 archived as invalid methodology-activation evidence by WORK-031 after 18 inference processes found a project skill-path mismatch; corrected pilot-3 is preregistered but not run.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.

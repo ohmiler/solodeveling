@@ -1,9 +1,10 @@
 schema: 1
-benchmark_id: solodeveling-superpowers-pilot-3
-status: preregistered-not-run
+benchmark_id: solodeveling-superpowers-pilot-2
+status: invalid-methodology-activation
 classification: pilot-signal-only
-predecessor: solodeveling-superpowers-pilot-2
-amendment_reason: install project-local skills at the Codex adapter path .agents/skills
+predecessor: solodeveling-superpowers-pilot-1
+amendment_reason: replace unavailable gpt-5.6 alias with exact account-visible gpt-5.6-sol slug
+invalid_reason: methodology skills were copied to .codex/skills instead of the Codex adapter path .agents/skills
 seed: 20260716
 repetitions: 3
 runtime:
@@ -28,24 +29,24 @@ methodologies:
 tasks:
   - id: quick-docs
     class: documentation
-    fixture: fixtures/quick-docs
-    hidden_check: checks/check_quick_docs.py
+    fixture: ../fixtures/quick-docs
+    hidden_check: ../checks/check_quick_docs.py
     prompt: >-
       Update README.md to document the existing --ignore-case option. Include one
       runnable command and its exact output for the input "Hello hello WORLD".
       Do not change product code. Run the existing tests and finish the task.
   - id: bug-repair
     class: bug-repair
-    fixture: fixtures/bug-repair
-    hidden_check: checks/check_bug_repair.py
+    fixture: ../fixtures/bug-repair
+    hidden_check: ../checks/check_bug_repair.py
     prompt: >-
       Fix slugger.slugify so consecutive spaces or hyphens become one hyphen and
       leading or trailing separators are removed. Preserve the documented lowercase
       ASCII behavior, add focused regression tests, run all tests, and finish the task.
   - id: medium-feature
     class: medium-feature
-    fixture: fixtures/medium-feature
-    hidden_check: checks/check_medium_feature.py
+    fixture: ../fixtures/medium-feature
+    hidden_check: ../checks/check_medium_feature.py
     prompt: >-
       Add bookmark removal by numeric id. BookmarkStore.remove(id) must remove and
       return the matching bookmark, persist the change, and raise KeyError for an
@@ -56,4 +57,4 @@ claim_policy:
   correctness_gates_speed: true
   public_faster_claim_allowed: false
   required_live_runs: 18
-  confirmation: RUN CONTROLLED PILOT 3 18
+  confirmation: RUN CONTROLLED PILOT 2 18

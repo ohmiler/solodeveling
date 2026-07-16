@@ -13,3 +13,4 @@ solodeveling_schema: 1
 - High-confidence secret detection is a bounded output and project-memory safeguard, not a complete repository scanner.
 - Security standards, runtime CLIs, structured-output schema subsets, authentication, and billing behavior evolve; exact claims require current primary-source verification.
 - Adjacent workflow projects change independently, and comparative speed or quality claims remain unsupported until a controlled repeated benchmark exists.
+- A methodology benchmark can execute the model without activating the named workflow if project-local skills are installed outside the runtime adapter path; live evidence must verify the adapter path and reject zero-activation results.

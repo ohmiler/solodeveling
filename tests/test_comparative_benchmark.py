@@ -12,6 +12,8 @@ from solodeveling_protocol.comparative_benchmark import (
     _result_document,
     _changed_paths,
     _initialize_repository,
+    _install_methodology,
+    _verify_installed_methodology,
     BenchmarkError,
     build_plan,
     classify_runtime_failure,
@@ -51,7 +53,7 @@ def test_plan_is_non_live_and_discloses_runtime_boundary() -> None:
     assert document["runtime"]["reasoning_effort"] == "medium"
     assert document["maximum_live_runs"] == 18
     assert document["maximum_agent_seconds"] == 21600
-    assert document["confirmation_required"] == "RUN CONTROLLED PILOT 2 18"
+    assert document["confirmation_required"] == "RUN CONTROLLED PILOT 3 18"
     assert "run-live" in document["live_command_template"]
 
 
@@ -121,6 +123,21 @@ def test_python_cache_does_not_count_as_agent_change(tmp_path: Path) -> None:
     assert _changed_paths(project, baseline) == ["README.md"]
 
 
+def test_methodology_is_installed_at_codex_adapter_path(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    root_skill = source / "skills" / "example" / "SKILL.md"
+    root_skill.parent.mkdir(parents=True)
+    root_skill.write_text("# Example\n", encoding="utf-8")
+    project = tmp_path / "project"
+    project.mkdir()
+
+    _install_methodology(source, project)
+    _verify_installed_methodology(project, "example")
+
+    assert (project / ".agents" / "skills" / "example" / "SKILL.md").is_file()
+    assert not (project / ".codex" / "skills").exists()
+
+
 def test_scoring_gates_speed_on_correct_pairs_and_forbids_claim() -> None:
     runs = [
         {"task_id": "a", "repetition": 1, "methodology": "solodeveling", "correct": True, "elapsed_seconds": 4},
@@ -143,9 +160,13 @@ def test_invalid_claim_policy_fails_closed(tmp_path: Path) -> None:
 
 
 def test_archived_invalid_pilot_is_not_live_eligible() -> None:
-    archived = load_spec(Path("benchmarks/comparative/archive/pilot-1-invalid.yaml"))
-    with pytest.raises(BenchmarkError, match="not eligible"):
-        require_live_ready(archived)
+    for path in (
+        Path("benchmarks/comparative/archive/pilot-1-invalid.yaml"),
+        Path("benchmarks/comparative/archive/pilot-2-invalid.yaml"),
+    ):
+        archived = load_spec(path)
+        with pytest.raises(BenchmarkError, match="not eligible"):
+            require_live_ready(archived)
 
 
 def test_live_runner_requires_exact_confirmation_before_any_runtime_call(tmp_path: Path) -> None:

@@ -1,20 +1,22 @@
 ---
 solodeveling_schema: 1
-current_goal: Preserve invalid pilot-1 evidence and decide whether to authorize corrected pilot-2.
-active_work: []
+current_goal: Deliver the pilot-2 methodology-activation recovery and preserve pilot-3 as not run pending separate authorization.
+active_work:
+- WORK-031
 blockers: []
 risks:
 - Published npm and PyPI versions 0.1.0 and 0.1.1 plus immutable GitHub Release assets cannot be replaced with different bytes.
 - Native executables remain unsigned; launcher integrity checks reduce substitution risk but do not provide platform code signing.
 - Adjacent frameworks change independently; comparison wording requires periodic source review.
 - Comparative speed or quality claims remain unsupported until a controlled repeated benchmark exists.
-next_action: Review pilot-2's exact gpt-5.6-sol command and separately authorize or decline its 18 live calls after protected-main delivery.
+next_action: Deliver WORK-031 through protected main, then separately authorize or decline pilot-3's 18 live calls.
 ---
 # State
 
-Pilot-1 remains invalid runtime evidence: 18 process failures before inference,
-zero tokens, zero tool calls, and zero correct pairs. WORK-030 completed pilot-2
-with exact `gpt-5.6-sol` medium catalog preflight, fixed diagnostic codes,
-cache-free change metrics, archived-pilot rejection, and a distinct checkpoint
-boundary. Offline verification passes and pilot-2 has not been run. No comparative
-speed result exists. Release 0.1.1 remains immutable and unchanged.
+Pilot-2 completed all 18 inference processes with the exact `gpt-5.6-sol`
+medium runtime, but both methodologies produced zero changed files and zero
+correct runs because the harness installed project skills at `.codex/skills`
+instead of the Codex adapter path `.agents/skills`. It is archived as invalid
+methodology-activation evidence and supports no speed claim. WORK-031 corrects
+the path, verifies the named root skill before timing, and preregisters pilot-3
+without running it. Release 0.1.1 remains immutable and unchanged.
