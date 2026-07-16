@@ -1,0 +1,57 @@
+schema: 1
+benchmark_id: solodeveling-superpowers-pilot-1
+status: preregistered-not-run
+classification: pilot-signal-only
+seed: 20260716
+repetitions: 3
+runtime:
+  executable: codex
+  cli_version: codex-cli 0.144.5
+  model: gpt-5.6
+  reasoning_effort: medium
+  timeout_seconds: 1200
+  sandbox: workspace-write
+  network: disabled
+methodologies:
+  - id: solodeveling
+    version: 0.1.1
+    commit: 889e07a47a8cbdca15765d00348dbbd7f9849f03
+    invocation: $solodeveling
+    skill: solodeveling
+  - id: superpowers
+    version: 6.1.1
+    commit: d884ae04edebef577e82ff7c4e143debd0bbec99
+    invocation: $using-superpowers
+    skill: using-superpowers
+tasks:
+  - id: quick-docs
+    class: documentation
+    fixture: fixtures/quick-docs
+    hidden_check: checks/check_quick_docs.py
+    prompt: >-
+      Update README.md to document the existing --ignore-case option. Include one
+      runnable command and its exact output for the input "Hello hello WORLD".
+      Do not change product code. Run the existing tests and finish the task.
+  - id: bug-repair
+    class: bug-repair
+    fixture: fixtures/bug-repair
+    hidden_check: checks/check_bug_repair.py
+    prompt: >-
+      Fix slugger.slugify so consecutive spaces or hyphens become one hyphen and
+      leading or trailing separators are removed. Preserve the documented lowercase
+      ASCII behavior, add focused regression tests, run all tests, and finish the task.
+  - id: medium-feature
+    class: medium-feature
+    fixture: fixtures/medium-feature
+    hidden_check: checks/check_medium_feature.py
+    prompt: >-
+      Add bookmark removal by numeric id. BookmarkStore.remove(id) must remove and
+      return the matching bookmark, persist the change, and raise KeyError for an
+      unknown id. Add `python -m bookmarks remove STORE ID`; on success print the
+      removed title, and for an unknown id print a useful stderr message and exit 2.
+      Keep add/list behavior working, add tests, run all tests, and finish the task.
+claim_policy:
+  correctness_gates_speed: true
+  public_faster_claim_allowed: false
+  required_live_runs: 18
+  confirmation: RUN CONTROLLED PILOT 18

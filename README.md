@@ -85,6 +85,10 @@ or quality benchmark.
 Solodeveling optimizes **workflow overhead**, not unmeasured model intelligence. It
 does not yet claim to complete coding tasks faster than the alternatives above. A
 fair claim requires the same repository, model, prompt, task set, and repeated runs.
+The repository now includes a
+[preregistered 18-run Solodeveling/Superpowers pilot](docs/comparative-benchmark.md)
+with exact source and runtime pins, hidden correctness checks, offline planning, and
+a separate live-authorization gate. The pilot has not been run yet.
 
 | Evidence from this repository | Observed result | What it supports |
 | --- | --- | --- |

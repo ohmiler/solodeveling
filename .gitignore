@@ -8,3 +8,5 @@ build/
 .coverage
 htmlcov/
 evals/results/
+benchmarks/results/
+benchmarks/comparative/sources/
