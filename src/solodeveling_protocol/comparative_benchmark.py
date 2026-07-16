@@ -285,6 +285,41 @@ def _write_checkpoint(output: Path, document: dict[str, Any]) -> None:
     temporary.replace(output)
 
 
+def _write_failure_diagnostic(
+    output: Path,
+    *,
+    run_id: str,
+    process_stdout: str,
+    process_stderr: str,
+    last_agent_message: str,
+    visible_stdout: str,
+    visible_stderr: str,
+    hidden_stdout: str,
+    hidden_stderr: str,
+    changed_paths: list[str],
+) -> Path:
+    """Write ignored, local-only raw diagnostics for an unsuccessful live run."""
+    path = output.with_name(f"{output.stem}.{run_id}.diagnostic.json")
+    document = {
+        "schema": 1,
+        "run_id": run_id,
+        "notice": "local-only unsanitized diagnostic; do not publish",
+        "process_stdout": process_stdout,
+        "process_stderr": process_stderr,
+        "last_agent_message": last_agent_message,
+        "visible_tests_stdout": visible_stdout,
+        "visible_tests_stderr": visible_stderr,
+        "hidden_check_stdout": hidden_stdout,
+        "hidden_check_stderr": hidden_stderr,
+        "changed_paths": changed_paths,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(path)
+    return path
+
+
 def _load_checkpoint(
     output: Path,
     expected_document: dict[str, Any],
@@ -578,11 +613,13 @@ def run_live(
             if added.returncode:
                 raise BenchmarkError(f"could not create fresh worktree for {planned.run_id}: {added.stderr.strip()}")
             prompt = f"{method['invocation']}\n\nThe requirements below are final and approved. Work autonomously in this already-isolated git worktree. Do not use the network or ask for approval. Run the tests and report completion.\n\n{task['prompt']}"
+            last_message_path = temp_root / f"{planned.run_id}-last-message.txt"
             command = [
                 executable, "exec", "--json", "--ephemeral", "--ignore-user-config", "--ignore-rules",
                 "--sandbox", spec["runtime"]["sandbox"], "--model", spec["runtime"]["model"],
                 "--config", f"model_reasoning_effort={json.dumps(spec['runtime']['reasoning_effort'])}",
                 "--config", 'approval_policy="never"', "--config", "sandbox_workspace_write.network_access=false",
+                "--output-last-message", str(last_message_path),
                 "-C", str(worktree), "-",
             ]
             started = time.perf_counter()
@@ -591,13 +628,16 @@ def run_live(
                 state = "completed" if process.returncode == 0 else "runtime-failure"
                 failure_code = None if process.returncode == 0 else classify_runtime_failure(process.stdout, process.stderr)
                 process_returncode = process.returncode
-                lines = process.stdout.splitlines()
+                stdout = process.stdout
+                stderr = process.stderr
+                lines = stdout.splitlines()
             except subprocess.TimeoutExpired as error:
                 process = None
                 state = "timeout"
                 failure_code = "timeout"
                 process_returncode = None
                 stdout = error.stdout.decode("utf-8", "replace") if isinstance(error.stdout, bytes) else (error.stdout or "")
+                stderr = error.stderr.decode("utf-8", "replace") if isinstance(error.stderr, bytes) else (error.stderr or "")
                 lines = stdout.splitlines()
             elapsed = round(time.perf_counter() - started, 4)
             visible = _run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], worktree)
@@ -610,6 +650,23 @@ def run_live(
             if _is_zero_mutation_failure(process_returncode, correct, changed):
                 state = "execution-failure"
                 failure_code = "zero-mutation"
+            if not correct:
+                _write_failure_diagnostic(
+                    output,
+                    run_id=planned.run_id,
+                    process_stdout=stdout,
+                    process_stderr=stderr,
+                    last_agent_message=(
+                        last_message_path.read_text(encoding="utf-8", errors="replace")
+                        if last_message_path.is_file()
+                        else ""
+                    ),
+                    visible_stdout=visible.stdout,
+                    visible_stderr=visible.stderr,
+                    hidden_stdout=hidden.stdout,
+                    hidden_stderr=hidden.stderr,
+                    changed_paths=changed,
+                )
             workflow = [path for path in changed if path.startswith((".solodeveling/", "docs/superpowers/"))]
             results.append({
                 "run_id": planned.run_id, "task_id": planned.task_id, "methodology": planned.methodology,

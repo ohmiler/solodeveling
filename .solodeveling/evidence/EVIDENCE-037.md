@@ -8,7 +8,7 @@ claim: The feedback measurement system is offline-verified, exact-source-bound, 
 method: Failing-first regressions; deterministic plan and hidden fixture checks; exact
   detached source identity checks; fail-closed non-live probe; full Python and Node
   gates; packaged-wheel smoke; local scorecard validation.
-command: pytest 257; npm test; validate_skill_suite.py; protocol validate; compileall;
+command: pytest 258; npm test; validate_skill_suite.py; protocol validate; compileall;
   pip check; build and installed-wheel smoke; comparative plan/verify-fixtures/probe;
   field_scorecard validate/summary.
 result: passed
@@ -16,8 +16,10 @@ scope: Generic paired benchmark harness, five-task 0.1.1-versus-0.1.2 preregistr
   30-call authorization boundary, overhead scoring, field scorecard schema/CLI/docs,
   and first sanitized local observation.
 limitations:
-- No live model call ran and no 0.1.1-versus-0.1.2 comparative result exists.
-- The Windows sandbox helper remains absent, so probe correctly stops before inference.
+- Feedback pilot 1 used one model call, produced a zero-mutation failure, and stopped
+  before run 2; it is invalid and provides no 0.1.1-versus-0.1.2 comparison.
+- The Windows sandbox is repaired and successor pilot 2 passes offline preflight,
+  but it requires a new exact 30-call authorization before live execution.
 - Field collection is 1 of 20 observations; elapsed time, tokens, resume accuracy,
   ceremony fit, and user annoyance remain unavailable rather than zero.
 ---
@@ -30,8 +32,8 @@ Verified observations are recorded below.
 - Method: Failing-first regressions; deterministic plan and hidden fixture checks; exact detached source identity checks; fail-closed non-live probe; full Python and Node gates; packaged-wheel smoke; local scorecard validation.
 - Result: passed
 - Scope: Generic paired benchmark harness, five-task 0.1.1-versus-0.1.2 preregistration, 30-call authorization boundary, overhead scoring, field scorecard schema/CLI/docs, and first sanitized local observation.
-- Command: pytest 257; npm test; validate_skill_suite.py; protocol validate; compileall; pip check; build and installed-wheel smoke; comparative plan/verify-fixtures/probe; field_scorecard validate/summary.
+- Command: pytest 258; npm test; validate_skill_suite.py; protocol validate; compileall; pip check; build and installed-wheel smoke; comparative plan/verify-fixtures/probe; field_scorecard validate/summary.
 - Limitations:
-  - No live model call ran and no 0.1.1-versus-0.1.2 comparative result exists.
-  - The Windows sandbox helper remains absent, so probe correctly stops before inference.
+  - Feedback pilot 1 used one model call, produced a zero-mutation failure, and stopped before run 2; it is invalid and provides no 0.1.1-versus-0.1.2 comparison.
+  - The Windows sandbox is repaired and successor pilot 2 passes offline preflight, but it requires a new exact 30-call authorization before live execution.
   - Field collection is 1 of 20 observations; elapsed time, tokens, resume accuracy, ceremony fit, and user annoyance remain unavailable rather than zero.

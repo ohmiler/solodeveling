@@ -14,6 +14,7 @@ from solodeveling_protocol.comparative_benchmark import (
     _initialize_repository,
     _install_methodology,
     _is_zero_mutation_failure,
+    _write_failure_diagnostic,
     _verify_installed_methodology,
     BenchmarkError,
     build_plan,
@@ -167,6 +168,27 @@ def test_zero_mutation_failure_requires_successful_but_incorrect_process() -> No
     assert not _is_zero_mutation_failure(0, False, ["README.md"])
 
 
+def test_failure_diagnostic_is_local_raw_sidecar(tmp_path: Path) -> None:
+    output = tmp_path / "pilot.json"
+    path = _write_failure_diagnostic(
+        output,
+        run_id="run-01",
+        process_stdout='{"type":"turn.completed"}\n',
+        process_stderr="stderr",
+        last_agent_message="Could not edit the fixture.",
+        visible_stdout="visible",
+        visible_stderr="",
+        hidden_stdout="",
+        hidden_stderr="hidden",
+        changed_paths=[],
+    )
+    assert path == tmp_path / "pilot.run-01.diagnostic.json"
+    document = json.loads(path.read_text(encoding="utf-8"))
+    assert document["notice"] == "local-only unsanitized diagnostic; do not publish"
+    assert document["last_agent_message"] == "Could not edit the fixture."
+    assert document["changed_paths"] == []
+
+
 def test_scoring_gates_speed_on_correct_pairs_and_forbids_claim() -> None:
     runs = [
         {"task_id": "a", "repetition": 1, "methodology": "solodeveling", "correct": True, "elapsed_seconds": 4},
@@ -193,6 +215,7 @@ def test_archived_invalid_pilot_is_not_live_eligible() -> None:
         Path("benchmarks/comparative/archive/pilot-1-invalid.yaml"),
         Path("benchmarks/comparative/archive/pilot-2-invalid.yaml"),
         Path("benchmarks/comparative/archive/pilot-3-invalid.yaml"),
+        Path("benchmarks/comparative/archive/feedback-0.1.1-vs-0.1.2-pilot-1-invalid.yaml"),
     ):
         archived = load_spec(path)
         with pytest.raises(BenchmarkError, match="not eligible"):

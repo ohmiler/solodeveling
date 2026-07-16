@@ -29,7 +29,7 @@ def test_feedback_plan_is_five_tasks_two_versions_three_repetitions() -> None:
     assert len({run.task_id for run in planned}) == 5
     document = plan_document(spec)
     assert document['maximum_live_runs'] == 30
-    assert document['confirmation_required'] == 'RUN CONTROLLED FEEDBACK PILOT 30'
+    assert document['confirmation_required'] == 'RUN CONTROLLED FEEDBACK PILOT 2 30'
     assert document['account_boundary'].startswith('30 Codex calls')
 
 
