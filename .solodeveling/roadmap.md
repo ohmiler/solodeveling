@@ -23,6 +23,7 @@ solodeveling_schema: 1
 18. Publication candidate ancestry repair - implemented and verified as WORK-017; current protected `main` can validate the exact verified ancestor candidate without weakening tag, release, provenance, or registry gates.
 19. Memory Workflow Simplification - deferred as WORK-019 for the release after 0.1.0; it must not change the 0.1.0 candidate, tag target, release set, or publication inputs.
 20. Immutable GitHub Release v0.1.0 - created and verified as WORK-020 with all 13 exact candidate assets; PyPI and npm actions remain separately authorized.
+21. PyPI publication 0.1.0 - published and verified as WORK-021 through protected OIDC; clean pip, uvx, and pipx paths pass, while npm remains deferred and unpublished.
 
 The approved delivery sequence remains authoritative in
 `docs/superpowers/specs/2026-07-15-solodeveling-design.md`.
