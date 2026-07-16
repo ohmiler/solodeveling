@@ -49,6 +49,17 @@ idempotent for valid memory and refuses to overwrite partial memory.
 Keep the body concise. Do not store secrets, local environment details, raw logs,
 temporary scans, caches, or conversation transcripts.
 
+Use an artifact budget:
+
+- Ephemeral Quick: no memory artifacts.
+- Tracked Standard: one WORK item and one cumulative EVIDENCE file.
+- Audited: add artifacts only for distinct decisions, findings, recovery boundaries,
+  or independently reviewable claims.
+
+Append bounded follow-up verification to the existing evidence file. Update roadmap
+only for milestone or priority changes. Keep final reports as summaries with links,
+not copies of WORK, EVIDENCE, state, or roadmap content.
+
 ## Brownfield preservation
 
 Before writing, list existing sources for requirements, architecture, tasks,

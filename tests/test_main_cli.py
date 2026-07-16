@@ -46,6 +46,7 @@ def test_unified_cli_routes_adapter_commands(
     [
         ("init", "memory_main"),
         ("validate", "validate_main"),
+        ("work", "lifecycle_main"),
         ("eval", "evaluation_main"),
     ],
 )
@@ -83,6 +84,7 @@ def test_unified_cli_help_has_complete_public_surface(
         "uninstall",
         "init",
         "validate",
+        "work",
         "eval",
         "version",
     ):

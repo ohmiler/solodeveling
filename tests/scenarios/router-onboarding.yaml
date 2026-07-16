@@ -28,6 +28,25 @@ scenarios:
       - 'persistent artifacts: 0'
       - 'focused verification: at least 1'
 
+  - id: standard-has-a-bounded-artifact-budget
+    skill: solodeveling
+    must_contain:
+      - Tracked Standard
+      - one WORK item
+      - one cumulative EVIDENCE file
+
+  - id: bounded-followups-reuse-existing-artifacts
+    skill: solodeveling
+    must_contain:
+      - Reuse the existing WORK/EVIDENCE pair
+      - materially changes
+
+  - id: roadmap-updates-only-on-priority-events
+    skill: solodeveling
+    must_contain:
+      - Update roadmap only when
+      - Completion alone is not a roadmap event
+
   - id: resumable-work-persists
     skill: solodeveling
     must_contain:

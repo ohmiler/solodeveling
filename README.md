@@ -63,8 +63,14 @@ and integrity controls.
 | Work level | Default behavior | Persistent overhead |
 | --- | --- | --- |
 | Quick | Act immediately when intent is clear; escalate if risk appears | None required for safe ephemeral work |
-| Standard | Shape, plan, implement, and verify with resumable state | Compact current state and one active work item |
+| Standard | Shape, plan, implement, and verify with resumable state | One WORK item and one cumulative EVIDENCE file |
 | Critical | Add security, recovery, provenance, and explicit authorization gates | Auditable work and evidence records |
+
+A small follow-up stays in the existing Standard pair when its goal, acceptance,
+authority, risk, release boundary, and rollback are unchanged. Roadmap updates happen
+only when priority, milestone, ordering, or a deferred-work decision changes. WORK
+owns scope and decisions, EVIDENCE owns checks and limitations, and state contains
+only the context needed to resume.
 
 ## How it compares
 
@@ -154,14 +160,23 @@ solodeveling install --runtime cursor --dry-run
 
 ## Other commands
 
-The install flow stays short; project memory and evaluation remain explicit:
+The install flow stays short; project memory, tracked-work helpers, and evaluation
+remain explicit:
 
 ~~~console
 solodeveling init
 solodeveling validate .
+solodeveling work evidence . WORK-033 --claim "Focused tests pass" --method "Automated test" --result passed --scope "Lifecycle helper"
+solodeveling work transition . WORK-033 verifying
+solodeveling work archive . WORK-033 --next-action "Select the next priority"
 solodeveling eval probe
 solodeveling version
 ~~~
+
+The work helper validates memory before and after each operation, rejects invalid
+transitions, updates work and state together, and rolls back a partial write. Standard
+work reuses its evidence file automatically; audited work with multiple evidence
+files can select one with `--evidence-id`.
 
 Live evaluation can consume model-service usage or API credits, so review
 [Cross-agent evaluation](docs/cross-agent-evaluation.md) before authorizing a live

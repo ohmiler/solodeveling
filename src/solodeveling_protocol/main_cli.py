@@ -8,6 +8,7 @@ from solodeveling_protocol import __version__
 from solodeveling_protocol.adapter_cli import main as adapter_main
 from solodeveling_protocol.cli import main as validate_main
 from solodeveling_protocol.evaluation_cli import main as evaluation_main
+from solodeveling_protocol.lifecycle_cli import main as lifecycle_main
 from solodeveling_protocol.memory_cli import main as memory_main
 
 
@@ -17,6 +18,7 @@ _COMMAND_HELP = (
     ("uninstall", "Safely remove unchanged managed skills."),
     ("init", "Create Solodeveling project memory."),
     ("validate", "Validate Solodeveling project memory."),
+    ("work", "Record evidence, transition status, or archive tracked work."),
     ("eval", "Run or inspect cross-agent evaluations."),
     ("version", "Print the installed Solodeveling version."),
 )
@@ -54,6 +56,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return memory_main(arguments[1:], prog="solodeveling init")
     if command == "validate":
         return validate_main(arguments[1:], prog="solodeveling validate")
+    if command == "work":
+        return lifecycle_main(arguments[1:], prog="solodeveling work")
     if command == "eval":
         return evaluation_main(arguments[1:], prog="solodeveling eval")
 

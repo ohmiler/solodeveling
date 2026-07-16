@@ -15,7 +15,9 @@ or framework memory alone.
   rollback only if it is not obvious. Do not create ceremony for a reversible change.
 - Standard: identify affected components and interfaces, ordered implementation
   slices, tests for each behavior, final verification, documentation or migration
-  effects, and meaningful rollback.
+  effects, and meaningful rollback. Store this concise plan in the existing WORK
+  item; do not create a separate plan artifact unless complexity requires independent
+  review.
 - Critical: include threat or abuse cases, security controls, sensitive-data impact,
   migration safety, staged verification, recovery and rollback, and authorization
   checkpoints before irreversible or production effects.
