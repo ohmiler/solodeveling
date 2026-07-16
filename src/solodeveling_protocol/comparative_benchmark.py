@@ -1,0 +1,460 @@
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import random
+import shutil
+import statistics
+import subprocess
+import sys
+import tempfile
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Iterable
+
+import yaml
+
+
+class BenchmarkError(RuntimeError):
+    pass
+
+
+@dataclass(frozen=True)
+class PlannedRun:
+    run_id: str
+    task_id: str
+    methodology: str
+    repetition: int
+    order: int
+
+
+def load_spec(path: Path) -> dict[str, Any]:
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(document, dict) or document.get("schema") != 1:
+        raise BenchmarkError("pilot spec must be a schema-1 mapping")
+    if document.get("classification") != "pilot-signal-only":
+        raise BenchmarkError("pilot must remain classified as pilot-signal-only")
+    if document.get("claim_policy", {}).get("public_faster_claim_allowed") is not False:
+        raise BenchmarkError("pilot must not authorize a public faster claim")
+    return document
+
+
+def build_plan(spec: dict[str, Any]) -> list[PlannedRun]:
+    tasks = [task["id"] for task in spec["tasks"]]
+    methods = [method["id"] for method in spec["methodologies"]]
+    repetitions = int(spec["repetitions"])
+    if len(tasks) != 3 or len(methods) != 2 or repetitions != 3:
+        raise BenchmarkError("pilot design must be exactly 3 tasks x 2 methods x 3 repetitions")
+    rng = random.Random(int(spec["seed"]))
+    blocks = [(repetition, task) for repetition in range(1, repetitions + 1) for task in tasks]
+    rng.shuffle(blocks)
+    reverse_first = rng.randrange(2)
+    planned: list[PlannedRun] = []
+    for block_index, (repetition, task) in enumerate(blocks):
+        ordered = list(methods)
+        if (block_index + reverse_first) % 2:
+            ordered.reverse()
+        for methodology in ordered:
+            order = len(planned) + 1
+            planned.append(PlannedRun(f"run-{order:02d}", task, methodology, repetition, order))
+    expected = int(spec["claim_policy"]["required_live_runs"])
+    if len(planned) != expected:
+        raise BenchmarkError(f"plan has {len(planned)} runs; expected {expected}")
+    return planned
+
+
+def plan_document(spec: dict[str, Any]) -> dict[str, Any]:
+    runtime = spec["runtime"]
+    return {
+        "schema": 1,
+        "benchmark_id": spec["benchmark_id"],
+        "classification": spec["classification"],
+        "live": False,
+        "runtime": runtime,
+        "methodologies": spec["methodologies"],
+        "confirmation_required": spec["claim_policy"]["confirmation"],
+        "maximum_live_runs": spec["claim_policy"]["required_live_runs"],
+        "maximum_agent_seconds": int(runtime["timeout_seconds"]) * int(spec["claim_policy"]["required_live_runs"]),
+        "account_boundary": "18 Codex calls use the signed-in account's capacity or credits; no stable dollar maximum is available from the CLI",
+        "mutation_boundary": "only fresh temporary fixture worktrees",
+        "live_command_template": (
+            'python scripts/comparative_benchmark.py run-live --confirm "'
+            + spec["claim_policy"]["confirmation"]
+            + '" --solodeveling-source <PINNED_SOLODEVELING_CHECKOUT>'
+            + " --superpowers-source <PINNED_SUPERPOWERS_CHECKOUT>"
+            + " --output benchmarks/results/pilot.json"
+        ),
+        "runs": [run.__dict__ for run in build_plan(spec)],
+    }
+
+
+def _run(command: list[str], cwd: Path, *, timeout: int = 120) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(command, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout, check=False, shell=False)
+
+
+def verify_fixtures(spec_path: Path) -> list[dict[str, Any]]:
+    spec = load_spec(spec_path)
+    root = spec_path.parent
+    reports: list[dict[str, Any]] = []
+    for task in spec["tasks"]:
+        fixture = root / task["fixture"]
+        checker = root / task["hidden_check"]
+        with tempfile.TemporaryDirectory(prefix=f"benchmark-{task['id']}-") as temporary:
+            project = Path(temporary) / "project"
+            shutil.copytree(fixture, project)
+            _initialize_repository(project)
+            visible = _run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], project)
+            hidden = _run([sys.executable, str(checker.resolve()), str(project), "HEAD"], project)
+            report = {"task_id": task["id"], "visible_baseline_passed": visible.returncode == 0, "hidden_baseline_rejected": hidden.returncode != 0}
+            if not all(report.values()):
+                raise BenchmarkError(f"fixture verification failed: {report}")
+            reports.append(report)
+    return reports
+
+
+def parse_codex_jsonl(lines: Iterable[str]) -> dict[str, int | None]:
+    usage: dict[str, int | None] = {"input_tokens": None, "cached_input_tokens": None, "output_tokens": None}
+    tool_calls = 0
+    questions = 0
+    for line in lines:
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if event.get("type") == "turn.completed" and isinstance(event.get("usage"), dict):
+            for key in usage:
+                value = event["usage"].get(key)
+                if isinstance(value, int) and not isinstance(value, bool):
+                    usage[key] = value
+        if event.get("type") == "item.completed" and isinstance(event.get("item"), dict):
+            item = event["item"]
+            if item.get("type") in {"command_execution", "mcp_tool_call", "file_change", "web_search"}:
+                tool_calls += 1
+            if item.get("type") == "agent_message" and str(item.get("text", "")).rstrip().endswith("?"):
+                questions += 1
+    return {**usage, "tool_calls": tool_calls, "agent_questions": questions}
+
+
+def _median(values: list[float]) -> float | None:
+    return round(statistics.median(values), 4) if values else None
+
+
+def summarize_results(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    methods = sorted({str(run["methodology"]) for run in runs})
+    by_method: dict[str, Any] = {}
+    for method in methods:
+        selected = [run for run in runs if run["methodology"] == method]
+        correct = [run for run in selected if run.get("correct") is True]
+        by_method[method] = {
+            "runs": len(selected),
+            "correct": len(correct),
+            "success_rate": round(len(correct) / len(selected), 4) if selected else None,
+            "median_correct_seconds": _median([float(run["elapsed_seconds"]) for run in correct]),
+        }
+    pairs: list[dict[str, Any]] = []
+    indexed = {(run["task_id"], run["repetition"], run["methodology"]): run for run in runs}
+    if len(methods) == 2:
+        keys = sorted({(run["task_id"], run["repetition"]) for run in runs})
+        for task_id, repetition in keys:
+            left = indexed.get((task_id, repetition, methods[0]))
+            right = indexed.get((task_id, repetition, methods[1]))
+            if left and right and left.get("correct") is True and right.get("correct") is True:
+                pairs.append({"task_id": task_id, "repetition": repetition, f"{methods[0]}_seconds": left["elapsed_seconds"], f"{methods[1]}_seconds": right["elapsed_seconds"]})
+    paired_medians = {method: _median([float(pair[f"{method}_seconds"]) for pair in pairs]) for method in methods}
+    return {
+        "correctness_first": True,
+        "by_methodology": by_method,
+        "correct_pairs": len(pairs),
+        "paired_median_seconds": paired_medians,
+        "public_faster_claim_allowed": False,
+        "interpretation": "pilot signal only; preregister a confirmatory benchmark before any public comparative claim",
+    }
+
+
+def _result_document(
+    spec: dict[str, Any],
+    spec_sha256: str,
+    runs: list[dict[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "schema": 1,
+        "benchmark_id": spec["benchmark_id"],
+        "classification": "pilot-signal-only",
+        "spec_sha256": spec_sha256,
+        "provenance": {
+            "runtime": spec["runtime"],
+            "methodology_pins": {
+                method["id"]: method["commit"] for method in spec["methodologies"]
+            },
+            "expected_runs": spec["claim_policy"]["required_live_runs"],
+        },
+        "runs": runs,
+        "summary": summarize_results(runs),
+    }
+
+
+def _write_checkpoint(output: Path, document: dict[str, Any]) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_suffix(output.suffix + ".tmp")
+    temporary.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(output)
+
+
+def _load_checkpoint(
+    output: Path,
+    expected_document: dict[str, Any],
+    planned_runs: list[PlannedRun],
+) -> list[dict[str, Any]]:
+    if not output.exists():
+        return []
+    try:
+        existing = json.loads(output.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise BenchmarkError("existing checkpoint is unreadable") from error
+    if not isinstance(existing, dict):
+        raise BenchmarkError("existing checkpoint must be a JSON object")
+    for key in ("schema", "benchmark_id", "classification", "spec_sha256", "provenance"):
+        if existing.get(key) != expected_document[key]:
+            raise BenchmarkError(f"existing checkpoint has mismatched {key}")
+    if not isinstance(existing.get("runs"), list):
+        raise BenchmarkError("existing checkpoint runs must be a list")
+    results = existing["runs"]
+    expected_runs = {run.run_id: run for run in planned_runs}
+    seen: set[str] = set()
+    for result in results:
+        if not isinstance(result, dict):
+            raise BenchmarkError("existing checkpoint run must be an object")
+        run_id = result.get("run_id")
+        if run_id in seen or run_id not in expected_runs:
+            raise BenchmarkError("existing checkpoint contains duplicate or unknown run IDs")
+        planned = expected_runs[run_id]
+        identity = (result.get("task_id"), result.get("methodology"), result.get("repetition"))
+        if identity != (planned.task_id, planned.methodology, planned.repetition):
+            raise BenchmarkError(f"existing checkpoint identity mismatch for {run_id}")
+        seen.add(run_id)
+    return results
+
+
+def _safe_environment() -> dict[str, str]:
+    allowed = {"APPDATA", "CODEX_HOME", "COMSPEC", "HOMEDRIVE", "HOMEPATH", "LOCALAPPDATA", "PATH", "PATHEXT", "PROGRAMFILES", "PROGRAMFILES(X86)", "SYSTEMROOT", "TEMP", "TMP", "USERPROFILE", "USERNAME", "WINDIR"}
+    return {key: value for key, value in os.environ.items() if key.upper() in allowed}
+
+
+def _initialize_repository(project: Path) -> None:
+    commands = [
+        ["git", "init", "--quiet"],
+        ["git", "config", "user.name", "Benchmark Fixture"],
+        ["git", "config", "user.email", "benchmark@example.invalid"],
+        ["git", "add", "."],
+        ["git", "commit", "--quiet", "-m", "benchmark seed"],
+    ]
+    for command in commands:
+        result = _run(command, project)
+        if result.returncode:
+            raise BenchmarkError(f"fixture git preparation failed: {command[1]}: {result.stderr.strip()}")
+
+
+def _source_commit(source: Path) -> str:
+    result = _run(["git", "rev-parse", "HEAD"], source)
+    if result.returncode:
+        raise BenchmarkError(f"methodology source is not a git checkout: {source}")
+    return result.stdout.strip()
+
+
+def verify_sources(spec: dict[str, Any], sources: dict[str, Path]) -> None:
+    for methodology in spec["methodologies"]:
+        identifier = methodology["id"]
+        source = sources.get(identifier)
+        if source is None:
+            raise BenchmarkError(f"missing --{identifier}-source")
+        actual = _source_commit(source)
+        if actual != methodology["commit"]:
+            raise BenchmarkError(f"{identifier} source is {actual}; expected {methodology['commit']}")
+        status = _run(["git", "status", "--porcelain", "--untracked-files=all"], source)
+        if status.returncode or status.stdout.strip():
+            raise BenchmarkError(f"{identifier} source checkout must be clean")
+        skill = source / "skills" / methodology["skill"] / "SKILL.md"
+        if not skill.is_file():
+            raise BenchmarkError(f"missing pinned root skill: {skill}")
+
+
+def _install_methodology(source: Path, project: Path) -> None:
+    destination = project / ".codex" / "skills"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source / "skills", destination)
+
+
+def _changed_paths(project: Path, baseline: str) -> list[str]:
+    status = _run(["git", "status", "--porcelain", "--untracked-files=all"], project)
+    committed = _run(["git", "diff", "--name-only", baseline, "HEAD"], project)
+    if status.returncode or committed.returncode:
+        raise BenchmarkError("could not inspect benchmark worktree")
+    paths = {line[3:].replace(chr(92), "/") for line in status.stdout.splitlines() if len(line) > 3}
+    paths.update(line.replace(chr(92), "/") for line in committed.stdout.splitlines() if line)
+    return sorted(paths)
+
+
+def _runtime_version(executable: str) -> str:
+    process = subprocess.run([executable, "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=15, check=False, shell=False)
+    return (process.stdout or process.stderr).strip().splitlines()[0]
+
+
+def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
+    executable = shutil.which(spec["runtime"]["executable"])
+    if executable is None:
+        raise BenchmarkError("codex executable is unavailable")
+    version = _runtime_version(executable)
+    if version != spec["runtime"]["cli_version"]:
+        raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
+    resolved = {key: value.resolve() for key, value in sources.items()}
+    verify_sources(spec, resolved)
+    document = plan_document(spec)
+    document["source_checkouts"] = {key: str(value) for key, value in resolved.items()}
+    document["runtime_verified"] = True
+    document["sources_verified"] = True
+    document["live_command"] = (
+        "python scripts/comparative_benchmark.py run-live"
+        f' --confirm "{spec["claim_policy"]["confirmation"]}"'
+        f' --solodeveling-source "{resolved["solodeveling"]}"'
+        f' --superpowers-source "{resolved["superpowers"]}"'
+        " --output benchmarks/results/pilot.json"
+    )
+    return document
+
+
+def run_live(spec_path: Path, *, confirmation: str, solodeveling_source: Path, superpowers_source: Path, output: Path) -> dict[str, Any]:
+    spec = load_spec(spec_path)
+    spec_sha256 = hashlib.sha256(spec_path.read_bytes()).hexdigest()
+    expected_confirmation = spec["claim_policy"]["confirmation"]
+    if confirmation != expected_confirmation:
+        raise BenchmarkError(f"live execution requires exact confirmation: {expected_confirmation}")
+    executable = shutil.which(spec["runtime"]["executable"])
+    if executable is None:
+        raise BenchmarkError("codex executable is unavailable")
+    version = _runtime_version(executable)
+    if version != spec["runtime"]["cli_version"]:
+        raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
+    sources = {"solodeveling": solodeveling_source.resolve(), "superpowers": superpowers_source.resolve()}
+    verify_sources(spec, sources)
+    tasks = {task["id"]: task for task in spec["tasks"]}
+    methods = {method["id"]: method for method in spec["methodologies"]}
+    planned_runs = build_plan(spec)
+    expected_document = _result_document(spec, spec_sha256, [])
+    results = _load_checkpoint(output, expected_document, planned_runs)
+    with tempfile.TemporaryDirectory(prefix="solodeveling-comparative-live-") as temporary:
+        temp_root = Path(temporary)
+        completed_ids = {result["run_id"] for result in results}
+        for planned in planned_runs:
+            if planned.run_id in completed_ids:
+                continue
+            task = tasks[planned.task_id]
+            method = methods[planned.methodology]
+            repository = temp_root / f"{planned.run_id}-repo"
+            worktree = temp_root / f"{planned.run_id}-worktree"
+            shutil.copytree(spec_path.parent / task["fixture"], repository)
+            _install_methodology(sources[planned.methodology], repository)
+            _initialize_repository(repository)
+            baseline = _run(["git", "rev-parse", "HEAD"], repository).stdout.strip()
+            added = _run(["git", "worktree", "add", "--quiet", "--detach", str(worktree), "HEAD"], repository)
+            if added.returncode:
+                raise BenchmarkError(f"could not create fresh worktree for {planned.run_id}: {added.stderr.strip()}")
+            prompt = f"{method['invocation']}\n\nThe requirements below are final and approved. Work autonomously in this already-isolated git worktree. Do not use the network or ask for approval. Run the tests and report completion.\n\n{task['prompt']}"
+            command = [
+                executable, "exec", "--json", "--ephemeral", "--ignore-user-config", "--ignore-rules",
+                "--sandbox", spec["runtime"]["sandbox"], "--model", spec["runtime"]["model"],
+                "--config", f"model_reasoning_effort={json.dumps(spec['runtime']['reasoning_effort'])}",
+                "--config", 'approval_policy="never"', "--config", "sandbox_workspace_write.network_access=false",
+                "-C", str(worktree), "-",
+            ]
+            started = time.perf_counter()
+            try:
+                process = subprocess.run(command, input=prompt, cwd=worktree, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=int(spec["runtime"]["timeout_seconds"]), check=False, shell=False, env=_safe_environment())
+                state = "completed" if process.returncode == 0 else "runtime-failure"
+                lines = process.stdout.splitlines()
+            except subprocess.TimeoutExpired as error:
+                process = None
+                state = "timeout"
+                stdout = error.stdout.decode("utf-8", "replace") if isinstance(error.stdout, bytes) else (error.stdout or "")
+                lines = stdout.splitlines()
+            elapsed = round(time.perf_counter() - started, 4)
+            visible = _run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], worktree)
+            hidden = _run([sys.executable, str((spec_path.parent / task["hidden_check"]).resolve()), str(worktree), baseline], worktree)
+            correct = state == "completed" and visible.returncode == 0 and hidden.returncode == 0
+            if not correct and state == "completed":
+                state = "correctness-failure"
+            activity = parse_codex_jsonl(lines)
+            changed = _changed_paths(worktree, baseline)
+            workflow = [path for path in changed if path.startswith((".solodeveling/", "docs/superpowers/"))]
+            results.append({
+                "run_id": planned.run_id, "task_id": planned.task_id, "methodology": planned.methodology,
+                "repetition": planned.repetition, "order": planned.order, "state": state, "correct": correct,
+                "elapsed_seconds": elapsed, **activity, "changed_files": len(changed), "workflow_artifacts": len(workflow),
+                "human_interventions": 0,
+                "runtime_version": version, "model": spec["runtime"]["model"], "reasoning_effort": spec["runtime"]["reasoning_effort"],
+                "visible_tests_passed": visible.returncode == 0, "hidden_check_passed": hidden.returncode == 0,
+            })
+            _write_checkpoint(output, _result_document(spec, spec_sha256, results))
+    document = _result_document(spec, spec_sha256, results)
+    _write_checkpoint(output, document)
+    return document
+
+
+def score_file(path: Path) -> dict[str, Any]:
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if document.get("classification") != "pilot-signal-only" or not isinstance(document.get("runs"), list):
+        raise BenchmarkError("not a sanitized pilot result document")
+    return summarize_results(document["runs"])
+
+
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Controlled Solodeveling/Superpowers pilot benchmark")
+    parser.add_argument("--spec", type=Path, default=Path("benchmarks/comparative/pilot.yaml"))
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers.add_parser("plan")
+    subparsers.add_parser("verify-fixtures")
+    source_probe = subparsers.add_parser("probe")
+    source_probe.add_argument("--solodeveling-source", type=Path, required=True)
+    source_probe.add_argument("--superpowers-source", type=Path, required=True)
+    score = subparsers.add_parser("score")
+    score.add_argument("result", type=Path)
+    live = subparsers.add_parser("run-live")
+    live.add_argument("--confirm", required=True)
+    live.add_argument("--solodeveling-source", type=Path, required=True)
+    live.add_argument("--superpowers-source", type=Path, required=True)
+    live.add_argument("--output", type=Path, default=Path("benchmarks/results/pilot.json"))
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parser().parse_args(argv)
+    try:
+        if args.command == "plan":
+            result = plan_document(load_spec(args.spec))
+        elif args.command == "verify-fixtures":
+            result = {"fixtures": verify_fixtures(args.spec), "live": False}
+        elif args.command == "probe":
+            result = probe(
+                load_spec(args.spec),
+                {
+                    "solodeveling": args.solodeveling_source,
+                    "superpowers": args.superpowers_source,
+                },
+            )
+        elif args.command == "score":
+            result = score_file(args.result)
+        else:
+            result = run_live(args.spec, confirmation=args.confirm, solodeveling_source=args.solodeveling_source, superpowers_source=args.superpowers_source, output=args.output)
+    except BenchmarkError as error:
+        print(f"benchmark error: {error}", file=sys.stderr)
+        return 2
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

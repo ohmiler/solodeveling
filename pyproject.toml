@@ -63,6 +63,7 @@ packages = ["src/solodeveling_protocol"]
 [tool.hatch.build.targets.sdist]
 include = [
   "/CONTRIBUTING.md",
+  "/benchmarks",
   "/LICENSE",
   "/SECURITY.md",
   "/README.md",
