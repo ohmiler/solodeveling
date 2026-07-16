@@ -21,7 +21,8 @@ reproducible where possible, and collected after the latest relevant change.
 4. Check scope integrity, unintended changes, documentation, migration, UX,
    compatibility, security, privacy, operations, and recovery when applicable.
 5. For persistent work, record each claim, method or command, result, scope, and
-   limitations in an evidence artifact. Ephemeral Quick reports the focused result
+   limitations. Standard work appends observations to its one evidence file;
+   same-boundary follow-ups reuse it. Ephemeral Quick reports the focused result
    inline and creates no artifact. Mark unavailable or unexecuted checks `unverified`;
    never present them as passing.
 
@@ -36,5 +37,7 @@ cannot continue.
 Transition to `done` only when every criterion has recent evidence or an explicitly
 accepted verification gap, applicable project checks pass, and state, work item,
 source, decisions, and evidence agree. Critical work also requires recorded security
-and recovery consideration. Archive the item, update state and roadmap, and report
-limitations alongside the bounded completion claim.
+and recovery consideration. Archive the item and update current state. Update roadmap
+only when priority, milestone, ordering, or a deferred-work decision changed. Combine
+Standard closure memory with its delivery change when possible; do not create one
+commit per transition. Report limitations alongside the bounded completion claim.

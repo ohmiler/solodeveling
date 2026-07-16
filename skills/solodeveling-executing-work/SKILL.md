@@ -18,10 +18,10 @@ Git provider.
    and stop only if overlapping changes cannot be handled safely.
 3. Use an existing branch strategy. Create a branch only when useful; a worktree is
    optional and never a correctness requirement.
-4. For tracked work, before any implementation edit, validate the `ready -> active`
-   transition, persist the work item and state, then re-read both to confirm the
-   checkpoint. Do not continue while durable status remains `ready`. Ephemeral Quick
-   work instead uses the core direct loop and does not enter this workflow.
+4. For tracked work, before any implementation edit, validate `ready -> active`.
+   Persist one coherent work/state update; do not create a transition-only commit.
+   Re-read changed fields or use the lifecycle helper. Ephemeral Quick uses the core
+   direct loop instead.
 
 ## Implement in slices
 
@@ -38,7 +38,11 @@ Git provider.
   and recovery proportional to risk.
 - Update the work item and state after decisions, blockers, risk changes, or a new
   next action. Do not record planned checks as evidence.
+- For uninterrupted Standard work, coalesce intermediate state writes and use the
+  same WORK/EVIDENCE pair through completion. A phase change alone is not a new
+  artifact or commit.
 
-When implementation matches the plan and focused checks pass, set status to
-`verifying` and route to `solodeveling-verifying`. Never claim completion from the
-execution workflow itself.
+When implementation matches the plan and focused checks pass, enter `verifying`
+semantically and route to `solodeveling-verifying`. Persist immediately only when
+another session, blocker, handoff, or policy needs the checkpoint. Never claim
+completion from the execution workflow itself.

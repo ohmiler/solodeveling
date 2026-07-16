@@ -52,6 +52,10 @@ def test_readme_positions_solodeveling_without_unmeasured_superiority() -> None:
         '## Who it is for',
         'it is not a controlled speed',
         'does not yet claim to complete coding tasks faster',
+        'one cumulative EVIDENCE file',
+        'solodeveling work evidence',
+        'Roadmap updates happen',
+        'deferred-work decision changes',
         'https://www.npmjs.com/package/solodeveling',
         'https://pypi.org/project/solodeveling/',
     ):
