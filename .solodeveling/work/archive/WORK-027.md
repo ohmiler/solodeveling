@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-027
 title: README Positioning and Honest Comparison
-status: active
+status: done
 level: standard
 type: change
 goal: Make the public README explain Solodeveling's value, speed model, intended users, and documented differences from adjacent agent-development frameworks without unsupported superiority claims.
@@ -30,8 +30,9 @@ verification:
 - Run protocol and canonical skill-suite validation.
 - Run the complete Python regression suite because root README uses the full gate.
 - Inspect rendered Markdown structure and links textually, then verify protected-main CI.
-next_action: Deliver the verified README and linked documentation through protected-main full CI, then record exact GitHub evidence and archive the work.
-evidence: []
+next_action: Preserve the evidence-backed positioning and require a controlled benchmark before adding comparative speed or quality claims.
+evidence:
+- EVIDENCE-027
 ---
 
 # Planned structure
