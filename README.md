@@ -53,6 +53,8 @@ and integrity controls.
   delegation, role hand-offs, or parallel workers for ordinary delivery.
 - **Quiet for small work:** a safe Quick task can use zero required questions, zero
   project-memory writes, and verification proportional to its impact.
+- **Direct for read-only work:** ordinary Q&A, explanation, review, status, diagnosis,
+  and inline advice inspect only what the claim needs and skip lifecycle artifacts.
 - **Durable when it matters:** resumable work records current state; Critical work
   adds explicit security, recovery, evidence, and release boundaries.
 - **Complete delivery lifecycle:** use one vocabulary from discovery and coding
@@ -62,15 +64,18 @@ and integrity controls.
 
 | Work level | Default behavior | Persistent overhead |
 | --- | --- | --- |
+| Direct Read-Only | Answer or inspect within the user's non-mutating authority | None |
 | Quick | Act immediately when intent is clear; escalate if risk appears | None required for safe ephemeral work |
 | Standard | Shape, plan, implement, and verify with resumable state | One WORK item and one cumulative EVIDENCE file |
 | Critical | Add security, recovery, provenance, and explicit authorization gates | Auditable work and evidence records |
 
-A small follow-up stays in the existing Standard pair when its goal, acceptance,
-authority, risk, release boundary, and rollback are unchanged. Roadmap updates happen
-only when priority, milestone, ordering, or a deferred-work decision changes. WORK
-owns scope and decisions, EVIDENCE owns checks and limitations, and state contains
-only the context needed to resume.
+A bounded same-session follow-up uses Ephemeral Quick before reopening or reusing
+prior Standard work. Reuse the existing Standard pair only when the continuation
+must survive a session, changes a durable decision, or belongs to an active batch
+with unchanged goal, acceptance, authority, risk, release boundary, and rollback.
+Roadmap updates happen only when priority, milestone, ordering, or a deferred-work decision changes.
+WORK owns scope and decisions, EVIDENCE owns checks and limitations, and
+state contains only the context needed to resume.
 
 ## How it compares
 

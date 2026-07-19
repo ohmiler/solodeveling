@@ -20,7 +20,9 @@ or framework memory alone.
   review.
 - Critical: include threat or abuse cases, security controls, sensitive-data impact,
   migration safety, staged verification, recovery and rollback, and authorization
-  checkpoints before irreversible or production effects.
+  checkpoints before irreversible or production effects. Reuse one attack-surface
+  matrix in WORK; do not restate the same actors, risks, controls, tests, and recovery
+  in separate planning and security artifacts.
 
 ## Build the plan
 
@@ -29,7 +31,8 @@ or framework memory alone.
 2. Inspect relevant implementation and tests. Name paths or components only after
    discovery; preserve user changes and established sources of truth.
 3. Split work into independently verifiable slices. For behavior changes, begin with
-   a failing regression where practical. Include exact commands only when confirmed.
+   a failing regression where practical. Separate focused per-slice checks from broad
+   checkpoint gates. Include exact non-interactive commands only when confirmed.
 4. Map every acceptance criterion to planned verification. Label checks that cannot
    run in the current environment rather than assuming they will pass.
 5. Include security and recovery whenever triggers or irreversible effects apply.

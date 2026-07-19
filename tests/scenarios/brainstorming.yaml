@@ -1,0 +1,25 @@
+scenarios:
+  - id: open-ideation-stays-outside-memory
+    skill: solodeveling-brainstorming
+    must_contain:
+      - "Do not initialize `.solodeveling`"
+      - "three to five genuinely different directions"
+      - "Confirmed"
+      - "Assumption"
+      - "Unknown"
+
+  - id: brainstorming-delays-architecture
+    skill: solodeveling-brainstorming
+    must_contain:
+      - "smallest useful MVP"
+      - "cheaper pre-build experiment"
+      - "Delay stack"
+      - "architecture choices"
+
+  - id: selected-direction-enters-shaping
+    skill: solodeveling-brainstorming
+    must_contain:
+      - "solodeveling-shaping-work"
+      - "smallest state or roadmap record"
+      - "authorizes shaping"
+      - "implementation"

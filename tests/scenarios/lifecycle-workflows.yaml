@@ -55,6 +55,29 @@ scenarios:
       - Critical
       - broad gate
 
+  - id: frontend-iteration-uses-one-batch
+    skill: solodeveling-executing-work
+    must_contain:
+      - "same-surface frontend design batch"
+      - "focused visual"
+      - "commit, handoff"
+      - "not after each micro-change"
+
+  - id: broad-verification-is-checkpointed
+    skill: solodeveling-verifying
+    must_contain:
+      - "broad gates once"
+      - "Reuse a broad result"
+      - "later change crosses"
+
+  - id: evidence-keeps-one-current-contract
+    skill: solodeveling-verifying
+    must_contain:
+      - "Current acceptance matrix"
+      - "Superseded by"
+      - "short"
+      - "changelog"
+
   - id: no-core-workflow-requires-subagents
     skill: solodeveling-executing-work
     must_contain:

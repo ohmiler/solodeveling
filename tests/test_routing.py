@@ -18,13 +18,31 @@ def test_unspecified_ordinary_feature_defaults_to_standard() -> None:
 
 
 @pytest.mark.parametrize(
+    "summary",
+    [
+        "Change sort order in an authenticated admin route that calls auth()",
+        "Adjust payment history display mapping without changing fulfillment",
+        "Add an optional nullable column to a local report",
+    ],
+)
+def test_technology_presence_does_not_force_critical(summary: str) -> None:
+    decision = classify_level(summary)
+
+    assert decision.level is WorkLevel.STANDARD
+    assert decision.triggers == ()
+
+
+@pytest.mark.parametrize(
     ("summary", "trigger"),
     [
         ("Change authorization checks for admin accounts", "identity-access"),
+        ("Change the ownership decision for certificates", "identity-access"),
         ("Migrate sensitive customer data", "sensitive-data"),
         ("Rotate production encryption secrets", "cryptography-secrets"),
         ("Deploy a destructive database migration", "destructive-migration"),
+        ("Backfill a new non-null constraint", "destructive-migration"),
         ("Change payment transaction settlement", "payments"),
+        ("Change webhook signature and payment fulfillment", "payments"),
     ],
 )
 def test_critical_trigger_forces_critical_level(summary: str, trigger: str) -> None:

@@ -62,6 +62,7 @@ def test_validator_discovers_every_scenario_file() -> None:
     discovered = validator.scenario_files(Path("."))  # type: ignore[attr-defined]
 
     assert {path.name for path in discovered} == {
+        "brainstorming.yaml",
         "router-onboarding.yaml",
         "lifecycle-workflows.yaml",
         "security.yaml",
@@ -71,6 +72,10 @@ def test_validator_discovers_every_scenario_file() -> None:
 
 def test_securing_skill_exists() -> None:
     assert Path("skills/solodeveling-securing/SKILL.md").is_file()
+
+
+def test_brainstorming_skill_exists() -> None:
+    assert Path("skills/solodeveling-brainstorming/SKILL.md").is_file()
 
 
 def test_release_and_maintenance_skills_exist() -> None:

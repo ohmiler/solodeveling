@@ -7,17 +7,28 @@ from solodeveling_protocol.models import RoutingDecision, WorkLevel
 
 CRITICAL_TRIGGERS: dict[str, re.Pattern[str]] = {
     "identity-access": re.compile(
-        r"\b(auth(?:entication|orization)?|login|session|permission|admin account)\b",
+        r"\b(password|credential|account recovery|login (?:authentication|flow)|"
+        r"session (?:creation|rotation|revocation|handling|lifecycle)|"
+        r"(?:role|permission|ownership|authorization|access) "
+        r"(?:check|checks|decision|policy|enforcement)|privilege escalation)\b",
         re.IGNORECASE,
     ),
     "payments": re.compile(
-        r"\b(payment|billing|financial|transaction settlement)\b", re.IGNORECASE
+        r"\b(payment fulfillment|billing authorization|financial effect|"
+        r"transaction settlement|webhook (?:signature|fulfillment)|charge|refund|"
+        r"payout|money movement)\b",
+        re.IGNORECASE,
     ),
     "sensitive-data": re.compile(
-        r"\b(sensitive|personal|private|customer data|health data)\b", re.IGNORECASE
+        r"\b(?:migrate|expose|export|transform|delete|encrypt|redact|retain)\w* "
+        r"(?:sensitive(?: customer)?|personal|private|customer|health) data\b|"
+        r"\bsensitive-data exposure\b",
+        re.IGNORECASE,
     ),
     "destructive-migration": re.compile(
-        r"\b(destructive|drop table|delete data|irreversible)\b", re.IGNORECASE
+        r"\b(destructive|drop table|delete data|irreversible|data transformation|"
+        r"backfill|non-null constraint)\b",
+        re.IGNORECASE,
     ),
     "production-infrastructure": re.compile(
         r"\b(production|public api|infrastructure|iam|firewall)\b", re.IGNORECASE

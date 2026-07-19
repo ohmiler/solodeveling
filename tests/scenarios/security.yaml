@@ -1,11 +1,27 @@
 scenarios:
-  - id: authentication-routes-critical-security
+  - id: changed-identity-boundary-routes-critical-security
     skill: solodeveling-securing
     must_contain:
       - "identity-access"
       - "Critical"
       - "authorization"
       - "session"
+
+  - id: authentication-presence-is-not-critical
+    skill: solodeveling-securing
+    must_contain:
+      - "authenticated"
+      - "route"
+      - "not automatically Critical"
+      - "role/permission/ownership decisions"
+
+  - id: security-stages-share-one-matrix
+    skill: solodeveling-securing
+    must_contain:
+      - "one attack-surface matrix"
+      - "Boundary"
+      - "Control"
+      - "Recovery"
 
   - id: agent-input-remains-untrusted
     skill: solodeveling-securing
