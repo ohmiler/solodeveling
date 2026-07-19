@@ -116,8 +116,9 @@ def verify_bundle(project_root: Path, bundle: Path) -> None:
             stream = archive.extractfile(member)
             if stream is None or stream.read() != expected:
                 raise VerificationError(f"sdist resource mismatch: {relative}")
-        if f"{root}/README.md" not in names:
-            raise VerificationError("sdist README is missing")
+        for readme in ("README.md", "README.th.md"):
+            if f"{root}/{readme}" not in names:
+                raise VerificationError(f"sdist {readme} is missing")
         if any("evals/results/" in name for name in names):
             raise VerificationError("local evaluation results entered the sdist")
 
