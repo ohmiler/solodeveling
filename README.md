@@ -79,6 +79,28 @@ Roadmap updates happen only when priority, milestone, ordering, or a deferred-wo
 WORK owns scope and decisions, EVIDENCE owns checks and limitations, and
 state contains only the context needed to resume.
 
+### With and without Solodeveling
+
+A coding agent can keep a `TODO.md` or write next-session notes without installing
+any skill. Solodeveling does not make the model inherently smarter; it packages a
+repeatable delivery policy so the user does not have to reconstruct it in every
+prompt or session.
+
+| Concern | Without a shared skill | With Solodeveling |
+| --- | --- | --- |
+| Coordination | Instructions and working conventions depend on the current prompt, agent, and session | Project-local skills provide the same routing and vocabulary on each supported runtime |
+| Continuity | Notes can use any format the user or agent chooses | Compact state records only resumable context, with one owner for each durable fact |
+| Small work | Can have almost no ceremony when the agent makes the right call | Direct Read-Only and Ephemeral Quick explicitly require no lifecycle artifacts |
+| Completion | The prompt or session determines what evidence is enough | Completion claims require recent verification scoped to the changed boundary |
+| Risky work | Security, authority, recovery, and release checks must be supplied by the prompt or another process | Critical work routes through explicit security, recovery, provenance, and authorization gates |
+
+Not every project needs Solodeveling. A small, low-risk, single-session project may
+be better served by a clear prompt and a `TODO.md`. Solodeveling earns its overhead
+when repeatable decisions, cross-session continuity, or risk-sensitive verification
+matter. The testable claim is not that a skill makes the model smarter, but that a
+shared protocol reduces repeated coordination and missed gates without burdening
+small work.
+
 ## How it compares
 
 These projects have different defaults rather than a universal winner. The table
