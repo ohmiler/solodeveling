@@ -1,5 +1,8 @@
 # solodeveling
 
+[English documentation](https://github.com/ohmiler/solodeveling#readme) |
+[เอกสารภาษาไทย](https://github.com/ohmiler/solodeveling/blob/main/README.th.md)
+
 One agent. The right amount of process. Solodeveling is a single-agent-first software
 delivery workflow that stays quiet for small changes and adds durable planning,
 verification, security, and release controls as risk grows.
@@ -19,6 +22,9 @@ Python installation fallback.
 
 Read the full overview, comparison, and support boundaries:
 https://github.com/ohmiler/solodeveling#readme
+
+อ่านภาพรวม การเปรียบเทียบ และขอบเขตการรองรับฉบับภาษาไทย:
+https://github.com/ohmiler/solodeveling/blob/main/README.th.md
 
 Installation guide:
 https://github.com/ohmiler/solodeveling/blob/main/docs/installation.md

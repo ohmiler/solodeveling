@@ -3,6 +3,7 @@ from pathlib import Path
 
 CURRENT_DOCS = (
     Path('README.md'),
+    Path('README.th.md'),
     Path('docs/installation.md'),
     Path('docs/runtime-adapters.md'),
     Path('docs/publishing.md'),
@@ -14,6 +15,18 @@ CURRENT_DOCS = (
     Path('docs/releases/0.1.2.md'),
     Path('docs/releases/0.2.0.md'),
 )
+
+
+def test_readmes_offer_complete_language_navigation() -> None:
+    english = Path('README.md').read_text('utf-8')
+    thai = Path('README.th.md').read_text('utf-8')
+    npm = Path('packages/npm/README.md').read_text('utf-8')
+
+    assert '[ภาษาไทย](README.th.md)' in english
+    assert '[English](README.md)' in thai
+    assert '## เริ่มต้นใช้งานอย่างรวดเร็ว' in thai
+    assert '## ขอบเขตด้านความปลอดภัยและการรองรับ' in thai
+    assert 'README.th.md' in npm
 
 
 def test_installation_docs_cover_node_and_python_easy_paths() -> None:

@@ -1,5 +1,7 @@
 # Solodeveling
 
+[English](README.md) | [ภาษาไทย](README.th.md)
+
 > **One agent. The right amount of process. From a tiny fix to a verified release.**
 
 Solodeveling is a single-agent-first software delivery protocol for solo developers.
