@@ -18,13 +18,20 @@ systems, data, tools, and actions.
 3. Activate every observable profile in [profiles.md](references/profiles.md). Common
    profiles are web-application, mobile, identity-access, sensitive-data,
    data-migration, supply-chain, infrastructure, AI-agentic, and payments.
-4. Authentication, authorization, session, secrets, payment, sensitive-data,
-   production, cryptography, destructive, and safety triggers are Critical unless an
-   authorized user explicitly accepts a lower level and its residual risk.
+4. Classify the changed boundary and effect, not technology presence. An authenticated
+   route or security profile is not automatically Critical. Escalate when the change
+   alters credentials, session lifecycle, role/permission/ownership decisions,
+   sensitive-data exposure, payment fulfillment, secrets, cryptography, a production
+   trust boundary, destructive behavior, or safety-critical behavior. Lowering a
+   genuine Critical change requires explicit authorized residual-risk acceptance.
 5. Read [standards.md](references/standards.md) only when choosing or citing a current
    standard, control, or requirement identifier.
 
 ## Integrate with the lifecycle
+
+Keep one attack-surface matrix in WORK with `Boundary`, `Risk`, `Control`,
+`Verification`, and `Recovery`. Update it across stages instead of duplicating actors,
+assets, threats, and controls in shaping, planning, security, and evidence artifacts.
 
 - Shaping: identify assets, sensitivity, trust boundaries, plausible abuse and misuse
   cases, security acceptance criteria, and privacy or operational impact.

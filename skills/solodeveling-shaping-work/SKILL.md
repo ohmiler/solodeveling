@@ -1,6 +1,6 @@
 ---
 name: solodeveling-shaping-work
-description: Turn an unclear software request into bounded, decision-ready work with intent, users, outcomes, scope, acceptance criteria, risks, and alternatives. Use for new features, meaningful changes, explorations, or repairs whose desired behavior or boundaries are not yet clear. Skip when an existing work item is already shaped and its acceptance criteria remain valid.
+description: Turn a selected but unclear software direction into bounded, decision-ready work with intent, users, outcomes, scope, acceptance, risks, and alternatives. Use after brainstorming when the user wants to formalize a direction, or for meaningful changes and repairs whose desired behavior or boundaries are unclear. Skip open-ended ideation and already-shaped work.
 ---
 
 # Shaping Work
@@ -18,8 +18,10 @@ questions whose answers materially change the outcome, scope, safety, or authori
    behavior or documentation instead of resolving them by guesswork.
 4. Write acceptance criteria that can be verified. Prefer behavior and outcomes over
    implementation choices.
-5. Classify Quick, Standard, or Critical from observable triggers. Record product,
-   technical, security, privacy, operational, and UX risks that actually apply.
+5. Classify Quick, Standard, or Critical from the boundary changed and effect
+   produced, not from the mere presence of authentication, an API, or a database.
+   Record product, technical, security, privacy, operational, and UX risks that
+   actually apply.
 6. Consider alternatives: at least the recommended approach, the smallest credible option,
    and doing nothing when the trade-off is meaningful. Record binding decisions.
 

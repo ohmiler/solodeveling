@@ -36,7 +36,7 @@ def test_prepare_npm_package_binds_complete_native_inventory(
 
     manifest = prepare_npm_package(Path("."), native, output)
 
-    assert manifest["version"] == "0.1.2"
+    assert manifest["version"] == "0.2.0"
     assert set(manifest["artifacts"]) == {
         "win32-x64",
         "win32-arm64",
@@ -58,7 +58,7 @@ def test_prepare_npm_package_refuses_missing_native_target(
 ) -> None:
     native = tmp_path / "native"
     write_native_set(native)
-    (native / "solodeveling-0.1.2-linux-arm64").unlink()
+    (native / "solodeveling-0.2.0-linux-arm64").unlink()
 
     with pytest.raises(NpmPackageError, match="missing or unsafe"):
         prepare_npm_package(Path("."), native, tmp_path / "package")
@@ -117,7 +117,7 @@ def test_source_package_versions_and_registry_readme_agree() -> None:
     artifacts = json.loads(Path("packages/npm/artifacts.json").read_text("utf-8"))
     readme = Path("packages/npm/README.md").read_text("utf-8")
 
-    assert __version__ == "0.1.2"
+    assert __version__ == "0.2.0"
     assert metadata["version"] == __version__
     assert artifacts["version"] == __version__
     assert "npx solodeveling install" in readme

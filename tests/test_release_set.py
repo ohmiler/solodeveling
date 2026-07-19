@@ -38,11 +38,11 @@ def _record(path: Path) -> dict[str, object]:
 
 def _candidate(root: Path) -> Path:
     root.mkdir()
-    wheel = root / "solodeveling-0.1.2-py3-none-any.whl"
-    sdist = root / "solodeveling-0.1.2.tar.gz"
+    wheel = root / "solodeveling-0.2.0-py3-none-any.whl"
+    sdist = root / "solodeveling-0.2.0.tar.gz"
     wheel.write_bytes(b"wheel")
     sdist.write_bytes(b"sdist")
-    base = release.artifact_manifest("0.1.2", [wheel, sdist])
+    base = release.artifact_manifest("0.2.0", [wheel, sdist])
     (root / "release-manifest.json").write_text(json.dumps(base), encoding="utf-8")
     (root / "SHA256SUMS").write_text("base\n", encoding="utf-8")
     sbom = root.parent / "generated.cdx.json"
@@ -56,7 +56,7 @@ def _candidate(root: Path) -> Path:
                     "component": {
                         "type": "library",
                         "name": "solodeveling",
-                        "version": "0.1.2",
+                        "version": "0.2.0",
                     }
                 },
                 "components": [
@@ -97,9 +97,9 @@ def _npm_tarball(
     symlink: bool = False,
     unsafe_path: bool = False,
 ) -> Path:
-    metadata = json.dumps({"name": "solodeveling", "version": "0.1.2"}).encode()
+    metadata = json.dumps({"name": "solodeveling", "version": "0.2.0"}).encode()
     manifest = json.dumps(
-        {"schema": 1, "version": "0.1.2", "artifacts": records}
+        {"schema": 1, "version": "0.2.0", "artifacts": records}
     ).encode()
     with tarfile.open(path, "w:gz") as archive:
         for name, content in (
@@ -125,7 +125,7 @@ def _npm_tarball(
 def _inputs(tmp_path: Path):
     candidate = _candidate(tmp_path / "candidate")
     native, records = _native(tmp_path / "native")
-    npm = _npm_tarball(tmp_path / "solodeveling-0.1.2.tgz", records)
+    npm = _npm_tarball(tmp_path / "solodeveling-0.2.0.tgz", records)
     return candidate, native, npm
 
 
@@ -140,7 +140,7 @@ def test_assemble_and_verify_complete_release_set(tmp_path: Path) -> None:
 
     assert verified == manifest
     assert manifest["solodeveling_release_set_schema"] == 1
-    assert manifest["version"] == "0.1.2"
+    assert manifest["version"] == "0.2.0"
     assert manifest["source_revision"] == REVISION
     assert "generated_at" not in manifest
     roles = [record["role"] for record in manifest["artifacts"]]
@@ -158,7 +158,7 @@ def test_assembly_rejects_npm_manifest_that_does_not_bind_native_bytes(
     candidate = _candidate(tmp_path / "candidate")
     native, records = _native(tmp_path / "native")
     records["linux-x64"]["sha256"] = "0" * 64
-    npm = _npm_tarball(tmp_path / "solodeveling-0.1.2.tgz", records)
+    npm = _npm_tarball(tmp_path / "solodeveling-0.2.0.tgz", records)
 
     with pytest.raises(ReleaseSetError, match="npm native manifest"):
         assemble_release_set(
@@ -186,7 +186,7 @@ def test_assembly_rejects_symlink_in_npm_archive(tmp_path: Path) -> None:
     candidate = _candidate(tmp_path / "candidate")
     native, records = _native(tmp_path / "native")
     npm = _npm_tarball(
-        tmp_path / "solodeveling-0.1.2.tgz", records, symlink=True
+        tmp_path / "solodeveling-0.2.0.tgz", records, symlink=True
     )
 
     with pytest.raises(ReleaseSetError, match="link"):
@@ -199,7 +199,7 @@ def test_assembly_rejects_path_traversal_in_npm_archive(tmp_path: Path) -> None:
     candidate = _candidate(tmp_path / "candidate")
     native, records = _native(tmp_path / "native")
     npm = _npm_tarball(
-        tmp_path / "solodeveling-0.1.2.tgz", records, unsafe_path=True
+        tmp_path / "solodeveling-0.2.0.tgz", records, unsafe_path=True
     )
 
     with pytest.raises(ReleaseSetError, match="path is unsafe"):
@@ -267,7 +267,7 @@ def test_release_set_docs_define_non_publishing_boundary_and_recovery() -> None:
     publishing = Path("docs/publishing.md").read_text("utf-8")
     readiness = Path("docs/release-readiness.md").read_text("utf-8")
     contributing = Path("CONTRIBUTING.md").read_text("utf-8")
-    notes = Path("docs/releases/0.1.2.md").read_text("utf-8")
+    notes = Path("docs/releases/0.2.0.md").read_text("utf-8")
     publishing_normalized = " ".join(publishing.split())
     for phrase in (
         "complete release set",

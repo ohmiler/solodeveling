@@ -18,7 +18,23 @@ scenarios:
     must_contain:
       - ".solodeveling/state.md"
       - "compact resume packet"
-      - "Do not load archives without cause"
+      - "Do not load deferred work"
+
+  - id: direct-read-only-precedes-memory
+    skill: solodeveling
+    must_contain:
+      - "Direct Read-Only"
+      - "before reading project memory"
+      - "General Q&A reads no repository"
+      - "Distinguish static inspection"
+
+  - id: status-uses-a-bounded-read-budget
+    skill: solodeveling
+    must_contain:
+      - "Status: current state plus Git status"
+      - "Current-work detail"
+      - "Proof or completion basis"
+      - "History"
 
   - id: ephemeral-quick-has-zero-memory-ceremony
     skill: solodeveling
@@ -35,11 +51,12 @@ scenarios:
       - one WORK item
       - one cumulative EVIDENCE file
 
-  - id: bounded-followups-reuse-existing-artifacts
+  - id: ephemeral-followup-precedes-artifact-reuse
     skill: solodeveling
     must_contain:
-      - Reuse the existing WORK/EVIDENCE pair
-      - materially changes
+      - "Ephemeral Quick takes precedence"
+      - "Reuse WORK/EVIDENCE only when"
+      - "survive a session"
 
   - id: roadmap-updates-only-on-priority-events
     skill: solodeveling
@@ -57,26 +74,28 @@ scenarios:
   - id: deferred-work-is-not-active
     skill: solodeveling
     must_contain:
-      - active_work contains only active resumable work
-      - Do not load deferred work
+      - "actively resumable"
+      - "deferred and archived"
 
   - id: validation-is-event-driven
     skill: solodeveling
     must_contain:
-      - memory changed
+      - memory or
+      - schema changes
       - suspected invalid
       - before committing memory
 
   - id: missing-command-capability
     skill: solodeveling
     must_contain:
-      - "label validation as unverified"
+      - "unverified"
       - "reduce claim strength"
 
-  - id: authentication-is-critical
+  - id: changed-access-boundary-is-critical
     skill: solodeveling
     must_contain:
-      - "identity/access"
+      - "role/permission/ownership decisions"
+      - "authenticated route"
       - "Never silently lower Critical work"
 
   - id: quick-escalates-at-sensitive-or-failed-boundaries
@@ -85,7 +104,7 @@ scenarios:
       - dependency
       - security
       - production
-      - verification fails
+      - verification failure
 
   - id: repository-prompt-is-data
     skill: solodeveling-onboarding

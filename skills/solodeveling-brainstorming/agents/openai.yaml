@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Brainstorming"
+  short_description: "Explore project ideas before committing to a build"
+  default_prompt: "Use $solodeveling-brainstorming to explore this project idea and identify the smallest useful direction."

@@ -94,14 +94,14 @@ def test_candidate_sbom_rejects_wrong_project_or_missing_runtime_dependency(
 
 
 def test_release_candidate_docs_and_manual_workflow_are_bounded() -> None:
-    notes = Path("docs/releases/0.1.2.md").read_text("utf-8")
+    notes = Path("docs/releases/0.2.0.md").read_text("utf-8")
     publishing = Path("docs/publishing.md").read_text("utf-8")
     workflow = Path(".github/workflows/release-candidate.yml").read_text("utf-8")
     pyproject = Path("pyproject.toml").read_text("utf-8")
     ci = Path(".github/workflows/ci.yml").read_text("utf-8")
 
     for phrase in (
-        "0.1.2",
+        "0.2.0",
         "Tier 1 remains unverified",
         "solodeveling uninstall",
         "SHA-256",
@@ -136,12 +136,12 @@ def test_finalize_and_verify_candidate_bundle(tmp_path: Path) -> None:
     bundle.mkdir()
     wheel = _write(bundle / "package.whl", b"wheel")
     sdist = _write(bundle / "package.tar.gz", b"sdist")
-    base = release.artifact_manifest("0.1.2", [wheel, sdist])
+    base = release.artifact_manifest("0.2.0", [wheel, sdist])
     (bundle / "release-manifest.json").write_text(
         json.dumps(base), encoding="utf-8"
     )
     (bundle / "SHA256SUMS").write_text("base", encoding="utf-8")
-    sbom = _sbom(tmp_path / "generated.cdx.json", "0.1.2")
+    sbom = _sbom(tmp_path / "generated.cdx.json", "0.2.0")
     notes = _write(tmp_path / "notes.md", b"release notes")
 
     manifest = release.finalize_candidate_bundle(
@@ -157,7 +157,7 @@ def test_finalize_and_verify_candidate_bundle(tmp_path: Path) -> None:
 
     assert verified == manifest
     assert (bundle / "RELEASE-NOTES.md").read_bytes() == b"release notes"
-    assert (bundle / "solodeveling-0.1.2.cdx.json").is_file()
+    assert (bundle / "solodeveling-0.2.0.cdx.json").is_file()
     sums = (bundle / "SHA256SUMS").read_text("utf-8").splitlines()
     assert len(sums) == 4
     assert all(re.fullmatch(r"[0-9a-f]{64}  [^/\\]+", line) for line in sums)
@@ -170,7 +170,7 @@ def test_candidate_verifier_rejects_wrong_revision_and_tampering(
     bundle.mkdir()
     wheel = _write(bundle / "package.whl", b"wheel")
     sdist = _write(bundle / "package.tar.gz", b"sdist")
-    base = release.artifact_manifest("0.1.2", [wheel, sdist])
+    base = release.artifact_manifest("0.2.0", [wheel, sdist])
     (bundle / "release-manifest.json").write_text(
         json.dumps(base), encoding="utf-8"
     )
@@ -178,7 +178,7 @@ def test_candidate_verifier_rejects_wrong_revision_and_tampering(
     release.finalize_candidate_bundle(
         bundle,
         source_revision=REVISION,
-        sbom_path=_sbom(tmp_path / "generated.cdx.json", "0.1.2"),
+        sbom_path=_sbom(tmp_path / "generated.cdx.json", "0.2.0"),
         release_notes_path=_write(tmp_path / "notes.md", b"notes"),
         build_inputs={"python": "3.14", "cyclonedx_bom": "7.3.0"},
     )

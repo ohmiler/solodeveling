@@ -1,110 +1,90 @@
 # Release readiness
 
-WORK-011 extends the guarded release and publication gate to one public name and two install
-ecosystems. Ordinary CI builds Python distributions, six platform executables, and an
-npm tarball for verification; it does not publish, tag, create a GitHub Release, or
-configure a registry.
+This document defines the current non-publishing candidate and public-release gates
+for Solodeveling. Ordinary CI verifies source, packages, six native targets, and npm
+packaging; it does not publish, tag, create a GitHub Release, or mutate a registry.
 
-## Local gate
+## Local candidate gate
 
-1. Run the full test suite, ten official skill validations, protocol validation,
+1. Run the full Python suite, skill-suite validation, protocol validation,
    compilation, dependency checks, Node launcher tests, and diff review.
 2. Build the current-platform executable into a new path:
 
-       python scripts/build_native.py C:/tmp/solodeveling-native
+       python scripts/build_native.py C:/tmp/solodeveling-native-0.2.0
 
-3. Exercise embedded templates, schemas, skills, evaluations, and all unified
-   subcommands:
+3. Exercise embedded templates, schemas, skills, evaluations, and unified commands:
 
-       python scripts/smoke_native.py C:/tmp/solodeveling-native C:/tmp/native-smoke
+       python scripts/smoke_native.py C:/tmp/solodeveling-native-0.2.0 C:/tmp/native-smoke-0.2.0
 
-4. Build the source-bound Python candidate from a clean exact revision and verify its
-   checksums, contents, SBOM, release notes, and manifest.
-5. Collect all six CI-native artifacts, prepare the version-bound npm package, inspect
-   `npm pack` contents, and run the local tarball through `npx`
-   with a verified cached artifact.
-6. Review manifests and SHA-256 values. Integrity hashes are not a signature,
-   attestation, or proof of publisher identity.
+4. Build the Python candidate from a clean exact commit and verify its checksums,
+   contents, SBOM, release notes, and manifest.
+5. Verify that installed wheel and native resources include every canonical skill,
+   including `solodeveling-brainstorming`, and run the representative routing
+   scenarios against the exact candidate bytes.
+6. Review manifests and SHA-256 values. Integrity hashes are not signatures,
+   attestations, or proof of publisher identity.
 
-The builders refuse unsafe or existing destinations, require exact inventories, use
+Builders refuse unsafe or existing destinations, require exact inventories, use
 temporary staging, and never upload to a registry.
 
-## Evidence checked 2026-07-15
+Python 3.10 and 3.14 remain the supported CI bounds. Candidate invocation, tag
+creation, GitHub Release creation, environment changes, PyPI publication, npm
+staging, and npm publication are each a separate external action and authorization
+checkpoint.
 
-- Python 3.10 and 3.14 remain the supported Python bounds in cross-platform CI.
-- The unified Python CLI regression and full suite passed locally after removing the
-  four split console entry points.
-- A Windows x64 PyInstaller 6.21.0 executable embedded schemas, templates, skills,
-  evaluations, and required dependency grammar data; full installed smoke passed.
-- A dependency-free npm tarball was prepared locally without lifecycle install scripts
-  and `npx` executed the verified cached Windows binary successfully.
-- Node tests rejected unsafe names, invalid versions, unsupported platforms, corrupt
-  downloads, tampered cache files, wrong sizes, and wrong hashes before execution.
-- npm and PyPI name lookups returned not found earlier on this date. That is not a
-  reservation and can change before publication.
-- No npm project, PyPI project, trusted publisher, protected registry environment,
-  tag, GitHub Release, or registry publication exists from this work.
+## 0.2.0 preparation status — 2026-07-19
 
-Tier 1 remains unverified because the full behavioral scenario matrix has not passed
-on Codex, Claude Code, and Cursor.
+- The feedback implementation is isolated on `release/0.2.0`; its behavior commit is
+  `679869e`.
+- The router, protocol, sub-skills, runtime classifier, public docs, and behavioral
+  scenarios agree on Direct Read-Only, frontend batching, boundary/effect routing,
+  checkpoint verification, and brainstorming.
+- Skill validation, the 266-test source suite, diff integrity, and seven blind task
+  scenarios passed before the version-bump commit.
+- Python, npm metadata, the empty source artifact manifest, current-version tests,
+  and these release notes are being advanced together to 0.2.0.
+- No tag, GitHub Release, registry action, or production mutation is authorized by
+  this preparation.
 
-## Status reconciled 2026-07-16
+Tier 1 remains unverified because the complete behavioral matrix has not passed on
+Codex, Claude Code, and Cursor. Native executables remain unsigned.
 
-- Pull requests 8 through 12 and WORK-008 through WORK-012 are merged. The reviewed
-  pre-release base is `main` commit
-  `cda0f4854359384f79ea45c50a8ad06f9eba6baf`; GitHub Actions run 29442409991
-  passed the full Python/package, six-native-target, and npm pack/npx matrix.
-- The npm and PyPI registry endpoints for `solodeveling` returned not found. The
-  repository has no version tag or GitHub Release, so public `npx`, `uvx`, `pipx`,
-  and registry installation remain unavailable.
-- GitHub Release immutability is enabled. The `pypi` and `npm` environments require
-  reviewer `ohmiler`, permit solo-owner self-review, contain exact `main`-only branch
-  policy, contain no secrets or variables, and have administrator bypass disabled.
-- The PyPI pending publisher is owner-confirmed for project `solodeveling`, owner
-  `ohmiler`, repository `solodeveling`, workflow `publish.yml`, and environment
-  `pypi`. Public independent verification is unavailable until first OIDC use.
-- Owner-authorized candidate run 29452526223 succeeded for version `0.1.0` from
-  exact `main` commit `700a9b9dafc877507232b84a94ff3d6eaf7afda4`.
-  All build, smoke, assembly, integrity, and attestation jobs passed. Independent
-  verification of the downloaded 13-file release set and every provenance subject
-  also passed. No registry, tag, GitHub Release, staging action, approval, or
-  publication was invoked.
-- WORK-017 repaired the publication gate so current protected `main` accepts that
-  exact candidate only as a verified ancestor and reads its canonical dynamic version
-  without executing candidate code. Adversarial tests and cross-platform CI passed;
-  `publish.yml` itself remains uninvoked pending separate external authority.
+## Remaining 0.2.0 gates
 
-## Remaining gates
+- Complete the local candidate gate from a clean exact commit and independently
+  verify the resulting Python candidate.
+- Complete the cross-platform CI candidate so all six native executables can be bound
+  into the npm tarball and complete release set.
+- Dogfood five to ten representative tasks while recording tool calls, memory writes,
+  broad-gate runs, reopen/archive counts, elapsed verification time, and escaped
+  regressions. Any Critical under-classification blocks release.
+- Reconcile source behavior, release notes, package inventories, checksums, SBOM,
+  scenario results, and known limitations.
+- Confirm the protected PyPI and npm environments and trusted-publisher identities
+  still match `publish.yml` before any registry action.
+- With separate explicit authority, create tag `v0.2.0` at the verified source
+  revision and create the immutable GitHub Release from that exact candidate.
+- With another explicit authority checkpoint, publish PyPI and stage or publish npm.
+  Complete clean-environment post-publication smoke checks before announcing the
+  release.
 
-- Recheck both registry names immediately before first publication.
-- With separate explicit authority, create tag `v0.1.0` at the verified source
-  revision, then separately authorize creation of the immutable GitHub Release from
-  candidate run 29452526223.
-- Verify the owner-confirmed PyPI pending publisher during the first separately
-  authorized OIDC publication. Bootstrap npm 0.1.0 separately with interactive
-  two-factor authentication, then configure npm Trusted Publishing with stage-only
-  permission where practical.
-- Treat each candidate invocation, tag, GitHub Release, environment or registry
-  setup, PyPI publication, npm staging, npm approval, and direct npm publication as a
-  separate external action and authorization checkpoint.
-- Complete Tier 1 agent-runtime evaluation and decide whether native platform signing
-  is required before a stable release.
 ## Complete release-set gate
 
-After all upstream checks pass, assemble the coordinated non-publishing input from one
-exact source revision:
+After all upstream checks pass, assemble the coordinated non-publishing input from
+one exact source revision:
 
     python scripts/assemble_release_set.py <candidate> <native> <npm-tarball> <release-set> --source-revision <sha>
     python scripts/verify_release_set.py <release-set> --source-revision <sha>
 
-`release-set-manifest.json` must describe exactly two Python distributions, six native
-executables, one npm tarball, one CycloneDX SBOM, and release notes. The verifier
-recomputes size and SHA-256, checks the flat inventory, validates the npm archive
-without extraction, and requires its platform manifest to match all six native bytes.
-The gate provides bounded integrity and provenance input; it is not publication,
-platform code signing, categorical security assurance, or Tier 1 behavior proof.
+`release-set-manifest.json` must describe exactly two Python distributions, six
+native executables, one npm tarball, one CycloneDX SBOM, and release notes. The
+verifier recomputes size and SHA-256, checks the flat inventory, validates the npm
+archive without extraction, and requires its platform manifest to match all six
+native bytes. This gate provides bounded integrity and provenance input; it is not
+publication, platform signing, or Tier 1 behavior proof.
 
-Recovery before publication is to remove only disposable output and rebuild the
-entire set from the reviewed commit. Do not edit manifests or replace an individual
-artifact. External tag, release, signing, registry configuration, and publication
-actions remain separate authorization checkpoints.
+Recovery before publication is to discard only disposable output and rebuild the
+entire set from the reviewed commit. Do not edit a generated manifest or replace an
+individual artifact. Candidate invocation, tag creation, GitHub Release creation,
+PyPI publication, npm staging, and npm publication remain separate authorization
+checkpoints.

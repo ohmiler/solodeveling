@@ -41,6 +41,17 @@ Git provider.
 - For uninterrupted Standard work, coalesce intermediate state writes and use the
   same WORK/EVIDENCE pair through completion. A phase change alone is not a new
   artifact or commit.
+- For a same-surface frontend design batch, keep the tracked item active while the
+  user iterates and no risk boundary changes. Run a focused visual, viewport, or
+  interaction check for each slice; defer affected lint, build, and broad E2E to a
+  commit, handoff, surface change, risk change, or user-confirmed checkpoint. Archive
+  once at the checkpoint, not after each micro-change.
+- Route a bounded same-session follow-up as Ephemeral Quick before considering reuse
+  or reopening of prior Standard work. If it belongs to an active batch, leave the
+  parent memory unchanged until the checkpoint and reconcile only durable decisions.
+- Keep a broad verification result valid until a later edit crosses a file, behavior,
+  dependency, environment, or boundary that it covered. Do not rerun it merely for a
+  commit request when relevant source has not changed.
 
 When implementation matches the plan and focused checks pass, enter `verifying`
 semantically and route to `solodeveling-verifying`. Persist immediately only when

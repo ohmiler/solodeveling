@@ -1,18 +1,19 @@
 ---
 name: solodeveling-onboarding
-description: Discover an existing software repository or shape a new project, then create the minimum safe Solodeveling project memory without overwriting established documentation. Use for greenfield setup, brownfield adoption, a missing `.solodeveling` directory, project-understanding requests, or recovery of project context before normal Solodeveling work. Works across stacks and coding-agent runtimes without requiring subagents.
+description: Adopt an existing repository or initialize a selected greenfield project with the minimum safe Solodeveling memory. Use when the user authorizes project tracking, mutating work needs missing `.solodeveling` memory, or existing project memory needs recovery. Do not use for ordinary read-only repository understanding or open-ended brainstorming.
 ---
 
 # Solodeveling Onboarding
 
 Create reliable project context from evidence. Do not invent unknown facts or replace
-an established source of truth.
+an established source of truth. Do not initialize memory merely because a repository
+exists or a user is exploring an idea.
 
 ## Determine the path
 
 - Brownfield: source, manifests, repository instructions, or history already exist.
-- Greenfield: no implementation exists; establish problem, users, success criteria,
-  constraints, and the first work item before selecting architecture.
+- Greenfield: the user selected a direction; establish problem, users, success
+  criteria, constraints, and the first work item before selecting architecture.
 - If mixed, preserve existing facts and label proposed choices separately.
 
 ## Discover
