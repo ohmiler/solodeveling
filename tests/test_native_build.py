@@ -10,12 +10,12 @@ from scripts.build_native import NativeBuildError, build_native, native_target
 @pytest.mark.parametrize(
     ("system", "machine", "expected"),
     [
-        ("win32", "AMD64", ("win32-x64", "solodeveling-0.1.2-windows-x64.exe")),
-        ("win32", "ARM64", ("win32-arm64", "solodeveling-0.1.2-windows-arm64.exe")),
-        ("darwin", "x86_64", ("darwin-x64", "solodeveling-0.1.2-macos-x64")),
-        ("darwin", "arm64", ("darwin-arm64", "solodeveling-0.1.2-macos-arm64")),
-        ("linux", "x86_64", ("linux-x64", "solodeveling-0.1.2-linux-x64")),
-        ("linux", "aarch64", ("linux-arm64", "solodeveling-0.1.2-linux-arm64")),
+        ("win32", "AMD64", ("win32-x64", "solodeveling-0.2.0-windows-x64.exe")),
+        ("win32", "ARM64", ("win32-arm64", "solodeveling-0.2.0-windows-arm64.exe")),
+        ("darwin", "x86_64", ("darwin-x64", "solodeveling-0.2.0-macos-x64")),
+        ("darwin", "arm64", ("darwin-arm64", "solodeveling-0.2.0-macos-arm64")),
+        ("linux", "x86_64", ("linux-x64", "solodeveling-0.2.0-linux-x64")),
+        ("linux", "aarch64", ("linux-arm64", "solodeveling-0.2.0-linux-arm64")),
     ],
 )
 def test_native_target_is_exact(
@@ -51,7 +51,7 @@ def test_native_builder_includes_canonical_resources(
         runner=runner,
     )
 
-    assert built.name == "solodeveling-0.1.2-windows-x64.exe"
+    assert built.name == "solodeveling-0.2.0-windows-x64.exe"
     assert built.read_bytes() == b"native"
     arguments, cwd = calls[0]
     assert cwd == Path(".").resolve()
@@ -72,7 +72,7 @@ def test_native_builder_refuses_existing_output_before_runner(
 ) -> None:
     output = tmp_path / "native"
     output.mkdir()
-    destination = output / "solodeveling-0.1.2-linux-x64"
+    destination = output / "solodeveling-0.2.0-linux-x64"
     destination.write_bytes(b"existing")
     called = False
 
