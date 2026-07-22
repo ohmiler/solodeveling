@@ -1,0 +1,6 @@
+{
+  "name": "harbor-notes",
+  "version": "2.4.0",
+  "status": "alpha",
+  "requires_python": ">=3.11"
+}

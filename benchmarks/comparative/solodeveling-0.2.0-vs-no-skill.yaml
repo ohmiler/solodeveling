@@ -1,0 +1,86 @@
+schema: 1
+benchmark_id: solodeveling-0.2.0-vs-no-skill-pilot-1
+status: preregistered-not-run
+classification: pilot-signal-only
+seed: 20260720
+repetitions: 3
+runtime:
+  executable: codex
+  cli_version: codex-cli 0.144.6
+  model: gpt-5.6-sol
+  reasoning_effort: medium
+  timeout_seconds: 1200
+  permission_profile: :workspace
+  windows_sandbox: elevated
+  network: disabled
+methodologies:
+  - id: solodeveling-0.2.0
+    kind: skill
+    version: 0.2.0
+    commit: ca7c3b356c2e9444963a52e00e2e97198ad94e7d
+    invocation: $solodeveling
+    skill: solodeveling
+  - id: no-skill
+    kind: none
+    version: none
+tasks:
+  - id: direct-read-only
+    class: direct-read-only
+    mutation_required: false
+    fixture: fixtures/read-only-review
+    hidden_check: checks/check_read_only_review.py
+    prompt: >-
+      Inspect the repository and report the exact project version, lifecycle status,
+      and minimum supported Python version. Do not modify files.
+  - id: quick-code
+    class: quick
+    fixture: fixtures/quick-code
+    hidden_check: checks/check_quick_code.py
+    prompt: >-
+      Update normalize_label so surrounding whitespace is removed, internal
+      whitespace runs become one space, and text is lowercase. Add focused tests
+      and run all tests.
+  - id: bug-repair
+    class: standard
+    fixture: fixtures/bug-repair
+    hidden_check: checks/check_bug_repair.py
+    prompt: >-
+      Fix slugify so consecutive spaces or hyphens become one hyphen and leading
+      or trailing separators are removed. Preserve lowercase ASCII behavior, add
+      focused regression tests, and run all tests.
+  - id: bounded-follow-up
+    class: follow-up
+    fixture: fixtures/bounded-follow-up
+    hidden_check: checks/check_bounded_follow_up.py
+    prompt: >-
+      Continue the existing tracked WORK-001. Add optional max_length to
+      format_title: shortened values must end with three dots and have total
+      max_length; reject limits below 4. Add tests and concise verification to the
+      existing EVIDENCE-001. Reuse the existing records, create no new tracking
+      files, and run all tests.
+  - id: critical-readiness
+    class: critical-readiness
+    mutation_required: false
+    fixture: fixtures/critical-readiness
+    hidden_check: checks/check_critical_readiness.py
+    prompt: >-
+      Review the proposed production migration for readiness. Do not execute it or
+      modify files. Give a go/no-go decision and identify material risks, required
+      prerequisites, the authorization boundary, validation, and recovery needs.
+claim_policy:
+  correctness_gates_speed: true
+  public_faster_claim_allowed: false
+  required_live_runs: 30
+  confirmation: RUN SOLDEVELING 0.2.0 VS NO-SKILL PILOT 1 30
+evaluation_policy:
+  primary: hidden_correctness
+  paired_metrics:
+    - elapsed_seconds
+    - input_tokens
+    - output_tokens
+    - tool_calls
+    - agent_questions
+    - changed_files
+    - workflow_artifacts
+  pilot_only: true
+  confirmatory_study_required_for_public_claim: true

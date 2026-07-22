@@ -24,6 +24,9 @@ and has not been run.
 The feedback-specific Solodeveling 0.1.1-versus-0.1.2 study and local twenty-task
 field scorecard are documented in [Measuring Solodeveling](measurement.md). They
 do not alter Pilot 4 or the archived Solodeveling-versus-Superpowers boundary.
+That document also contains a separate preregistered 30-call pilot comparing pinned
+Solodeveling 0.2.0 with a true no-skill arm. It has not been run and is not evidence
+that Solodeveling is faster or better.
 
 ## Fairness boundary
 

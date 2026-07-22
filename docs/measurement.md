@@ -16,6 +16,57 @@ overhead, then keep controlled comparisons separate from observational field dat
 Current evidence supports reduced internal workflow overhead and preserved release
 controls. It does not establish that Solodeveling is faster than another methodology.
 
+## Solodeveling 0.2.0 versus no skill
+
+The preregistration in
+`benchmarks/comparative/solodeveling-0.2.0-vs-no-skill.yaml` tests the narrower
+claim behind the README comparison: whether a shared delivery protocol changes
+correctness or observable workflow overhead compared with the same agent receiving
+no project skill. It pins Solodeveling 0.2.0 to commit
+`ca7c3b356c2e9444963a52e00e2e97198ad94e7d`. The no-skill arm has no source
+checkout, installs no project skill, and receives no skill invocation.
+
+Both arms otherwise receive the same Codex CLI, model, reasoning effort, permission
+profile, network boundary, fixture, task text, neutral execution instructions,
+timeout, and hidden check. Skill installation happens before timing. Every run uses
+a fresh isolated Git worktree with user configuration and repository rules ignored.
+The Windows preregistration pins the preferred `elevated` native sandbox. The runner
+canonicalizes the standalone executable before launch so its signed package-relative
+sandbox setup and command-runner resources remain paired with that CLI version.
+The fixtures contain no `AGENTS.md` or alternate agent rules. Existing project
+memory appears only in the bounded-continuation task because resuming that state is
+the behavior being tested.
+
+Five tasks cover Direct Read-Only inspection, a Quick change, a Standard repair,
+bounded continuation, and Critical readiness review. Three paired repetitions over
+two arms produce 30 calls. The two non-mutating tasks are checked using both the Git
+diff and the saved final response; deterministic checks require the requested facts
+or safety boundaries without using an AI judge. Mutation-required tasks retain the
+zero-mutation circuit breaker.
+
+These commands make no model calls:
+
+    python scripts/comparative_benchmark.py --spec benchmarks/comparative/solodeveling-0.2.0-vs-no-skill.yaml plan
+    python scripts/comparative_benchmark.py --spec benchmarks/comparative/solodeveling-0.2.0-vs-no-skill.yaml verify-fixtures
+    python scripts/comparative_benchmark.py --spec benchmarks/comparative/solodeveling-0.2.0-vs-no-skill.yaml probe --source solodeveling-0.2.0=PINNED_V020_CHECKOUT
+
+`probe` verifies the pinned runtime, local model catalog, sandbox and permission
+capabilities, and a clean exact source checkout without inference. `run-live` is a
+separate authorized action: it requires the exact confirmation printed by `plan`
+and can consume up to 30 calls from the signed-in account. Preparing or validating
+this preregistration does not authorize those calls.
+
+The current offline probe passed on Codex CLI 0.144.6 with the signed standalone
+Windows helper, the `elevated` `:workspace` write check, `gpt-5.6-sol` at medium
+reasoning, and the clean pinned v0.2.0 commit. This establishes harness readiness,
+not a comparative result.
+
+Correctness remains primary. Timing, tokens, tool calls, questions, changed files,
+and workflow artifacts are compared only where both paired runs pass. Any outcome
+is pilot signal only: it cannot show that the model became smarter, cannot establish
+universal superiority, and cannot support a public speed or quality claim without a
+broader preregistered confirmatory study and independent review.
+
 ## Feedback pilot: 0.1.1 versus 0.1.2
 
 The preregistration in benchmarks/comparative/feedback-0.1.1-vs-0.1.2.yaml compares
