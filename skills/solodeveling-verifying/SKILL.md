@@ -1,6 +1,6 @@
 ---
 name: solodeveling-verifying
-description: Verify implemented Solodeveling work against every acceptance criterion and bind completion claims to recent, scoped evidence. Use before saying work is done, fixed, passing, secure, ready, or releasable; after implementation or debugging; and whenever a prior verification failed or capabilities are missing.
+description: Independently verify implemented Solodeveling work against every acceptance criterion and bind completion claims to recent, scoped evidence. Use for verification-only or audit requests, Critical final gates, closure after debugging when no combined workflow owns delivery, and prior failed or unavailable verification. Clear uninterrupted Standard delivery verifies inside solodeveling-standard-delivery.
 ---
 
 # Verifying
@@ -22,13 +22,22 @@ reproducible where possible, and collected after the latest relevant change.
    security and recovery coverage. Reuse a broad result until a later change crosses
    what it covered. Inspect exit status and meaningful output; invocation alone is
    not evidence.
+   For backend work, use the effect minimums and applicability rules in the
+   [backend delivery contract](../solodeveling/references/backend-delivery.md). A
+   database, login, provider, or webhook in the stack does not make every broad gate
+   applicable.
+   Reuse current E2E evidence for the routes, viewports, responsive behavior, and
+   overflow it actually proves. Use manual browser review only for unproved visual or
+   interaction qualities. Treat screenshots, traces, and videos as transient unless
+   acceptance explicitly requires a durable project-owned artifact.
 4. Check scope integrity, unintended changes, documentation, migration, UX,
    compatibility, security, privacy, operations, and recovery when applicable.
 5. For persistent work, record each claim, method or command, result, scope,
    limitations, and important invariant proved. Keep follow-up history as a short
    changelog below the current matrix. Ephemeral Quick reports the focused result
    inline and creates no artifact. Mark unavailable or unexecuted checks `unverified`;
-   never present them as passing.
+   never present them as passing. Reference a backend boundary record by ID rather
+   than copying its authority, invariant, failure, and recovery fields.
 
 For external providers, accept code-level mocks, signature fixtures, retry,
 idempotency, and failure tests as implementation evidence. Keep owner-controlled
@@ -36,6 +45,11 @@ target-environment smoke checks as release evidence; do not block code completio
 production credentials when deployment is outside scope.
 
 ## Decide
+
+Before classifying a plausible transient harness or environment failure, inspect its
+logs and artifacts and rerun once without source edits under one controlled warmed or
+reduced-concurrency condition. Continue only when evidence isolates the transient
+cause and record the limitation; otherwise treat it as a failure.
 
 If any acceptance criterion fails, lacks evidence, or has an unaccepted gap, the item
 must not transition to done. If Ephemeral Quick verification fails, leave the fast

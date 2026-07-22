@@ -5,12 +5,16 @@
 - Intent and read budgets
 - Lifecycle and persistence
 - Boundary and effect profiles
+- Backend delivery profiles
 - Iteration batches and checkpoints
+- Verification reuse, triage, and artifacts
 - Evidence and reconciliation
 
 ## Intent and read budgets
 
-Classify the user's authority before loading project memory:
+Classify the user's authority before reading project memory.
+General Q&A reads no repository. Distinguish static inspection from runtime
+verification and inference:
 
 - General knowledge: answer directly; read no repository or memory.
 - Repository explanation: read only the relevant source and describe static behavior.
@@ -31,6 +35,9 @@ Do not run tests or builds for a static explanation. Run a focused reproduction 
 check only when the question asks about current runtime behavior or diagnosis. Label
 the result explicitly as static inspection, executed behavior, or inference.
 
+For status, read `.solodeveling/state.md` and Git status. Do not load deferred work
+or archives unless the user asks for history or resumes that item.
+
 A request to remember an idea authorizes only a minimal state or roadmap update. It
 does not authorize implementation or justify creating WORK, EVIDENCE, acceptance
 matrices, or lifecycle transitions in advance.
@@ -41,6 +48,17 @@ Tracked work uses `captured -> shaped -> ready -> active -> verifying -> done`.
 `blocked` and `deferred` are explicit side states with a reason and return action.
 Ephemeral Quick creates no lifecycle artifact but still reports focused proof before
 a completion claim.
+
+Ephemeral Quick targets `memory writes: 0`, `persistent artifacts: 0`, and
+`focused verification: at least 1`. Ephemeral Quick takes precedence for a bounded
+safe follow-up. Reuse WORK/EVIDENCE only when the continuation must survive a session,
+changes a durable decision, or remains in the same active tracked batch.
+
+Lifecycle state is semantic continuously but persistent only at useful checkpoints.
+For uninterrupted Standard delivery, persist `active` once before implementation,
+then persist final evidence plus `done` and archive once after verification. Persist
+`captured`, `shaped`, `ready`, or `verifying` only when work crosses a session, is
+blocked, needs handoff, changes scope or risk, or the user requests a checkpoint.
 
 Apply this precedence:
 
@@ -61,10 +79,21 @@ the full contract, security, authority, recovery, and evidence needed for Critic
 release, production, destructive, or sensitive effects. Existing memory, Git, a PR,
 or lifecycle history never escalates work by itself.
 
+A Standard WORK item normally targets roughly 30–40 lines and keeps intent, scope and
+out of scope, acceptance with verification methods, material risks and decisions,
+confirmed commands, and next action. Brevity is a target, not a reason to remove
+required risk or recovery context. Do not duplicate an implementation plan and a
+verification mapping when acceptance already identifies how it will be checked.
+Keep EVIDENCE as a short current `AC -> result -> evidence -> limitation` table and
+log only material failures, decisions, or limitations.
+
 `state.md` is a current dashboard, not history. `active_work` references only work
 that is actively resumable; deferred and archived work is loaded only when requested
 or resumed. Coalesce uninterrupted memory writes and never create a transition-only
 commit to demonstrate protocol use.
+
+Cross-session or otherwise resumable work must persist the exact next action; a
+same-session phase change alone does not justify a write.
 
 ## Boundary and effect profiles
 
@@ -74,8 +103,9 @@ Classify backend work by the boundary changed and effect produced:
 financial/security effect -> migration`
 
 - Pure local helpers may remain Quick with a focused unit check. Server-side queries
-  and API handlers default to Standard even when authentication and data boundaries
-  remain unchanged.
+  and API handlers default to Standard. A bounded read-only mapping, sorting, copy,
+  or observationally equivalent refactor remains Quick only when every carve-out in
+  [backend-delivery.md](backend-delivery.md) is demonstrably true.
 - A local database mutation is Standard when authority, data sensitivity, rollback,
   and external effects remain ordinary and bounded.
 - Privileged mutations require authorization-boundary tests; become Critical when
@@ -86,14 +116,18 @@ financial/security effect -> migration`
 - An authenticated route is not automatically Critical. Sorting, mapping, or copy
   behind login remains proportional unless the change alters identity or access.
 - Additive reversible migrations with no material backfill are normally Standard.
-  Constraint changes, backfills, and data transformations are Critical when failure
-  can corrupt or expose data. Destructive schema/data changes are Critical and need
-  explicit authority plus recovery.
+Constraint changes, backfills, and data transformations are Critical when failure
+can corrupt or expose data. Destructive schema/data changes are Critical and need
+explicit authority plus recovery.
 
-For security-bearing work, keep one attack-surface matrix in WORK with `Boundary`,
-`Risk`, `Control`, `Verification`, and `Recovery`. Shaping, planning, securing, and
-verification update that matrix rather than restating actors and threats in separate
-artifacts.
+Changes to role/permission/ownership decisions cross an access boundary. Never silently lower Critical work.
+
+For backend work, read [backend-delivery.md](backend-delivery.md) when classifying a
+query/API Quick carve-out, mutation or webhook gates, environment failure, or additive
+migration. Keep one boundary record in WORK. For security-bearing work this is the
+attack-surface matrix, extended with `ID`, `Boundary`, `Authority`, `Invariant`,
+`Failure`, `Risk / Control`, `Verification`, and `Recovery`. Shaping, planning,
+securing, execution, and evidence update or reference the same record by ID.
 
 For provider integrations, separate:
 
@@ -124,7 +158,8 @@ Use proportional frontend checks:
 - Auth, payment, sensitive data, or changed trust boundaries: Critical applicable
   gates.
 
-Use proportional backend checks:
+Use proportional backend checks with the effect-specific minimums and broad-gate
+conditions in [backend-delivery.md](backend-delivery.md):
 
 - Pure helper: focused unit test; full unit suite at checkpoint when inexpensive.
 - Read-only endpoint: auth contract, validation, mapping, empty, and error paths;
@@ -132,7 +167,11 @@ Use proportional backend checks:
 - Local mutation: focused transaction and failure tests; neighboring regressions,
   lint, and build at checkpoint.
 - Identity, payment, webhook, or security boundary: boundary, replay, failure, and
-  recovery tests plus all applicable broad gates.
+  recovery tests plus only applicable broad gates.
+
+For backend work, `applicable` means the gate can detect a regression in a changed
+file, behavior, dependency, generated artifact, environment, or boundary. Stack
+presence alone never makes every test, lint, build, or E2E gate applicable.
 
 A broad result remains current across slices until a later change touches a file,
 behavior, environment, dependency, or boundary covered by that result. Do not rerun
@@ -144,6 +183,33 @@ frame or character.
 Record canonical non-interactive commands in project standards, including how to run
 tests once instead of watch mode. Confirm commands from the repository; for Vitest a
 project might use `npm run test -- --run` or define a dedicated `test:run` script.
+
+## Verification reuse, triage, and artifacts
+
+Reuse recent evidence until a later edit crosses the file, behavior, dependency,
+environment, or boundary it covered. For example, a current responsive E2E result
+may prove navigation, overflow, and viewport behavior; a manual browser audit should
+then sample only gaps such as hierarchy, visual balance, computed color, hover, and
+focus rather than repeat every route and viewport.
+
+Before routing an unexpected verification failure to debugging:
+
+1. Inspect exit status, logs, screenshots, traces, and relevant environment state.
+2. If evidence plausibly indicates a transient harness or environment condition,
+   make no source edit and rerun once under one controlled condition such as a warmed
+   server or reduced concurrency.
+3. Continue only when evidence isolates the transient cause, and record the first
+   failure plus limitation. Route a repeated or unexplained failure to debugging.
+
+For backend failures, use the source, harness, local environment, provider capability,
+and migration-target outcomes in [backend-delivery.md](backend-delivery.md). Never
+weaken a contract test, introduce real credentials, or mutate an uncertain database
+to manufacture a passing rerun.
+
+Browser screenshots, traces, and videos are transient by default. Evidence records
+the observed result and limitation, not an ephemeral path. Persist an artifact only
+when acceptance, audit, or review explicitly requires it; store it in a deliberate
+project-owned location with intentional ignore or tracking policy.
 
 ## Evidence and reconciliation
 
@@ -162,6 +228,8 @@ and evidence. A failed or unverified acceptance criterion blocks completion unle
 authorized owner explicitly accepts the gap. Critical completion also requires
 security and recovery evidence. Preserve concise durable summaries; omit raw logs,
 secrets, caches, and conversation history.
+
+When a required capability is missing, mark it unverified and reduce claim strength.
 
 Update roadmap only when a milestone, priority, ordering, or deferred-work decision
 changes. Completion alone is not a roadmap event. Validate memory after memory or

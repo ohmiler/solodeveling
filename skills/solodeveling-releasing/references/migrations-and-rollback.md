@@ -2,6 +2,14 @@
 
 Treat destructive, irreversible, or production migration work as Critical.
 
+## Keep additive migrations proportional
+
+An additive, reversible migration with no material backfill remains Standard unless
+it changes access, constraints, data meaning, or production effects. Follow the
+[additive migration template](../../solodeveling/references/backend-delivery.md)
+instead of applying the destructive-migration contract below. Production execution
+still requires separate authority.
+
 ## Prove the transition
 
 - Identify source and target schema or data versions, invariants, volume, concurrency,

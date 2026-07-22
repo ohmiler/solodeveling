@@ -29,9 +29,11 @@ systems, data, tools, and actions.
 
 ## Integrate with the lifecycle
 
-Keep one attack-surface matrix in WORK with `Boundary`, `Risk`, `Control`,
-`Verification`, and `Recovery`. Update it across stages instead of duplicating actors,
-assets, threats, and controls in shaping, planning, security, and evidence artifacts.
+Keep one attack-surface matrix as the shared boundary record in WORK with `ID`,
+`Boundary`, `Authority`, `Invariant`, `Failure`, `Risk / Control`, `Verification`,
+and `Recovery`. Follow the [backend delivery contract](../solodeveling/references/backend-delivery.md)
+for effect-specific fields and gates. Update or reference the same record by ID across
+stages instead of duplicating actors, transactions, threats, controls, and recovery.
 
 - Shaping: identify assets, sensitivity, trust boundaries, plausible abuse and misuse
   cases, security acceptance criteria, and privacy or operational impact.
@@ -41,7 +43,8 @@ assets, threats, and controls in shaping, planning, security, and evidence artif
   cryptography, identity, or secret handling without evidence and justification.
 - Verification: select only applicable authorization and boundary tests, secret and
   dependency scanning, static or dynamic analysis, configuration review, provenance,
-  or manual threat-to-control review. Label anything not executed `unverified`.
+  or manual threat-to-control review. A gate is applicable only when its coverage
+  intersects the changed boundary. Label anything not executed `unverified`.
 
 Do not run intrusive scans, access credentials, rotate secrets, change permissions,
 or touch production without explicit authority. If a secret may have been exposed,

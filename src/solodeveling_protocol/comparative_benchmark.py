@@ -22,6 +22,56 @@ class BenchmarkError(RuntimeError):
     pass
 
 
+def _methodology_kind(methodology: dict[str, Any]) -> str:
+    kind = str(methodology.get("kind", "skill"))
+    if kind not in {"skill", "none"}:
+        raise BenchmarkError(
+            f"methodology {methodology.get('id', 'missing')} has unsupported kind: {kind}"
+        )
+    return kind
+
+
+def _validate_live_methodology(methodology: dict[str, Any]) -> None:
+    kind = _methodology_kind(methodology)
+    if kind == "skill":
+        missing = [
+            field
+            for field in ("commit", "skill", "invocation")
+            if not methodology.get(field)
+        ]
+        if missing:
+            raise BenchmarkError(
+                f"skill methodology {methodology.get('id', 'missing')} is missing: {missing}"
+            )
+    else:
+        forbidden = [
+            field
+            for field in ("commit", "skill", "invocation")
+            if field in methodology
+        ]
+        if forbidden:
+            raise BenchmarkError(
+                f"no-skill methodology {methodology.get('id', 'missing')} must not define: {forbidden}"
+            )
+
+
+def _source_methodologies(spec: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        methodology
+        for methodology in spec["methodologies"]
+        if _methodology_kind(methodology) == "skill"
+    ]
+
+
+def _windows_sandbox_arguments(spec: dict[str, Any]) -> list[str]:
+    mode = spec.get("runtime", {}).get("windows_sandbox")
+    if mode is None:
+        return []
+    if mode not in {"elevated", "unelevated"}:
+        raise BenchmarkError(f"unsupported Windows sandbox mode: {mode}")
+    return ["--config", f"windows.sandbox={json.dumps(mode)}"]
+
+
 @dataclass(frozen=True)
 class PlannedRun:
     run_id: str
@@ -39,6 +89,15 @@ def load_spec(path: Path) -> dict[str, Any]:
         raise BenchmarkError("pilot must remain classified as pilot-signal-only")
     if document.get("claim_policy", {}).get("public_faster_claim_allowed") is not False:
         raise BenchmarkError("pilot must not authorize a public faster claim")
+    _windows_sandbox_arguments(document)
+    methodologies = document.get("methodologies")
+    if not isinstance(methodologies, list):
+        raise BenchmarkError("pilot methodologies must be a list")
+    for methodology in methodologies:
+        if not isinstance(methodology, dict) or not methodology.get("id"):
+            raise BenchmarkError("each methodology must be a mapping with an ID")
+        if document.get("status") == "preregistered-not-run":
+            _validate_live_methodology(methodology)
     return document
 
 
@@ -84,7 +143,7 @@ def plan_document(spec: dict[str, Any]) -> dict[str, Any]:
     expected_runs = int(spec["claim_policy"]["required_live_runs"])
     source_arguments = "".join(
         f' --source "{method["id"]}=<PINNED_{method["id"].upper()}_CHECKOUT>"'
-        for method in spec["methodologies"]
+        for method in _source_methodologies(spec)
     )
     return {
         "schema": 1,
@@ -129,8 +188,19 @@ def verify_fixtures(spec_path: Path) -> list[dict[str, Any]]:
             project = Path(temporary) / "project"
             shutil.copytree(fixture, project)
             _initialize_repository(project)
+            last_message = Path(temporary) / "last-message.txt"
+            last_message.write_text("", encoding="utf-8")
             visible = _run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], project)
-            hidden = _run([sys.executable, str(checker.resolve()), str(project), "HEAD"], project)
+            hidden = _run(
+                [
+                    sys.executable,
+                    str(checker.resolve()),
+                    str(project),
+                    "HEAD",
+                    str(last_message),
+                ],
+                project,
+            )
             report = {"task_id": task["id"], "visible_baseline_passed": visible.returncode == 0, "hidden_baseline_rejected": hidden.returncode != 0}
             if not all(report.values()):
                 raise BenchmarkError(f"fixture verification failed: {report}")
@@ -269,7 +339,12 @@ def _result_document(
         "provenance": {
             "runtime": spec["runtime"],
             "methodology_pins": {
-                method["id"]: method["commit"] for method in spec["methodologies"]
+                method["id"]: (
+                    method["commit"]
+                    if _methodology_kind(method) == "skill"
+                    else "none"
+                )
+                for method in spec["methodologies"]
             },
             "expected_runs": spec["claim_policy"]["required_live_runs"],
         },
@@ -370,9 +445,25 @@ def _load_checkpoint(
     return results
 
 
-def _safe_environment() -> dict[str, str]:
+def _safe_environment(
+    executable: str | None = None,
+    *,
+    platform: str = sys.platform,
+    helper_finder: Callable[[str], str | None] = shutil.which,
+) -> dict[str, str]:
     allowed = {"APPDATA", "CODEX_HOME", "COMSPEC", "HOMEDRIVE", "HOMEPATH", "LOCALAPPDATA", "PATH", "PATHEXT", "PROGRAMFILES", "PROGRAMFILES(X86)", "SYSTEMROOT", "TEMP", "TMP", "USERPROFILE", "USERNAME", "WINDIR"}
     environment = {key: value for key, value in os.environ.items() if key.upper() in allowed}
+    if executable is not None and platform == "win32":
+        sandbox = verify_sandbox_runtime(
+            executable,
+            platform=platform,
+            helper_finder=helper_finder,
+        )
+        helper_directory = str(Path(sandbox["helper"]).parent)
+        existing_path = environment.get("PATH", "")
+        environment["PATH"] = os.pathsep.join(
+            part for part in (helper_directory, existing_path) if part
+        )
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     return environment
 
@@ -427,9 +518,14 @@ def verify_sandbox_runtime(
     if platform != "win32":
         return {"platform": platform, "status": "not-windows"}
     helper_name = "codex-windows-sandbox-setup.exe"
-    sibling = Path(executable).resolve().with_name(helper_name)
+    executable_path = Path(executable).resolve()
+    candidates = (
+        executable_path.with_name(helper_name),
+        executable_path.parent.parent / "codex-resources" / helper_name,
+    )
+    packaged = next((candidate for candidate in candidates if candidate.is_file()), None)
     discovered = helper_finder(helper_name)
-    if not sibling.is_file() and discovered is None:
+    if packaged is None and discovered is None:
         raise BenchmarkError(
             "Codex Windows sandbox helper is unavailable; "
             "repair the Codex installation before any live call"
@@ -437,7 +533,7 @@ def verify_sandbox_runtime(
     return {
         "platform": platform,
         "status": "available",
-        "helper": str(sibling if sibling.is_file() else Path(discovered).resolve()),
+        "helper": str(packaged if packaged is not None else Path(discovered).resolve()),
     }
 
 
@@ -451,6 +547,7 @@ def verify_permission_runtime(executable: str, spec: dict[str, Any]) -> dict[str
         command = [
             executable,
             "sandbox",
+            *_windows_sandbox_arguments(spec),
             "--permission-profile",
             profile,
             "--cd",
@@ -469,7 +566,7 @@ def verify_permission_runtime(executable: str, spec: dict[str, Any]) -> dict[str
             timeout=30,
             check=False,
             shell=False,
-            env=_safe_environment(),
+            env=_safe_environment(executable),
         )
         if process.returncode or not marker.is_file():
             raise BenchmarkError(
@@ -502,7 +599,7 @@ def _source_commit(source: Path) -> str:
 
 def verify_sources(spec: dict[str, Any], sources: dict[str, Path]) -> None:
     expected_identifiers = {
-        str(methodology["id"]) for methodology in spec["methodologies"]
+        str(methodology["id"]) for methodology in _source_methodologies(spec)
     }
     if set(sources) != expected_identifiers:
         missing = sorted(expected_identifiers - set(sources))
@@ -511,7 +608,7 @@ def verify_sources(spec: dict[str, Any], sources: dict[str, Path]) -> None:
             f"source assignments must exactly match the spec; "
             f"missing={missing}, unexpected={unexpected}"
         )
-    for methodology in spec["methodologies"]:
+    for methodology in _source_methodologies(spec):
         identifier = methodology["id"]
         source = sources.get(identifier)
         if source is None:
@@ -539,6 +636,41 @@ def _verify_installed_methodology(project: Path, skill: str) -> None:
         raise BenchmarkError(f"installed Codex root skill is unavailable: {installed}")
 
 
+def _prepare_methodology(
+    methodology: dict[str, Any],
+    sources: dict[str, Path],
+    project: Path,
+) -> None:
+    if _methodology_kind(methodology) == "none":
+        if (project / ".agents" / "skills").exists():
+            raise BenchmarkError("no-skill methodology fixture already contains project skills")
+        return
+    identifier = str(methodology["id"])
+    source = sources.get(identifier)
+    if source is None:
+        raise BenchmarkError(f"missing --source assignment for {identifier}")
+    _install_methodology(source, project)
+    _verify_installed_methodology(project, str(methodology["skill"]))
+
+
+def _build_task_prompt(
+    methodology: dict[str, Any],
+    task: dict[str, Any],
+) -> str:
+    if task.get("mutation_required", True):
+        execution = "Make the required project changes, run the tests, and report completion."
+    else:
+        execution = "Inspect only: do not modify files. Report the requested findings in the final response."
+    shared = (
+        "The requirements below are final and approved. Work autonomously in this "
+        "already-isolated git worktree. Do not use the network or ask for approval. "
+        f"{execution}\n\n{task['prompt']}"
+    )
+    if _methodology_kind(methodology) == "none":
+        return shared
+    return f"{methodology['invocation']}\n\n{shared}"
+
+
 def _changed_paths(project: Path, baseline: str) -> list[str]:
     status = _run(["git", "status", "--porcelain", "--untracked-files=all"], project)
     committed = _run(["git", "diff", "--name-only", baseline, "HEAD"], project)
@@ -556,13 +688,22 @@ def _is_zero_mutation_failure(
     process_returncode: int | None,
     correct: bool,
     changed: list[str],
+    *,
+    mutation_required: bool = True,
 ) -> bool:
-    return process_returncode == 0 and not correct and not changed
+    return mutation_required and process_returncode == 0 and not correct and not changed
 
 
 def _runtime_version(executable: str) -> str:
     process = subprocess.run([executable, "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=15, check=False, shell=False)
     return (process.stdout or process.stderr).strip().splitlines()[0]
+
+
+def _runtime_executable(name: str) -> str:
+    executable = shutil.which(name)
+    if executable is None:
+        raise BenchmarkError("codex executable is unavailable")
+    return str(Path(executable).resolve())
 
 
 def _build_live_command(
@@ -586,6 +727,7 @@ def _build_live_command(
         runtime["model"],
         "--config",
         f"model_reasoning_effort={json.dumps(runtime['reasoning_effort'])}",
+        *_windows_sandbox_arguments(spec),
         "--config",
         f"default_permissions={json.dumps(profile)}",
         "--config",
@@ -600,9 +742,7 @@ def _build_live_command(
 
 def probe(spec: dict[str, Any], sources: dict[str, Path]) -> dict[str, Any]:
     require_live_ready(spec)
-    executable = shutil.which(spec["runtime"]["executable"])
-    if executable is None:
-        raise BenchmarkError("codex executable is unavailable")
+    executable = _runtime_executable(spec["runtime"]["executable"])
     version = _runtime_version(executable)
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
@@ -646,9 +786,7 @@ def run_live(
     expected_confirmation = spec["claim_policy"]["confirmation"]
     if confirmation != expected_confirmation:
         raise BenchmarkError(f"live execution requires exact confirmation: {expected_confirmation}")
-    executable = shutil.which(spec["runtime"]["executable"])
-    if executable is None:
-        raise BenchmarkError("codex executable is unavailable")
+    executable = _runtime_executable(spec["runtime"]["executable"])
     version = _runtime_version(executable)
     if version != spec["runtime"]["cli_version"]:
         raise BenchmarkError(f"runtime is {version}; expected {spec['runtime']['cli_version']}")
@@ -679,19 +817,18 @@ def run_live(
             repository = temp_root / f"{planned.run_id}-repo"
             worktree = temp_root / f"{planned.run_id}-worktree"
             shutil.copytree(spec_path.parent / task["fixture"], repository)
-            _install_methodology(sources[planned.methodology], repository)
-            _verify_installed_methodology(repository, method["skill"])
+            _prepare_methodology(method, sources, repository)
             _initialize_repository(repository)
             baseline = _run(["git", "rev-parse", "HEAD"], repository).stdout.strip()
             added = _run(["git", "worktree", "add", "--quiet", "--detach", str(worktree), "HEAD"], repository)
             if added.returncode:
                 raise BenchmarkError(f"could not create fresh worktree for {planned.run_id}: {added.stderr.strip()}")
-            prompt = f"{method['invocation']}\n\nThe requirements below are final and approved. Work autonomously in this already-isolated git worktree. Do not use the network or ask for approval. Run the tests and report completion.\n\n{task['prompt']}"
+            prompt = _build_task_prompt(method, task)
             last_message_path = temp_root / f"{planned.run_id}-last-message.txt"
             command = _build_live_command(executable, spec, worktree, last_message_path)
             started = time.perf_counter()
             try:
-                process = subprocess.run(command, input=prompt, cwd=worktree, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=int(spec["runtime"]["timeout_seconds"]), check=False, shell=False, env=_safe_environment())
+                process = subprocess.run(command, input=prompt, cwd=worktree, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=int(spec["runtime"]["timeout_seconds"]), check=False, shell=False, env=_safe_environment(executable))
                 state = "completed" if process.returncode == 0 else "runtime-failure"
                 failure_code = None if process.returncode == 0 else classify_runtime_failure(process.stdout, process.stderr)
                 process_returncode = process.returncode
@@ -708,13 +845,27 @@ def run_live(
                 lines = stdout.splitlines()
             elapsed = round(time.perf_counter() - started, 4)
             visible = _run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], worktree)
-            hidden = _run([sys.executable, str((spec_path.parent / task["hidden_check"]).resolve()), str(worktree), baseline], worktree)
+            hidden = _run(
+                [
+                    sys.executable,
+                    str((spec_path.parent / task["hidden_check"]).resolve()),
+                    str(worktree),
+                    baseline,
+                    str(last_message_path),
+                ],
+                worktree,
+            )
             correct = state == "completed" and visible.returncode == 0 and hidden.returncode == 0
             if not correct and state == "completed":
                 state = "correctness-failure"
             activity = parse_codex_jsonl(lines)
             changed = _changed_paths(worktree, baseline)
-            if _is_zero_mutation_failure(process_returncode, correct, changed):
+            if _is_zero_mutation_failure(
+                process_returncode,
+                correct,
+                changed,
+                mutation_required=task.get("mutation_required", True),
+            ):
                 state = "execution-failure"
                 failure_code = "zero-mutation"
             if not correct:

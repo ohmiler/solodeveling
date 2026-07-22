@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import subprocess
+import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -8,6 +12,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from solodeveling_protocol.comparative_benchmark import (
+    _build_task_prompt,
     _load_checkpoint,
     _result_document,
     _changed_paths,
@@ -15,6 +20,9 @@ from solodeveling_protocol.comparative_benchmark import (
     _initialize_repository,
     _install_methodology,
     _is_zero_mutation_failure,
+    _prepare_methodology,
+    _runtime_executable,
+    _safe_environment,
     _write_failure_diagnostic,
     _verify_installed_methodology,
     BenchmarkError,
@@ -34,6 +42,7 @@ from solodeveling_protocol.comparative_benchmark import (
 
 
 SPEC = Path("benchmarks/comparative/pilot.yaml")
+NO_SKILL_SPEC = Path("benchmarks/comparative/solodeveling-0.2.0-vs-no-skill.yaml")
 
 
 def test_plan_is_deterministic_and_exactly_eighteen_runs() -> None:
@@ -67,6 +76,81 @@ def test_fixture_baselines_pass_visible_and_fail_hidden_checks() -> None:
     assert len(reports) == 3
     assert all(report["visible_baseline_passed"] for report in reports)
     assert all(report["hidden_baseline_rejected"] for report in reports)
+
+
+def test_no_skill_preregistration_is_balanced_and_fixture_gated() -> None:
+    spec = load_spec(NO_SKILL_SPEC)
+    planned = build_plan(spec)
+
+    assert len(spec["tasks"]) == 5
+    assert len(planned) == 30
+    assert [method.get("kind", "skill") for method in spec["methodologies"]] == [
+        "skill",
+        "none",
+    ]
+    assert spec["methodologies"][0]["version"] == "0.2.0"
+    assert spec["methodologies"][0]["commit"] == "ca7c3b356c2e9444963a52e00e2e97198ad94e7d"
+    assert spec["runtime"]["cli_version"] == "codex-cli 0.144.6"
+    assert {task["class"] for task in spec["tasks"]} == {
+        "direct-read-only",
+        "quick",
+        "standard",
+        "follow-up",
+        "critical-readiness",
+    }
+
+    reports = verify_fixtures(NO_SKILL_SPEC)
+    assert len(reports) == 5
+    assert all(report["visible_baseline_passed"] for report in reports)
+    assert all(report["hidden_baseline_rejected"] for report in reports)
+
+
+@pytest.mark.parametrize(
+    ("fixture_name", "checker_name", "response"),
+    [
+        (
+            "read-only-review",
+            "check_read_only_review.py",
+            "Version 2.4.0 is alpha and requires Python 3.11 or newer.",
+        ),
+        (
+            "critical-readiness",
+            "check_critical_readiness.py",
+            "No-go: this destructive drop risks data loss. Require explicit approval, "
+            "a backup, staging validation, and a tested rollback before proceeding.",
+        ),
+    ],
+)
+def test_response_aware_hidden_checks_accept_complete_read_only_answers(
+    tmp_path: Path,
+    fixture_name: str,
+    checker_name: str,
+    response: str,
+) -> None:
+    root = tmp_path / "project"
+    shutil.copytree(
+        Path("benchmarks/comparative/fixtures") / fixture_name,
+        root,
+    )
+    _initialize_repository(root)
+    last_message = tmp_path / "last-message.txt"
+    last_message.write_text(response, encoding="utf-8")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str((Path("benchmarks/comparative/checks") / checker_name).resolve()),
+            str(root),
+            "HEAD",
+            str(last_message),
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
 
 
 def test_jsonl_parser_extracts_usage_activity_and_questions() -> None:
@@ -114,6 +198,19 @@ def test_runtime_failure_is_reduced_to_fixed_diagnostic_code() -> None:
     assert classify_runtime_failure("opaque provider failure", "") == "process-exit-nonzero"
 
 
+def test_runtime_executable_is_canonicalized(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    executable = tmp_path / "release" / "bin" / "codex.exe"
+    executable.parent.mkdir(parents=True)
+    executable.write_bytes(b"codex")
+    alias = executable.parent / ".." / "bin" / "codex.exe"
+    monkeypatch.setattr(shutil, "which", lambda name: str(alias))
+
+    assert Path(_runtime_executable("codex")) == executable.resolve()
+
+
 def test_windows_sandbox_helper_is_required_before_live_calls(tmp_path: Path) -> None:
     executable = tmp_path / "codex.exe"
     executable.write_bytes(b"codex")
@@ -132,6 +229,49 @@ def test_windows_sandbox_helper_is_required_before_live_calls(tmp_path: Path) ->
     )
     assert report["status"] == "available"
     assert Path(report["helper"]) == helper.resolve()
+
+
+def test_windows_sandbox_helper_is_discovered_in_standalone_resources(
+    tmp_path: Path,
+) -> None:
+    release = tmp_path / "release"
+    executable = release / "bin" / "codex.exe"
+    executable.parent.mkdir(parents=True)
+    executable.write_bytes(b"codex")
+    helper = release / "codex-resources" / "codex-windows-sandbox-setup.exe"
+    helper.parent.mkdir()
+    helper.write_bytes(b"helper")
+
+    report = verify_sandbox_runtime(
+        str(executable),
+        platform="win32",
+        helper_finder=lambda name: None,
+    )
+
+    assert report["status"] == "available"
+    assert Path(report["helper"]) == helper.resolve()
+
+
+def test_safe_environment_exposes_packaged_sandbox_helper_to_codex(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    release = tmp_path / "release"
+    executable = release / "bin" / "codex.exe"
+    executable.parent.mkdir(parents=True)
+    executable.write_bytes(b"codex")
+    helper = release / "codex-resources" / "codex-windows-sandbox-setup.exe"
+    helper.parent.mkdir()
+    helper.write_bytes(b"helper")
+    monkeypatch.setenv("PATH", str(tmp_path / "existing-path"))
+
+    environment = _safe_environment(
+        str(executable),
+        platform="win32",
+        helper_finder=lambda name: None,
+    )
+
+    assert environment["PATH"].split(os.pathsep)[0] == str(helper.parent.resolve())
 
 
 def test_python_cache_does_not_count_as_agent_change(tmp_path: Path) -> None:
@@ -163,11 +303,56 @@ def test_methodology_is_installed_at_codex_adapter_path(tmp_path: Path) -> None:
     assert not (project / ".codex" / "skills").exists()
 
 
+def test_no_skill_methodology_installs_nothing(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    project.mkdir()
+
+    _prepare_methodology(
+        {"id": "no-skill", "kind": "none", "version": "none"},
+        {},
+        project,
+    )
+
+    assert not (project / ".agents").exists()
+
+
+def test_task_prompt_omits_invocation_for_no_skill() -> None:
+    task = {"prompt": "Inspect the repository and report its status."}
+    candidate = _build_task_prompt(
+        {"id": "solodeveling", "kind": "skill", "invocation": "$solodeveling"},
+        task,
+    )
+    baseline = _build_task_prompt(
+        {"id": "no-skill", "kind": "none"},
+        task,
+    )
+
+    assert candidate.startswith("$solodeveling\n\n")
+    assert "$solodeveling" not in baseline
+    assert candidate.split("\n\n", 1)[1] == baseline
+    assert baseline.endswith(task["prompt"])
+
+
+def test_no_skill_plan_requires_only_installed_methodology_sources() -> None:
+    spec = deepcopy(load_spec(SPEC))
+    spec["methodologies"][1] = {
+        "id": "no-skill",
+        "kind": "none",
+        "version": "none",
+    }
+
+    document = plan_document(spec)
+
+    assert '--source "solodeveling=<PINNED_SOLODEVELING_CHECKOUT>"' in document["live_command_template"]
+    assert "no-skill-source" not in document["live_command_template"]
+
+
 def test_zero_mutation_failure_requires_successful_but_incorrect_process() -> None:
     assert _is_zero_mutation_failure(0, False, [])
     assert not _is_zero_mutation_failure(1, False, [])
     assert not _is_zero_mutation_failure(0, True, [])
     assert not _is_zero_mutation_failure(0, False, ["README.md"])
+    assert not _is_zero_mutation_failure(0, False, [], mutation_required=False)
 
 
 def test_failure_diagnostic_is_local_raw_sidecar(tmp_path: Path) -> None:
@@ -202,6 +387,18 @@ def test_live_command_uses_workspace_permission_profile_not_legacy_sandbox(tmp_p
     assert "--sandbox" not in command
     assert 'default_permissions=":workspace"' in command
     assert "sandbox_workspace_write.network_access=false" not in command
+
+
+def test_no_skill_live_command_pins_the_verified_windows_sandbox(tmp_path: Path) -> None:
+    spec = load_spec(NO_SKILL_SPEC)
+    command = _build_live_command(
+        "codex",
+        spec,
+        tmp_path / "worktree",
+        tmp_path / "last-message.txt",
+    )
+
+    assert 'windows.sandbox="elevated"' in command
 
 
 def test_scoring_gates_speed_on_correct_pairs_and_forbids_claim() -> None:

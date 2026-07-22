@@ -29,9 +29,9 @@ def _record(path: Path, role: str) -> dict[str, object]:
 
 def _release_set(root: Path) -> tuple[Path, dict[str, object]]:
     root.mkdir()
-    wheel = root / "solodeveling-0.2.0-py3-none-any.whl"
-    sdist = root / "solodeveling-0.2.0.tar.gz"
-    npm = root / "solodeveling-0.2.0.tgz"
+    wheel = root / "solodeveling-0.3.0-py3-none-any.whl"
+    sdist = root / "solodeveling-0.3.0.tar.gz"
+    npm = root / "solodeveling-0.3.0.tgz"
     wheel.write_bytes(b"wheel")
     sdist.write_bytes(b"sdist")
     npm.write_bytes(b"npm")
@@ -42,7 +42,7 @@ def _release_set(root: Path) -> tuple[Path, dict[str, object]]:
     ]
     manifest = {
         "solodeveling_release_set_schema": 1,
-        "version": "0.2.0",
+        "version": "0.3.0",
         "source_revision": REVISION,
         "target": "coordinated release input (not published)",
         "artifacts": sorted(records, key=lambda item: str(item["filename"])),
@@ -68,15 +68,15 @@ def test_prepare_and_verify_publication_inputs(
 
     assert verified == plan
     assert plan["solodeveling_publication_plan_schema"] == 1
-    assert plan["version"] == "0.2.0"
+    assert plan["version"] == "0.3.0"
     assert plan["source_revision"] == REVISION
     assert "generated_at" not in plan
     assert sorted(path.name for path in (output / "pypi").iterdir()) == [
-        "solodeveling-0.2.0-py3-none-any.whl",
-        "solodeveling-0.2.0.tar.gz",
+        "solodeveling-0.3.0-py3-none-any.whl",
+        "solodeveling-0.3.0.tar.gz",
     ]
     assert [path.name for path in (output / "npm").iterdir()] == [
-        "solodeveling-0.2.0.tgz"
+        "solodeveling-0.3.0.tgz"
     ]
 
 

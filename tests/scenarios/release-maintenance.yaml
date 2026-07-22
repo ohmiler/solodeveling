@@ -24,6 +24,14 @@ scenarios:
       - "rollback"
       - "roll-forward"
 
+  - id: additive-migration-remains-proportional
+    skill: solodeveling-releasing
+    must_contain:
+      - additive, reversible migration
+      - remains Standard
+      - additive migration template
+      - Production execution
+
   - id: deploy-success-is-not-release-proof
     skill: solodeveling-releasing
     must_contain:

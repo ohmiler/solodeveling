@@ -1,22 +1,26 @@
 ---
 solodeveling_schema: 1
-current_goal: Collect measured field evidence for Solodeveling 0.1.2 and preserve
-  the no-claim boundary until a controlled study succeeds.
+current_goal: Preserve the verified local 0.3.0 candidate while keeping live-routing,
+  cross-platform, and public-release gaps explicit.
 active_work: []
 blockers: []
 risks:
-- Published npm and PyPI versions 0.1.0, 0.1.1, and 0.1.2 plus immutable GitHub
-  Release assets cannot be replaced with different bytes.
+- Synthetic fixtures and self-authored evaluation are not independent comparative
+  proof; speed or quality claims still require a controlled repeated benchmark.
+- The authorized three-task live pilot consumes signed-in Codex capacity; the
+  separate 30-call comparative benchmark remains unauthorized.
 - Native executables remain unsigned; launcher integrity checks reduce substitution
   risk but do not provide platform code signing.
-- Adjacent frameworks change independently; comparison wording requires periodic source
-  review.
-- Comparative speed or quality claims remain unsupported until a controlled repeated
-  benchmark exists.
-next_action: Deliver the permission-profile runner and successor preregistration,
-  then request exact authorization for feedback pilot 3; append the next 19 real
-  tasks to the ignored local field scorecard as work occurs.
+- Combined Standard routing must not bypass ambiguity, Critical, security, release,
+  diagnosis-only, or verification-only boundaries.
+- Backend Quick routing must fail closed when API compatibility or sensitivity is
+  unclear.
+next_action: Do not tag or publish. Resolve live routing and cross-platform release-set
+  gates, or obtain new explicit release-level acceptance and external-action authority.
 ---
 # State
 
-WORK-037 delivered an offline-verified five-task 0.1.1-versus-0.1.2 paired benchmark, correctness-gated overhead metrics, and a packaged local field scorecard. The Windows sandbox is repaired. Feedback pilots 1 and 2 each stopped after one zero-mutation call and are invalid; pilot 2 diagnostics identified a legacy-sandbox versus permission-profile mismatch. Successor pilot 3 selects built-in `:workspace`, preserves local diagnostics, and passes an explicit no-model write probe. The first sanitized field observation remains recorded locally, no comparative conclusion exists, and published releases remain unchanged.
+WORK-043 archived ready-with-accepted-gap for local candidate inspection. Version
+0.3.0 source d0e9bcb produced verified Python and Windows x64 candidates; exact-source
+gates passed. Live routing, five native targets, npm release set, signing, push, tag,
+publication, the 30-call comparison, and production remain unverified or unauthorized.
