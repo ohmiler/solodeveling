@@ -16,8 +16,8 @@ command: python -m pytest -q tests/test_evaluation.py tests/test_evaluation_cli.
 result: unverified
 scope: Release 0.3.0 routing-pilot preregistration and offline preflight only.
 limitations:
-- The live call was denied before execution because informed approval for sending
-  private-workspace skill and scenario text to the external Codex service is missing.
+- The owner supplied informed approval, but tenant policy still forbids sending
+  private-workspace skill and scenario text externally from this environment.
 - No live-pass, runtime semantic result, fixture integrity result, version bump, or
   candidate evidence exists yet.
 ---
@@ -26,7 +26,13 @@ limitations:
 | AC | Result | Evidence | Limitation |
 | --- | --- | --- | --- |
 | AC1 | Passed | Three versioned scenarios; deterministic route expectations; 35 evaluation tests | Scenarios are self-authored |
-| AC2 | Unverified | Codex CLI 0.145.0 available; exactly three read-only calls in dry-run | Policy stopped the command before any call |
+| AC2 | Unverified | Codex CLI 0.145.0 available; exactly three read-only calls in dry-run; owner gave informed approval | Tenant policy still stopped the command before any call |
 | AC3 | Not started | Version remains 0.2.0 by gate design | Requires AC2 |
 | AC4 | Not started | Prior source revision passed 280 tests | Exact 0.3.0 candidate does not exist |
 | AC5 | In progress | WORK boundary excludes all external release actions | Candidate identity is not available |
+
+## Observation log
+
+- A second live invocation after exact informed approval was denied by tenant policy.
+  The policy explicitly forbids this external transmission from the current
+  environment even with user approval. No runtime output or result file was created.

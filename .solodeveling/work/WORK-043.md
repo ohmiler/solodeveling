@@ -39,9 +39,9 @@ decisions:
 verification:
 - Validate the pilot corpus and dry-run plan, run exactly three live Codex scenarios,
   inspect sanitized results, then run focused/full source and candidate gates.
-next_action: Obtain explicit owner approval to send canonical Solodeveling skill and
-  scenario text from this private workspace to the external Codex service, then run
-  exactly the three preregistered scenarios.
+next_action: Do not retry live execution in this environment. Either verify a
+  sanitized three-scenario result produced in an owner-approved environment or obtain
+  explicit owner acceptance to waive AC2 before any version bump.
 evidence:
 - EVIDENCE-043
 ---
@@ -57,3 +57,6 @@ evidence:
 - The offline preflight passed. The first live invocation was denied before execution
   because external transmission of private-workspace skill and scenario text requires
   explicit informed owner approval. No model call or sanitized result was produced.
+- The owner then supplied the exact informed approval. Tenant policy still denied the
+  invocation because this environment forbids that external transmission even with
+  approval. No model call occurred; retry or indirect execution is prohibited.
