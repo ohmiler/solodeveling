@@ -10,11 +10,11 @@ packaging; it does not publish, tag, create a GitHub Release, or mutate a regist
    compilation, dependency checks, Node launcher tests, and diff review.
 2. Build the current-platform executable into a new path:
 
-       python scripts/build_native.py C:/tmp/solodeveling-native-0.2.0
+       python scripts/build_native.py C:/tmp/solodeveling-native-0.3.0
 
 3. Exercise embedded templates, schemas, skills, evaluations, and unified commands:
 
-       python scripts/smoke_native.py C:/tmp/solodeveling-native-0.2.0 C:/tmp/native-smoke-0.2.0
+       python scripts/smoke_native.py C:/tmp/solodeveling-native-0.3.0 C:/tmp/native-smoke-0.3.0
 
 4. Build the Python candidate from a clean exact commit and verify its checksums,
    contents, SBOM, release notes, and manifest.
@@ -32,37 +32,47 @@ creation, GitHub Release creation, environment changes, PyPI publication, npm
 staging, and npm publication are each a separate external action and authorization
 checkpoint.
 
-## 0.2.0 preparation status — 2026-07-19
+## 0.3.0 preparation status — 2026-07-22
 
-- The feedback implementation is isolated on `release/0.2.0`; its behavior commit is
-  `679869e`.
-- The router, protocol, sub-skills, runtime classifier, public docs, and behavioral
-  scenarios agree on Direct Read-Only, frontend batching, boundary/effect routing,
-  checkpoint verification, and brainstorming.
-- Skill validation, the 266-test source suite, diff integrity, and seven blind task
-  scenarios passed before the version-bump commit.
-- Python, npm metadata, the empty source artifact manifest, current-version tests,
-  and these release notes are being advanced together to 0.2.0.
-- No tag, GitHub Release, registry action, or production mutation is authorized by
-  this preparation.
+- The next feature release is isolated locally on `release/0.3.0`. Commit `26f0ac5`
+  contains the pinned no-skill benchmark harness; commit `0429dba` contains the
+  frontend and backend workflow-feedback implementation.
+- Clear non-Critical Standard work now has one combined delivery workflow. Backend
+  work has fail-closed Quick routing, one shared boundary record, effect-specific
+  gates, capability-aware triage, and an additive migration template.
+- The 30-call Solodeveling 0.2.0-versus-no-skill pilot is preregistered and passed
+  offline fixture checks. It has not run, is not a 0.3.0 release gate, and provides
+  no comparative result or public performance claim.
+- Focused benchmark and workflow checks passed before their local commits. The full
+  source and candidate gates must still run against the exact release-preparation
+  revision.
+- Python, npm, artifact, native-output, and current-version tests intentionally remain
+  at 0.2.0 until the representative routing pilot is reviewed.
+- No push, pull request, tag, GitHub Release, registry action, live-agent call, or
+  production mutation is authorized by this preparation.
 
 Tier 1 remains unverified because the complete behavioral matrix has not passed on
 Codex, Claude Code, and Cursor. Native executables remain unsigned.
 
-## Remaining 0.2.0 gates
+## Remaining 0.3.0 gates
 
+- With separate capacity authorization, run one clear Standard frontend task, one
+  Standard backend task, and one Critical backend readiness task. Any Critical
+  under-classification or combined-workflow bypass blocks the version bump.
+- Review the routing-pilot evidence. If it passes, advance Python and npm metadata,
+  artifact manifests, current-version tests, and release notes together to 0.3.0.
 - Complete the local candidate gate from a clean exact commit and independently
   verify the resulting Python candidate.
 - Complete the cross-platform CI candidate so all six native executables can be bound
   into the npm tarball and complete release set.
-- Dogfood five to ten representative tasks while recording tool calls, memory writes,
+- Continue dogfooding representative tasks while recording tool calls, memory writes,
   broad-gate runs, reopen/archive counts, elapsed verification time, and escaped
   regressions. Any Critical under-classification blocks release.
 - Reconcile source behavior, release notes, package inventories, checksums, SBOM,
   scenario results, and known limitations.
 - Confirm the protected PyPI and npm environments and trusted-publisher identities
   still match `publish.yml` before any registry action.
-- With separate explicit authority, create tag `v0.2.0` at the verified source
+- With separate explicit authority, create tag `v0.3.0` at the verified source
   revision and create the immutable GitHub Release from that exact candidate.
 - With another explicit authority checkpoint, publish PyPI and stage or publish npm.
   Complete clean-environment post-publication smoke checks before announcing the
