@@ -1,6 +1,6 @@
 ---
 name: solodeveling-planning-work
-description: Convert a shaped Solodeveling work item into a proportional, executable implementation and verification plan. Use when scope and acceptance are clear but the sequence, affected boundaries, tests, security work, migration, or recovery approach is not yet ready for implementation. Supports Quick, Standard, and Critical work without team ceremony.
+description: Convert a shaped Solodeveling work item into a proportional, independently reviewable implementation and verification plan. Use when the user requests a plan, execution is not authorized yet, or material sequencing, boundary, security, migration, or recovery choices must be resolved before implementation. Skip clear authorized Standard mutations that can use solodeveling-standard-delivery.
 ---
 
 # Planning Work

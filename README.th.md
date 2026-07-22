@@ -68,7 +68,7 @@ pipx install solodeveling
 | --- | --- | --- |
 | Direct Read-Only | ตอบหรือสำรวจภายในสิทธิ์แบบไม่แก้ไขที่ผู้ใช้ให้มา | ไม่มี |
 | Quick | ลงมือทันทีเมื่อเจตนาชัดเจน และยกระดับเมื่อพบความเสี่ยง | งาน ephemeral ที่ปลอดภัยไม่ต้องเก็บ |
-| Standard | กำหนดรูปงาน วางแผน ลงมือ และตรวจสอบ พร้อมสถานะที่กลับมาทำต่อได้ | WORK หนึ่งไฟล์และ EVIDENCE สะสมหนึ่งไฟล์ |
+| Standard | ทำงานที่ชัดเจนผ่าน workflow เดียวตั้งแต่กำหนดรูป → วางแผน → ลงมือ → ตรวจสอบ และแยก workflow เมื่อมี boundary จริง | WORK แบบกระชับหนึ่งไฟล์และ EVIDENCE สะสมหนึ่งไฟล์ |
 | Critical | เพิ่ม security, recovery, provenance และ authorization gate ที่ชัดเจน | บันทึกงานและหลักฐานที่ตรวจสอบย้อนหลังได้ |
 
 งานต่อเนื่องขนาดจำกัดภายใน session เดียวจะใช้ Ephemeral Quick ก่อนเปิดหรือ reuse งาน
@@ -77,6 +77,18 @@ durable decision หรือยังอยู่ใน batch ที่ goal, a
 และ rollback ไม่เปลี่ยนแปลง Roadmap จะอัปเดตเฉพาะเมื่อ priority, milestone, ลำดับงาน
 หรือการตัดสินใจเลื่อนงานเปลี่ยนไป WORK เป็นเจ้าของ scope และ decision ส่วน EVIDENCE
 เป็นเจ้าของ checks และ limitations โดย state เก็บเฉพาะบริบทที่จำเป็นต่อการทำงานต่อ
+
+สำหรับ Standard ที่ทำต่อเนื่องใน session เดียว จะ persist `active` ครั้งเดียว แล้วเขียน
+หลักฐานสุดท้ายพร้อม `done` และ archive ครั้งเดียวหลัง verification สถานะระหว่างทางจะ
+persist เฉพาะเมื่อต้องข้าม session, มี blocker, ต้อง handoff, scope/risk เปลี่ยน หรือผู้ใช้
+ขอ checkpoint หลักฐาน automation ที่ยังครอบคลุมอยู่จะ reuse ตามขอบเขตจริง และ manual
+browser review จะตรวจเฉพาะคุณภาพภาพหรือ interaction ที่ automation ยังไม่พิสูจน์
+
+Backend query และ API handler ยังคงเป็น Standard โดยปริยาย งาน mapping, sorting, copy
+หรือ refactor ที่ให้ผลเท่าเดิมและเป็น read-only อาจคงเป็น Quick ได้เฉพาะเมื่อ access,
+ข้อมูล sensitive, validation, response compatibility, ข้อมูลที่บันทึก และ external effect
+ไม่เปลี่ยน พร้อม focused contract test ที่พิสูจน์ boundary นั้น หากมีความไม่แน่ใจให้คง
+เป็น Standard
 
 ### เมื่อใช้และไม่ใช้ Solodeveling
 
@@ -123,6 +135,10 @@ gate แยกต่างหาก Pilot 1 ล้มเหลวก่อน in
 ที่ใช้ไม่ได้ ไม่ใช่ผลการเปรียบเทียบ นอกจากนี้
 [แผนการวัดผลจาก feedback](docs/measurement.md) ได้ preregister pilot เปรียบเทียบ
 0.1.1 กับ 0.1.2 แบบ correctness-gated และ field scorecard จำนวนยี่สิบงานไว้แล้ว
+แผนเดียวกันยังเพิ่มการเปรียบเทียบ 30 calls ที่ยังไม่ได้รัน ระหว่าง Solodeveling
+0.2.0 ที่ pin ไว้กับแขนที่ไม่ใช้ skill จริง ครอบคลุมงาน read-only, Quick, Standard,
+งานต่อเนื่อง และการประเมินความพร้อมระดับ Critical โดยยึด correctness ก่อน
+preregistration เป็นเพียงแผนทดสอบ ไม่ใช่ผลบวกหรือคำกล่าวอ้างด้านประสิทธิภาพต่อสาธารณะ
 
 | หลักฐานจาก repository นี้ | ผลที่สังเกตได้ | สิ่งที่หลักฐานรองรับ |
 | --- | --- | --- |

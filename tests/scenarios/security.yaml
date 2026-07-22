@@ -18,6 +18,9 @@ scenarios:
   - id: security-stages-share-one-matrix
     skill: solodeveling-securing
     must_contain:
+      - Authority
+      - Invariant
+      - Failure
       - "one attack-surface matrix"
       - "Boundary"
       - "Control"

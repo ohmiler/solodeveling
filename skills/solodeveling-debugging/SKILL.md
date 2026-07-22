@@ -1,12 +1,16 @@
 ---
 name: solodeveling-debugging
-description: Diagnose a bug, failing test, regression, or unexpected software behavior from reproducible evidence before implementing a repair. Use whenever observed behavior differs from requirements or expectations, including intermittent failures, integration errors, build failures, and failed verification. Do not use for clearly understood planned implementation.
+description: Diagnose a bug, reproducible or unexplained failing test, regression, or unexpected software behavior from evidence before implementing a repair. Use for diagnosis requests and when bounded verification triage cannot isolate a transient harness or environment cause. Do not use for a clearly understood planned implementation or a single plausible transient failure before controlled rerun.
 ---
 
 # Debugging
 
 Do not guess at fixes. Preserve current evidence and find the root cause before
 implementation changes.
+
+Enter after the delivery or verification workflow inspects the first failure and, when
+a transient harness or environment cause is plausible, performs one controlled rerun
+without source edits. A repeated, unexplained, or behavior-level failure belongs here.
 
 ## Diagnose
 

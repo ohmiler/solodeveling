@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solodeveling Standard Delivery"
+  short_description: "Deliver clear Standard work end to end"
+  default_prompt: "Use $solodeveling-standard-delivery to deliver this clear Standard change from intent through verified completion."

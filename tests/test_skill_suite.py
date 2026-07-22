@@ -45,6 +45,7 @@ def test_router_stays_within_token_budget() -> None:
 
 def test_all_core_lifecycle_skills_exist() -> None:
     required = {
+        'solodeveling-standard-delivery',
         "solodeveling-shaping-work",
         "solodeveling-planning-work",
         "solodeveling-executing-work",
@@ -54,6 +55,36 @@ def test_all_core_lifecycle_skills_exist() -> None:
     installed = {path.name for path in Path("skills").iterdir() if path.is_dir()}
 
     assert required <= installed
+
+
+def test_standard_delivery_skill_has_interface_metadata() -> None:
+    root = Path('skills/solodeveling-standard-delivery')
+
+    assert (root / 'SKILL.md').is_file()
+    assert (root / 'agents/openai.yaml').is_file()
+
+
+def test_backend_delivery_contract_is_shared_without_duplication() -> None:
+    reference = Path('skills/solodeveling/references/backend-delivery.md')
+    text = reference.read_text('utf-8')
+
+    for phrase in (
+        'A query or API handler remains Standard unless every applicable condition',
+        'Keep one boundary record',
+        'These are focused minimums, not a command checklist',
+        'Triage backend verification failures',
+        'Use the additive migration template',
+    ):
+        assert phrase in text
+
+    consumers = (
+        Path('skills/solodeveling/SKILL.md'),
+        Path('skills/solodeveling-standard-delivery/SKILL.md'),
+        Path('skills/solodeveling-securing/SKILL.md'),
+        Path('skills/solodeveling-verifying/SKILL.md'),
+    )
+    for consumer in consumers:
+        assert 'backend-delivery.md' in consumer.read_text('utf-8')
 
 
 def test_validator_discovers_every_scenario_file() -> None:

@@ -78,6 +78,78 @@ scenarios:
       - "short"
       - "changelog"
 
+  - id: standard-delivery-owns-one-loop
+    skill: solodeveling-standard-delivery
+    must_contain:
+      - shape, plan, execute, and verify
+      - Persist `active` once
+      - persist `done`, and archive once
+      - session, is blocked
+
+  - id: standard-delivery-keeps-compact-artifacts
+    skill: solodeveling-standard-delivery
+    must_contain:
+      - 30–40 lines
+      - implementation plan
+      - verification mapping
+      - AC -> result -> evidence -> limitation
+
+  - id: standard-delivery-reuses-and-triages-evidence
+    skill: solodeveling-standard-delivery
+    must_contain:
+      - Reuse a current result
+      - manual browser review
+      - transient by default
+      - rerun once
+      - route the reproducible or unexplained failure
+
+  - id: backend-quick-carveout-fails-closed
+    skill: solodeveling
+    must_contain:
+      - Queries and APIs default to Standard
+      - every carve-out
+      - does not select or expose new sensitive data
+      - Authentication, authorization
+      - focused contract test
+      - Any uncertainty
+
+  - id: backend-owns-one-boundary-record
+    skill: solodeveling
+    must_contain:
+      - one boundary record
+      - Authority
+      - Invariant
+      - Failure
+      - Verification
+      - Recovery
+      - EVIDENCE records
+
+  - id: backend-broad-gates-are-effect-specific
+    skill: solodeveling
+    must_contain:
+      - focused minimums, not a command checklist
+      - Applicable
+      - Run the full suite once
+      - Do not run a broad gate merely because
+
+  - id: backend-triage-separates-capability-from-source
+    skill: solodeveling
+    must_contain:
+      - fixture or mock
+      - unavailable local database
+      - Missing credentials
+      - migration target
+      - Never use real credentials
+
+  - id: additive-migration-has-a-standard-template
+    skill: solodeveling
+    must_contain:
+      - additive, reversible migration
+      - fresh schema
+      - existing representative pre-migration schema
+      - old/new application compatibility
+      - Production execution still requires separate authority
+
   - id: no-core-workflow-requires-subagents
     skill: solodeveling-executing-work
     must_contain:
@@ -87,6 +159,7 @@ scenarios:
   - id: router-selects-lifecycle-skills
     skill: solodeveling
     must_contain:
+      - solodeveling-standard-delivery
       - "captured -> shaped -> ready -> active -> verifying -> done"
       - "solodeveling-shaping-work"
       - "solodeveling-planning-work"

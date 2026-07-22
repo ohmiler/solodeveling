@@ -1,6 +1,6 @@
 ---
 name: solodeveling-shaping-work
-description: Turn a selected but unclear software direction into bounded, decision-ready work with intent, users, outcomes, scope, acceptance, risks, and alternatives. Use after brainstorming when the user wants to formalize a direction, or for meaningful changes and repairs whose desired behavior or boundaries are unclear. Skip open-ended ideation and already-shaped work.
+description: Turn a selected but unclear software direction into bounded, decision-ready work with intent, users, outcomes, scope, acceptance, risks, and alternatives. Use after brainstorming, when the user wants a separate shaping result, or when a material product, architecture, scope, safety, or authority question blocks delivery. Skip open-ended ideation, already-shaped work, and clear Standard mutations that can use solodeveling-standard-delivery.
 ---
 
 # Shaping Work

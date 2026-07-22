@@ -24,3 +24,27 @@ def test_portable_workflow_suite_reaches_verifying_without_superpowers() -> None
     debugging = Path("skills/solodeveling-debugging/SKILL.md").read_text("utf-8")
     assert "root cause" in debugging.lower()
     assert current is WorkStatus.VERIFYING
+
+
+def test_standard_delivery_owns_the_uninterrupted_standard_trace() -> None:
+    skill = Path('skills/solodeveling-standard-delivery/SKILL.md').read_text('utf-8')
+
+    for phrase in (
+        'Shape, plan, execute, and verify',
+        'Persist `active` once',
+        'persist `done`, and archive once',
+        'controlled condition',
+    ):
+        assert phrase.lower() in skill.lower()
+
+    current = WorkStatus.CAPTURED
+    for target in (
+        WorkStatus.SHAPED,
+        WorkStatus.READY,
+        WorkStatus.ACTIVE,
+        WorkStatus.VERIFYING,
+    ):
+        validate_transition(current, target, {'level': 'standard'})
+        current = target
+
+    assert current is WorkStatus.VERIFYING

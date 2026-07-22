@@ -68,7 +68,7 @@ and integrity controls.
 | --- | --- | --- |
 | Direct Read-Only | Answer or inspect within the user's non-mutating authority | None |
 | Quick | Act immediately when intent is clear; escalate if risk appears | None required for safe ephemeral work |
-| Standard | Shape, plan, implement, and verify with resumable state | One WORK item and one cumulative EVIDENCE file |
+| Standard | Run clear work through one shape → plan → implement → verify workflow; split only at a real boundary | One compact WORK item and one cumulative EVIDENCE file |
 | Critical | Add security, recovery, provenance, and explicit authorization gates | Auditable work and evidence records |
 
 A bounded same-session follow-up uses Ephemeral Quick before reopening or reusing
@@ -78,6 +78,18 @@ with unchanged goal, acceptance, authority, risk, release boundary, and rollback
 Roadmap updates happen only when priority, milestone, ordering, or a deferred-work decision changes.
 WORK owns scope and decisions, EVIDENCE owns checks and limitations, and
 state contains only the context needed to resume.
+
+During uninterrupted Standard delivery, persist `active` once and write final
+evidence plus `done` and archive once after verification. Persist an intermediate
+phase only for a session boundary, blocker, handoff, scope/risk change, or requested
+checkpoint. Reuse current automated evidence for the exact coverage it proves;
+manual browser review fills only the remaining visual or interaction gaps.
+
+Backend queries and API handlers default to Standard. A bounded read-only mapping,
+sorting, copy, or observationally equivalent refactor may stay Quick only when
+access, sensitivity, validation, response compatibility, stored data, and external
+effects remain unchanged and a focused contract test proves the exact boundary.
+Any uncertainty keeps the work Standard.
 
 ### With and without Solodeveling
 
@@ -128,6 +140,10 @@ not activate either methodology; and Pilot 3 could not mutate through the broken
 Windows sandbox. These are invalid measurement runs, not a comparative result.
 A separate [feedback measurement plan](docs/measurement.md) preregisters a
 correctness-gated 0.1.1-versus-0.1.2 pilot and a local twenty-task field scorecard.
+The same plan now includes an unrun, correctness-first 30-call comparison between
+pinned Solodeveling 0.2.0 and a true no-skill arm across read-only, Quick, Standard,
+continuation, and Critical-readiness work. A preregistration is a test plan, not a
+positive result or a public performance claim.
 
 | Evidence from this repository | Observed result | What it supports |
 | --- | --- | --- |
