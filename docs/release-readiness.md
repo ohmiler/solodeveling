@@ -43,14 +43,20 @@ checkpoint.
 - The 30-call Solodeveling 0.2.0-versus-no-skill pilot is preregistered and passed
   offline fixture checks. It has not run, is not a 0.3.0 release gate, and provides
   no comparative result or public performance claim.
-- Focused benchmark and workflow checks passed before their local commits. The full
-  source and candidate gates must still run against the exact release-preparation
-  revision.
+- Exact source revision d0e9bcbaef88b301561fe4f6a530e0897378b2c9 passed
+  281 Python tests, skill/protocol validation, npm tests, compilation, dependency
+  checks, diff review, fresh-wheel installed smoke, and candidate verification.
 - Tenant policy denied the three-call live routing pilot before execution even after
   informed owner approval. On 2026-07-22 the owner accepted the missing live evidence
   only for local candidate construction; the gap remains unverified.
 - Python, npm, artifact, native-output, current-version tests, and release notes are
   being advanced together to 0.3.0 under that bounded local-candidate acceptance.
+- The verified Python candidate contains wheel SHA-256
+  e8898b324edf33978e01905396702d1841f892cc21c1b281f509ddacd4b41f67
+  and sdist SHA-256
+  8bc9ae2cec4e9e7e0dedaa7be21f466e3484ee76a89a3242cb3cc824db060c0e.
+  The Windows x64 native smoke passed for SHA-256
+  cab76a3c49af00beef50fcbfa2e5549aebfdcb46bcae51295a807ad765e4957f.
 - No push, pull request, tag, GitHub Release, registry action, live-agent call, or
   production mutation is authorized by this preparation.
 
@@ -62,8 +68,6 @@ Codex, Claude Code, and Cursor. Native executables remain unsigned.
 - Resolve the missing live routing evidence in an approved environment or obtain a
   new explicit release-level risk acceptance before tag or publication. The current
   acceptance expires when local candidate inspection ends.
-- Complete the local candidate gate from a clean exact commit and independently
-  verify the resulting Python candidate.
 - Complete the cross-platform CI candidate so all six native executables can be bound
   into the npm tarball and complete release set.
 - Continue dogfooding representative tasks while recording tool calls, memory writes,

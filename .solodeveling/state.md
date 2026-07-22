@@ -1,9 +1,8 @@
 ---
 solodeveling_schema: 1
-current_goal: Run the authorized three-task routing pilot and, only if it passes,
-  build and verify a local Solodeveling 0.3.0 candidate.
-active_work:
-- WORK-043
+current_goal: Preserve the verified local 0.3.0 candidate while keeping live-routing,
+  cross-platform, and public-release gaps explicit.
+active_work: []
 blockers: []
 risks:
 - Synthetic fixtures and self-authored evaluation are not independent comparative
@@ -16,12 +15,12 @@ risks:
   diagnosis-only, or verification-only boundaries.
 - Backend Quick routing must fail closed when API compatibility or sensitivity is
   unclear.
-next_action: Bump all current release surfaces to 0.3.0 and build local Python and
-  Windows candidates from an exact clean source revision.
+next_action: Do not tag or publish. Resolve live routing and cross-platform release-set
+  gates, or obtain new explicit release-level acceptance and external-action authority.
 ---
 # State
 
-WORK-043 has owner acceptance for the missing AC2 live evidence through local
-candidate inspection only. Version surfaces are advancing to 0.3.0; AC2 remains
-unverified and acceptance expires before public release. Push, tag, publication, the
-30-call comparison, and production remain unauthorized.
+WORK-043 archived ready-with-accepted-gap for local candidate inspection. Version
+0.3.0 source d0e9bcb produced verified Python and Windows x64 candidates; exact-source
+gates passed. Live routing, five native targets, npm release set, signing, push, tag,
+publication, the 30-call comparison, and production remain unverified or unauthorized.

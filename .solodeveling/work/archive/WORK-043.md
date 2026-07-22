@@ -2,7 +2,7 @@
 solodeveling_schema: 1
 id: WORK-043
 title: Gate and build the local Solodeveling 0.3.0 candidate
-status: active
+status: done
 level: standard
 type: release
 goal: Run the authorized three-scenario Codex routing pilot and, only if it passes,
@@ -42,8 +42,7 @@ decisions:
 verification:
 - Validate the pilot corpus and dry-run plan, run exactly three live Codex scenarios,
   inspect sanitized results, then run focused/full source and candidate gates.
-next_action: Advance version surfaces and release notes to 0.3.0, verify source gates,
-  commit the exact source revision, and build local Python and Windows candidates.
+next_action: None; archived with a local-candidate-only accepted gap.
 evidence:
 - EVIDENCE-043
 ---
@@ -65,3 +64,6 @@ evidence:
 - The owner explicitly accepted missing AC2 evidence for local candidate construction
   only. AC2 remains unverified and must be resolved or accepted again at the separate
   public-release decision.
+- Source revision d0e9bcbaef88b301561fe4f6a530e0897378b2c9 passed exact-source
+  gates. Its Python candidate, fresh-wheel installed smoke, and Windows x64 native
+  smoke passed. Cross-platform release-set and public-release gates remain open.
