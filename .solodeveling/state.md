@@ -1,25 +1,30 @@
 ---
 solodeveling_schema: 1
-current_goal: Hold the 0.3.0 version bump until the representative routing pilot is
-  separately authorized and reviewed.
-active_work: []
-blockers: []
+current_goal: Run the authorized three-task routing pilot and, only if it passes,
+  build and verify a local Solodeveling 0.3.0 candidate.
+active_work:
+- WORK-043
+blockers:
+- Live pilot policy gate requires explicit informed owner approval before canonical
+  skill and scenario text from this private workspace may be sent to external Codex.
 risks:
 - Synthetic fixtures and self-authored evaluation are not independent comparative
   proof; speed or quality claims still require a controlled repeated benchmark.
-- Live execution would consume signed-in Codex capacity and remains unauthorized.
+- The authorized three-task live pilot consumes signed-in Codex capacity; the
+  separate 30-call comparative benchmark remains unauthorized.
 - Native executables remain unsigned; launcher integrity checks reduce substitution
   risk but do not provide platform code signing.
 - Combined Standard routing must not bypass ambiguity, Critical, security, release,
   diagnosis-only, or verification-only boundaries.
 - Backend Quick routing must fail closed when API compatibility or sensitivity is
   unclear.
-next_action: Ask the owner whether to authorize the three-task live routing pilot;
-  if it passes, bump all version surfaces to 0.3.0 and build a clean candidate.
+next_action: Ask for explicit informed approval of the external Codex transmission;
+  then run exactly three preregistered scenarios and stop on any non-pass result.
 ---
 # State
 
-WORK-042 archived after separating benchmark commit 26f0ac5 and workflow commit
-0429dba on local branch release/0.3.0. Full source verification passed with 280 tests,
-skill-suite validation, and protocol validation. Raw feedback remains outside Git.
-No live call, version bump, candidate, push, tag, or publication occurred.
+WORK-043 preregistration and offline preflight passed with 35 evaluation tests and a
+three-call read-only dry-run. The live command was denied before execution because
+private-workspace skill and scenario text require explicit informed approval for
+external Codex transmission. No model call occurred and version remains 0.2.0. Push,
+tag, publication, the 30-call comparison, and production remain unauthorized.

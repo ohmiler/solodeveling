@@ -25,6 +25,9 @@ SCENARIOS = Path("evals/scenarios/core.yaml")
 RESPONSE_SCHEMA = Path("evals/evaluation-response.schema.json")
 
 
+RELEASE_030_SCENARIOS = Path('evals/release-pilots/0.3.0/core.yaml')
+
+
 def passing_response(scenario) -> dict[str, object]:
     expected = scenario.expected
     return {
@@ -66,6 +69,41 @@ def test_every_expected_response_conforms_to_shared_schema() -> None:
     schema = json.loads(RESPONSE_SCHEMA.read_text("utf-8"))
 
     for scenario in load_scenarios(SCENARIOS):
+        jsonschema.validate(passing_response(scenario), schema)
+
+
+def test_release_030_pilot_covers_standard_and_critical_routing() -> None:
+    scenarios = load_scenarios(RELEASE_030_SCENARIOS)
+    expected = {
+        scenario.identifier: (
+            scenario.expected.level,
+            scenario.expected.workflow,
+            scenario.expected.action,
+        )
+        for scenario in scenarios
+    }
+
+    assert expected == {
+        'release-0.3.0-standard-frontend': (
+            'standard',
+            'solodeveling-standard-delivery',
+            'proceed',
+        ),
+        'release-0.3.0-standard-backend': (
+            'standard',
+            'solodeveling-standard-delivery',
+            'proceed',
+        ),
+        'release-0.3.0-critical-backend-readiness': (
+            'critical',
+            'solodeveling-shaping-work',
+            'clarify',
+        ),
+    }
+    assert all(scenario.smoke for scenario in scenarios)
+
+    schema = json.loads(RESPONSE_SCHEMA.read_text('utf-8'))
+    for scenario in scenarios:
         jsonschema.validate(passing_response(scenario), schema)
 
 
