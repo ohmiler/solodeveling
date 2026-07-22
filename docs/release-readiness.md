@@ -32,56 +32,33 @@ creation, GitHub Release creation, environment changes, PyPI publication, npm
 staging, and npm publication are each a separate external action and authorization
 checkpoint.
 
-## 0.3.0 preparation status — 2026-07-22
+## 0.3.0 published status — 2026-07-22
 
-- The next feature release is isolated locally on `release/0.3.0`. Commit `26f0ac5`
-  contains the pinned no-skill benchmark harness; commit `0429dba` contains the
-  frontend and backend workflow-feedback implementation.
-- Clear non-Critical Standard work now has one combined delivery workflow. Backend
-  work has fail-closed Quick routing, one shared boundary record, effect-specific
-  gates, capability-aware triage, and an additive migration template.
-- The 30-call Solodeveling 0.2.0-versus-no-skill pilot is preregistered and passed
-  offline fixture checks. It has not run, is not a 0.3.0 release gate, and provides
-  no comparative result or public performance claim.
-- Exact source revision d0e9bcbaef88b301561fe4f6a530e0897378b2c9 passed
-  281 Python tests, skill/protocol validation, npm tests, compilation, dependency
-  checks, diff review, fresh-wheel installed smoke, and candidate verification.
-- Tenant policy denied the three-call live routing pilot before execution even after
-  informed owner approval. On 2026-07-22 the owner accepted the missing live evidence
-  only for local candidate construction; the gap remains unverified.
-- Python, npm, artifact, native-output, current-version tests, and release notes are
-  being advanced together to 0.3.0 under that bounded local-candidate acceptance.
-- The verified Python candidate contains wheel SHA-256
-  e8898b324edf33978e01905396702d1841f892cc21c1b281f509ddacd4b41f67
-  and sdist SHA-256
-  8bc9ae2cec4e9e7e0dedaa7be21f466e3484ee76a89a3242cb3cc824db060c0e.
-  The Windows x64 native smoke passed for SHA-256
-  cab76a3c49af00beef50fcbfa2e5549aebfdcb46bcae51295a807ad765e4957f.
-- No push, pull request, tag, GitHub Release, registry action, live-agent call, or
-  production mutation is authorized by this preparation.
+- Exact protected-main source revision
+  `1bdfadd137c30f64b4d6308fe49975e81988644d` passed main CI and candidate run
+  `29927763248`, including all six native targets and complete release-set assembly.
+- Annotated tag `v0.3.0` and the immutable non-draft GitHub Release contain the exact
+  13 verified and attested files from that candidate.
+- Protected publish run `29931781583` published the matching wheel and sdist to PyPI
+  through OIDC and staged the matching npm tarball for owner review. Owner 2FA
+  approval published npm stage `3860fd61-a8a4-473b-8eb4-1693eebe3cb9`.
+- Public PyPI/npm digests and provenance match the release. Clean no-cache pip,
+  isolated uvx, and clean-cache npx report 0.3.0; the downloaded Windows x64 native
+  executable matches the release manifest.
+- The owner explicitly accepted missing three-call live routing evidence for this
+  exact public release after tenant policy prevented execution. The 30-call
+  comparison did not run and supports no performance or comparative quality claim.
 
 Tier 1 remains unverified because the complete behavioral matrix has not passed on
-Codex, Claude Code, and Cursor. Native executables remain unsigned.
+Codex, Claude Code, and Cursor. Native executables remain unsigned. Corrections must
+use a newly reviewed version; immutable release or registry bytes must not be replaced.
 
-## Remaining 0.3.0 gates
+## Post-release follow-up
 
-- Resolve the missing live routing evidence in an approved environment or obtain a
-  new explicit release-level risk acceptance before tag or publication. The current
-  acceptance expires when local candidate inspection ends.
-- Complete the cross-platform CI candidate so all six native executables can be bound
-  into the npm tarball and complete release set.
-- Continue dogfooding representative tasks while recording tool calls, memory writes,
-  broad-gate runs, reopen/archive counts, elapsed verification time, and escaped
-  regressions. Any Critical under-classification blocks release.
-- Reconcile source behavior, release notes, package inventories, checksums, SBOM,
-  scenario results, and known limitations.
-- Confirm the protected PyPI and npm environments and trusted-publisher identities
-  still match `publish.yml` before any registry action.
-- With separate explicit authority, create tag `v0.3.0` at the verified source
-  revision and create the immutable GitHub Release from that exact candidate.
-- With another explicit authority checkpoint, publish PyPI and stage or publish npm.
-  Complete clean-environment post-publication smoke checks before announcing the
-  release.
+- Continue representative dogfooding and record escaped regressions or any Critical
+  under-classification.
+- Keep live-routing, Tier 1, signing, and comparative-evidence limitations visible.
+- Do not rerun the preregistered 30-call comparison without exact authorization.
 
 ## Complete release-set gate
 
