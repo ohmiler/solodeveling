@@ -36,12 +36,14 @@ decisions:
 - Use the existing sanitized, read-only evaluation harness and Codex runtime only.
 - Require all deterministic scalar and signal gates; do not use an AI judge.
 - Build only local non-publishing artifacts and leave external actions unauthorized.
+- On 2026-07-22 the owner explicitly accepted missing AC2 live evidence only for local
+  candidate construction. This does not convert AC2 to passed and expires before any
+  tag or publication decision.
 verification:
 - Validate the pilot corpus and dry-run plan, run exactly three live Codex scenarios,
   inspect sanitized results, then run focused/full source and candidate gates.
-next_action: Do not retry live execution in this environment. Either verify a
-  sanitized three-scenario result produced in an owner-approved environment or obtain
-  explicit owner acceptance to waive AC2 before any version bump.
+next_action: Advance version surfaces and release notes to 0.3.0, verify source gates,
+  commit the exact source revision, and build local Python and Windows candidates.
 evidence:
 - EVIDENCE-043
 ---
@@ -60,3 +62,6 @@ evidence:
 - The owner then supplied the exact informed approval. Tenant policy still denied the
   invocation because this environment forbids that external transmission even with
   approval. No model call occurred; retry or indirect execution is prohibited.
+- The owner explicitly accepted missing AC2 evidence for local candidate construction
+  only. AC2 remains unverified and must be resolved or accepted again at the separate
+  public-release decision.

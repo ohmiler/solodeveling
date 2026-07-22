@@ -14,6 +14,7 @@ CURRENT_DOCS = (
     Path('docs/releases/0.1.1.md'),
     Path('docs/releases/0.1.2.md'),
     Path('docs/releases/0.2.0.md'),
+    Path('docs/releases/0.3.0.md'),
 )
 
 

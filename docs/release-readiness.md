@@ -46,8 +46,11 @@ checkpoint.
 - Focused benchmark and workflow checks passed before their local commits. The full
   source and candidate gates must still run against the exact release-preparation
   revision.
-- Python, npm, artifact, native-output, and current-version tests intentionally remain
-  at 0.2.0 until the representative routing pilot is reviewed.
+- Tenant policy denied the three-call live routing pilot before execution even after
+  informed owner approval. On 2026-07-22 the owner accepted the missing live evidence
+  only for local candidate construction; the gap remains unverified.
+- Python, npm, artifact, native-output, current-version tests, and release notes are
+  being advanced together to 0.3.0 under that bounded local-candidate acceptance.
 - No push, pull request, tag, GitHub Release, registry action, live-agent call, or
   production mutation is authorized by this preparation.
 
@@ -56,11 +59,9 @@ Codex, Claude Code, and Cursor. Native executables remain unsigned.
 
 ## Remaining 0.3.0 gates
 
-- With separate capacity authorization, run one clear Standard frontend task, one
-  Standard backend task, and one Critical backend readiness task. Any Critical
-  under-classification or combined-workflow bypass blocks the version bump.
-- Review the routing-pilot evidence. If it passes, advance Python and npm metadata,
-  artifact manifests, current-version tests, and release notes together to 0.3.0.
+- Resolve the missing live routing evidence in an approved environment or obtain a
+  new explicit release-level risk acceptance before tag or publication. The current
+  acceptance expires when local candidate inspection ends.
 - Complete the local candidate gate from a clean exact commit and independently
   verify the resulting Python candidate.
 - Complete the cross-platform CI candidate so all six native executables can be bound
